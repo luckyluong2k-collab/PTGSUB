@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=45">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -39,6 +39,14 @@
           <summary class="menu-section-summary">Quản lý đăng nhập</summary>
           <div class="menu-section-body">
             <p id="authStatus">Vui lòng đăng nhập bằng Gmail để truy cập website.</p>
+            <div class="browser-warning" id="browserWarning" hidden>
+              <strong>Điện thoại cần mở bằng Safari/Chrome</strong>
+              <span>Google chặn đăng nhập trong trình duyệt nhúng của Zalo, Facebook, Messenger. Hãy bấm dấu ba chấm rồi chọn mở bằng Safari/Chrome, hoặc sao chép link bên dưới.</span>
+              <div class="browser-warning-actions">
+                <button class="filter-reset" id="copyAppLinkBtn" type="button">Sao chép link web</button>
+                <a id="openBrowserLink" href="./">Mở lại web</a>
+              </div>
+            </div>
             <div class="auth-actions">
               <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
               <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
@@ -286,8 +294,8 @@
   </main>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="unit-data.js"></script>
-  <script src="app.js"></script>
-  <script type="module" src="firebase-auth.js"></script>
+  <script src="unit-data.js?v=45"></script>
+  <script src="app.js?v=45"></script>
+  <script type="module" src="firebase-auth.js?v=45"></script>
 </body>
 </html>

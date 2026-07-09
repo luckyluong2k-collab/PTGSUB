@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v42-menu-sections";
+const CACHE_NAME = "park-pricing-v45-menu-depth";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./unit-data.js",
-  "./app.js",
-  "./firebase-auth.js",
+  "./styles.css?v=45",
+  "./unit-data.js?v=45",
+  "./app.js?v=45",
+  "./firebase-auth.js?v=45",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",

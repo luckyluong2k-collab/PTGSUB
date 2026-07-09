@@ -3,6 +3,7 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -71,6 +72,9 @@ const myHistoryList = document.querySelector("#myHistoryList");
 const loginIntro = document.querySelector("#loginIntro");
 const loginMenuSection = document.querySelector("#loginMenuSection");
 const protectedMenuItems = Array.from(document.querySelectorAll("[data-auth-menu]"));
+const browserWarning = document.querySelector("#browserWarning");
+const copyAppLinkBtn = document.querySelector("#copyAppLinkBtn");
+const openBrowserLink = document.querySelector("#openBrowserLink");
 
 let currentUserId = "";
 let currentUserEmail = "";
@@ -102,6 +106,22 @@ function moneyText(value) {
 
 function setStatus(message) {
   if (authStatus) authStatus.textContent = message;
+}
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+}
+
+function isBlockedOAuthBrowser() {
+  const ua = navigator.userAgent || "";
+  return /FBAN|FBAV|FBIOS|FB_IAB|Instagram|Line|MicroMessenger|Zalo|Messenger|wv\)/i.test(ua);
+}
+
+function updateBrowserWarning(force = false) {
+  const shouldShow = force || isBlockedOAuthBrowser();
+  if (browserWarning) browserWarning.hidden = !shouldShow;
+  if (openBrowserLink) openBrowserLink.href = window.location.href;
+  return shouldShow;
 }
 
 function setMenuAuthState(isInsideApp) {
@@ -137,6 +157,7 @@ function hideApp(message) {
   if (adminPanel) adminPanel.hidden = true;
   if (myHistoryPanel) myHistoryPanel.hidden = true;
   setMenuAuthState(false);
+  updateBrowserWarning(false);
   setStatus(message);
   openDrawer();
 }
@@ -428,13 +449,43 @@ if (accountTab) {
 
 if (authCloseBtn) authCloseBtn.addEventListener("click", closeDrawer);
 
+if (copyAppLinkBtn) {
+  copyAppLinkBtn.addEventListener("click", async () => {
+    const link = window.location.href;
+    try {
+      await navigator.clipboard.writeText(link);
+      copyAppLinkBtn.textContent = "Đã sao chép link";
+    } catch (error) {
+      copyAppLinkBtn.textContent = "Không sao chép được";
+      setStatus(`Hãy copy link này rồi mở bằng Safari/Chrome: ${link}`);
+    }
+    window.setTimeout(() => {
+      copyAppLinkBtn.textContent = "Sao chép link web";
+    }, 1800);
+  });
+}
+
 if (loginBtn) {
   loginBtn.addEventListener("click", async () => {
+    if (updateBrowserWarning(false)) {
+      setStatus("Google đang chặn trình duyệt trong app này. Hãy mở web bằng Safari/Chrome rồi đăng nhập lại.");
+      return;
+    }
+
     try {
       loginBtn.disabled = true;
       loginBtn.textContent = "Đang mở Google...";
+      if (isMobileDevice()) {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
       await signInWithPopup(auth, provider);
     } catch (error) {
+      if (error?.code === "auth/popup-blocked" || error?.code === "auth/cancelled-popup-request") {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+      if (String(error?.message || error).includes("disallowed_useragent")) updateBrowserWarning(true);
       setStatus(`Không đăng nhập được: ${authErrorMessage(error)}`);
     } finally {
       loginBtn.disabled = false;
@@ -458,6 +509,7 @@ document.addEventListener("input", (event) => {
 });
 
 hideApp("Vui lòng đăng nhập bằng Gmail để truy cập website.");
+updateBrowserWarning(false);
 
 onAuthStateChanged(auth, async (user) => {
   try {

@@ -1140,6 +1140,89 @@ function row(label, value, className = "") {
   return `<div class="row ${className}"><span>${emphasizePercentText(label, markPercent)}</span><strong>${emphasizePercentText(value, markPercent)}</strong></div>`;
 }
 
+function safeText(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function quoteCardStat(label, value, icon, tone = "primary") {
+  return `
+    <div class="quote-stat quote-stat-${tone}">
+      <div class="quote-stat-top">
+        <span>${safeText(label)}</span>
+        <em>${safeText(icon)}</em>
+      </div>
+      <strong>${safeText(value)}</strong>
+    </div>`;
+}
+
+function quoteCardDetail(label, value, className = "") {
+  const markPercent = shouldEmphasizePercent(label);
+  const formattedValue = emphasizePercentText(safeText(value), markPercent);
+  return `
+    <div class="quote-detail ${className}">
+      <span>${safeText(label)}</span>
+      <strong>${formattedValue}</strong>
+    </div>`;
+}
+
+function renderQuoteCard(result, isLoan, isTts) {
+  const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const scenario = scenarioLabel(activeScenario, result.policy);
+  const depositRow = result.schedule[0] || ["Cọc", 0];
+  const paymentRow = result.schedule[1] || ["Đợt tiếp theo", 0];
+  const stats = [
+    quoteCardStat("Tổng giá thanh toán", money(result.total), "VND", "primary"),
+  ];
+
+  if (isLoan) {
+    stats.push(quoteCardStat("Trả trước 25%", money(result.upfront), "25%", "warm"));
+    stats.push(quoteCardStat(`NH giải ngân ${percent(result.loanRatio)}`, money(result.bankDisbursement), "NH", "blue"));
+  } else if (isTts) {
+    stats.push(quoteCardStat(depositRow[0], money(depositRow[1]), "Cọc", "warm"));
+    stats.push(quoteCardStat(paymentRow[0], money(paymentRow[1]), "TTS", "blue"));
+  } else {
+    stats.push(quoteCardStat("Giá đã gồm VAT/KPBT", money(result.listedGross), "VAT", "warm"));
+    stats.push(quoteCardStat("Giá thô sau CK", money(result.rawGrossAfterDiscount), "CK", "blue"));
+  }
+
+  const details = [
+    quoteCardDetail("Mã căn", unitCode),
+    quoteCardDetail("Nhóm tòa", result.policy.name),
+    ...(result.policy.customerHandover
+      ? [quoteCardDetail("Ngày dự kiến nhận bàn giao nhà", formatDateText(result.policy.customerHandover))]
+      : []),
+    quoteCardDetail("Giá đã gồm VAT/KPBT", money(result.listedGross)),
+    quoteCardDetail("Giá thô sau CK", money(result.rawGrossAfterDiscount)),
+    quoteCardDetail("Giá nội thất/hoàn thiện", money(result.completion)),
+  ];
+
+  if (result.ttsRate) {
+    details.push(quoteCardDetail("Tỷ lệ TTS đang áp dụng", percent(result.ttsRate)));
+  }
+  if (isLoan) {
+    details.push(quoteCardDetail("HTLS", result.policy.loanSupport, "wide"));
+  }
+
+  return `
+    <article class="quote-card" aria-label="Phiếu báo giá ${safeText(unitCode)}">
+      <div class="quote-card-hero">
+        <div>
+          <p class="quote-eyebrow">Phiếu báo giá nhanh</p>
+          <h3>${safeText(unitCode)} - ${safeText(result.policy.name)}</h3>
+          <p class="quote-subtitle">Phương án: <strong>${safeText(scenario)}</strong></p>
+        </div>
+        <span class="quote-badge">${safeText(scenario)}</span>
+      </div>
+      <div class="quote-stats">${stats.join("")}</div>
+      <div class="quote-detail-grid">${details.join("")}</div>
+    </article>`;
+}
+
 function render() {
   const policy = policies[els.policyGroup.value] || policies.P3P9;
   syncPolicyControls(policy);
@@ -1165,27 +1248,7 @@ function render() {
     els.upfrontPrice.textContent = "";
   }
 
-  const rows = [
-    row("Phương án", scenarioLabel(activeScenario, result.policy), "highlight"),
-    row("Mã căn", els.unitCode.value.trim() || "Căn hộ", "strong-value"),
-    row("Nhóm tòa", result.policy.name),
-    ...(result.policy.customerHandover ? [row("Ngày dự kiến nhận bàn giao nhà", formatDateText(result.policy.customerHandover), "highlight")] : []),
-    row("Giá đã gồm VAT/KPBT", money(result.listedGross)),
-    row("Giá thô sau CK", money(result.rawGrossAfterDiscount)),
-    row("Giá nội thất/hoàn thiện", money(result.completion)),
-    row("Tổng giá thanh toán", money(result.total), "highlight"),
-  ];
-  if (isLoan) {
-    rows.push(row("Trả trước 25% để báo", money(result.upfront), "highlight"));
-    rows.push(row(`Ngân hàng giải ngân ${percent(result.loanRatio)}`, money(result.bankDisbursement)));
-  }
-  if (result.ttsRate) {
-    rows.push(row("Tỷ lệ TTS đang áp dụng", percent(result.ttsRate)));
-  }
-  if (isLoan) {
-    rows.push(row("HTLS", result.policy.loanSupport));
-  }
-  els.resultRows.innerHTML = rows.join("");
+  els.resultRows.innerHTML = renderQuoteCard(result, isLoan, isTts);
 
   const discountRows = result.discounts.map((item) => {
     const label = item.rate ? `${item.label}` : item.label;
@@ -1338,7 +1401,7 @@ els.copyBtn.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js").catch(() => {});
+  navigator.serviceWorker.register("service-worker.js?v=45").catch(() => {});
 }
 
 syncBaseFromGross();
