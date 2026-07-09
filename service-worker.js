@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v39-login-intro";
+const CACHE_NAME = "park-pricing-v40-sun-logo";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,10 @@ const ASSETS = [
   "./firebase-auth.js",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./favicon.png",
+  "./apple-touch-icon.png",
+  "./sun-group-icon.png",
+  "./sun-group-logo.png",
 ];
 
 self.addEventListener("install", (event) => {

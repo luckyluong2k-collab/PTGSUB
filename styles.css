@@ -72,6 +72,16 @@ select {
   min-width: 0;
 }
 
+.brand-logo {
+  flex: 0 0 auto;
+  width: clamp(58px, 12vw, 86px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid rgba(244, 179, 94, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(120, 18, 18, 0.18);
+}
+
 .eyebrow {
   margin: 0 0 4px;
   color: var(--brand);
@@ -1051,5 +1061,8 @@ input[readonly] {
   .auth-drawer {
     width: min(100vw, 390px);
     padding-left: 48px;
+  }
+  .brand-logo {
+    width: 58px;
   }
 }
