@@ -873,10 +873,11 @@ function buildStandardSchedule(result) {
   const secondDate = addDays(quoteDate, 9);
   const installmentDates = spreadDates(addDays(secondDate, 60), addDays(handoverDate, -14), 15);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
+  const paymentBasisRawWithVat = result.paymentBasisRawWithVat || result.rawWithVat;
 
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
-    [`Lần 2 - 15% (${formatDateText(secondDate)})`, round(result.rawWithVat * 0.15 - deposit)],
+    [`Lần 2 - 15% (${formatDateText(secondDate)})`, round(paymentBasisRawWithVat * 0.15 - deposit)],
   ];
 
   if (completion.total) {
@@ -931,11 +932,12 @@ function buildTtsSchedule(result) {
   const deadline = ttsDeadlineFromQuote(els.quoteDate.value);
   const handoverDate = dateFromText(result.policy.handover);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
+  const paymentBasisRawWithVat = result.paymentBasisRawWithVat || result.rawWithVat;
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
     [
       `Thanh toán sớm ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
-      Math.max(0, round(result.rawWithVat * ttsRatio - deposit)),
+      Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit)),
     ],
   ];
 
@@ -1058,19 +1060,20 @@ function calculate(options = {}) {
   const completion = completionValue(policy, unitType, area);
   const total = rawGrossAfterDiscount + completion;
   const rawWithVat = netAfterDiscount + vat;
+  const noGuaranteeBasis = includeGuarantee
+    ? calculate({ scenario, includeGuarantee: false })
+    : null;
+  const paymentBasisRawWithVat = noGuaranteeBasis
+    ? noGuaranteeBasis.netAfterDiscount + noGuaranteeBasis.vat
+    : rawWithVat;
   const bankDisbursement = scenario === "loan" ? round(rawWithVat * loanRatio) : 0;
   const deposit = depositByType[unitType] || 0;
 
   let upfront = 0;
   let schedule = [];
   if (scenario === "loan") {
-    const noGuarantee = includeGuarantee
-      ? calculate({ scenario: "loan", includeGuarantee: false })
-      : null;
-    const basis = noGuarantee || { netAfterDiscount, vat };
-    const basisRawWithVat = basis.netAfterDiscount + basis.vat;
-    const payment2 = round(basisRawWithVat * 0.15 - deposit);
-    const payment4 = round(basisRawWithVat * 0.10);
+    const payment2 = round(paymentBasisRawWithVat * 0.15 - deposit);
+    const payment4 = round(paymentBasisRawWithVat * 0.10);
     upfront = deposit + payment2 + payment4;
 
     schedule = [
@@ -1094,6 +1097,7 @@ function calculate(options = {}) {
       maintenance,
       total,
       rawWithVat,
+      paymentBasisRawWithVat,
     });
   } else {
     schedule = buildTtsSchedule({
@@ -1106,6 +1110,7 @@ function calculate(options = {}) {
       maintenance,
       total,
       rawWithVat,
+      paymentBasisRawWithVat,
     });
   }
 
@@ -1127,6 +1132,7 @@ function calculate(options = {}) {
     completion,
     total,
     rawWithVat,
+    paymentBasisRawWithVat,
     bankDisbursement,
     loanRatio,
     upfront,
@@ -1170,6 +1176,28 @@ function quoteCardDetail(label, value, className = "") {
     </div>`;
 }
 
+function quoteCardDiscountSummary(discounts) {
+  const totalDiscount = discounts.reduce((sum, item) => sum + round(item.amount), 0);
+  const rows = discounts.length
+    ? discounts.map((item) => {
+      const markPercent = shouldEmphasizePercent(item.label);
+      const label = emphasizePercentText(safeText(item.label), markPercent);
+      return `
+        <li>
+          <span>${label}</span>
+          <strong>${safeText(money(item.amount))}</strong>
+        </li>`;
+    }).join("")
+    : `<li><span>Chưa có chiết khấu</span><strong>${safeText(money(0))}</strong></li>`;
+
+  return `
+    <div class="quote-detail quote-discount-summary wide">
+      <span>Tổng chiết khấu được nhận</span>
+      <strong>${safeText(money(totalDiscount))}</strong>
+      <ul class="quote-discount-list">${rows}</ul>
+    </div>`;
+}
+
 function renderQuoteCard(result, isLoan, isTts) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
   const scenario = scenarioLabel(activeScenario, result.policy);
@@ -1201,9 +1229,7 @@ function renderQuoteCard(result, isLoan, isTts) {
     quoteCardDetail("Giá nội thất/hoàn thiện", money(result.completion)),
   ];
 
-  if (result.ttsRate) {
-    details.push(quoteCardDetail("Tỷ lệ TTS đang áp dụng", percent(result.ttsRate)));
-  }
+  details.push(quoteCardDiscountSummary(result.discounts));
   if (isLoan) {
     details.push(quoteCardDetail("HTLS", result.policy.loanSupport, "wide"));
   }
@@ -1401,7 +1427,7 @@ els.copyBtn.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js?v=45").catch(() => {});
+  navigator.serviceWorker.register("service-worker.js?v=47").catch(() => {});
 }
 
 syncBaseFromGross();
