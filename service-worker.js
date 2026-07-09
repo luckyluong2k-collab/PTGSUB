@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "park-pricing-v33-auth";
+const CACHE_NAME = "park-pricing-v34-auth-admin";
 const ASSETS = [
   "./",
   "./index.html",
