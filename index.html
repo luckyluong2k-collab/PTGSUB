@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=47">
+  <link rel="stylesheet" href="styles.css?v=48">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -279,7 +279,10 @@
     <section class="panel results">
       <h2>K&#7871;t qu&#7843;</h2>
       <div id="resultRows" class="result-list"></div>
-      <button class="primary" id="copyBtn" type="button">Sao ch&#233;p b&#225;o gi&#225;</button>
+      <div class="result-actions">
+        <button class="primary" id="copyBtn" type="button">Sao ch&#233;p b&#225;o gi&#225;</button>
+        <button class="secondary pdf-button" id="pdfBtn" type="button">Xu&#7845;t PDF</button>
+      </div>
     </section>
 
     <section class="panel compact">
@@ -294,8 +297,9 @@
   </main>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="unit-data.js?v=47"></script>
-  <script src="app.js?v=47"></script>
-  <script type="module" src="firebase-auth.js?v=47"></script>
+  <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
+  <script src="unit-data.js?v=48"></script>
+  <script src="app.js?v=48"></script>
+  <script type="module" src="firebase-auth.js?v=48"></script>
 </body>
 </html>

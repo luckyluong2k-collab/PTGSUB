@@ -203,6 +203,8 @@ const els = {
   discountRows: document.querySelector("#discountRows"),
   scheduleRows: document.querySelector("#scheduleRows"),
   copyBtn: document.querySelector("#copyBtn"),
+  pdfBtn: document.querySelector("#pdfBtn"),
+  pdfPrintArea: document.querySelector("#pdfPrintArea"),
   resetBtn: document.querySelector("#resetBtn"),
   scenarioButtons: document.querySelectorAll(".segmented button"),
   filterTower: document.querySelector("#filterTower"),
@@ -1249,6 +1251,77 @@ function renderQuoteCard(result, isLoan, isTts) {
     </article>`;
 }
 
+function discountRowsHtml(result) {
+  const discountRows = result.discounts.map((item) => {
+    const label = item.rate ? `${item.label}` : item.label;
+    return row(label, money(item.amount));
+  });
+  discountRows.push(row("Giá chưa VAT/KPBT sau CK", money(result.netAfterDiscount), "highlight"));
+  discountRows.push(row(`VAT ${percent(vatRate(result.policy))}`, money(result.vat)));
+  discountRows.push(row(`KPBT ${percent(maintenanceRate(result.policy))}`, money(result.maintenance)));
+  return discountRows.join("");
+}
+
+function scheduleRowsHtml(result) {
+  return result.schedule.map(([label, value]) => {
+    const className = /NH|Tổng|Trả|Bàn giao|GCN/.test(label) ? "highlight" : "";
+    return row(label, money(value), className);
+  }).join("");
+}
+
+function buildPdfSheet(result, isLoan, isTts) {
+  const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const quoteDate = formatDateText(els.quoteDate.value);
+  return `
+    <article class="print-sheet">
+      <header class="print-header">
+        <img src="sun-group-logo.png" alt="Sun Group">
+        <div>
+          <p>PTGSUB</p>
+          <h1>Phiếu tính giá</h1>
+          <span>${safeText(unitCode)} - ${safeText(result.policy.name)} | Ngày báo giá: ${safeText(quoteDate)}</span>
+        </div>
+      </header>
+
+      <section class="print-section results">
+        <h2>Kết quả</h2>
+        <div class="result-list">${renderQuoteCard(result, isLoan, isTts)}</div>
+      </section>
+
+      <div class="print-columns">
+        <section class="print-section compact">
+          <h2>Chi tiết CK</h2>
+          <div class="result-list">${discountRowsHtml(result)}</div>
+        </section>
+        <section class="print-section compact">
+          <h2>Tiến độ tạm tính</h2>
+          <div class="result-list">${scheduleRowsHtml(result)}</div>
+        </section>
+      </div>
+    </article>`;
+}
+
+function exportPdf() {
+  render();
+  const result = calculate();
+  const isLoan = activeScenario === "loan";
+  const isTts = ["tts50", "tts70", "tts95"].includes(activeScenario);
+  els.pdfPrintArea.innerHTML = buildPdfSheet(result, isLoan, isTts);
+  document.body.classList.add("print-mode");
+  showToast("Đang mở hộp thoại lưu PDF");
+
+  const cleanup = () => {
+    document.body.classList.remove("print-mode");
+    window.removeEventListener("afterprint", cleanup);
+  };
+
+  window.addEventListener("afterprint", cleanup);
+  window.setTimeout(() => {
+    window.print();
+    window.setTimeout(cleanup, 60000);
+  }, 80);
+}
+
 function render() {
   const policy = policies[els.policyGroup.value] || policies.P3P9;
   syncPolicyControls(policy);
@@ -1276,19 +1349,8 @@ function render() {
 
   els.resultRows.innerHTML = renderQuoteCard(result, isLoan, isTts);
 
-  const discountRows = result.discounts.map((item) => {
-    const label = item.rate ? `${item.label}` : item.label;
-    return row(label, money(item.amount));
-  });
-  discountRows.push(row("Giá chưa VAT/KPBT sau CK", money(result.netAfterDiscount), "highlight"));
-  discountRows.push(row(`VAT ${percent(vatRate(result.policy))}`, money(result.vat)));
-  discountRows.push(row(`KPBT ${percent(maintenanceRate(result.policy))}`, money(result.maintenance)));
-  els.discountRows.innerHTML = discountRows.join("");
-
-  els.scheduleRows.innerHTML = result.schedule.map(([label, value]) => {
-    const className = /NH|Tổng|Trả|Bàn giao|GCN/.test(label) ? "highlight" : "";
-    return row(label, money(value), className);
-  }).join("");
+  els.discountRows.innerHTML = discountRowsHtml(result);
+  els.scheduleRows.innerHTML = scheduleRowsHtml(result);
 
   lastQuoteText = makeQuoteText(result);
 }
@@ -1425,6 +1487,8 @@ els.copyBtn.addEventListener("click", async () => {
     showToast("Không sao chép được trên trình duyệt này");
   }
 });
+
+els.pdfBtn.addEventListener("click", exportPdf);
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js?v=47").catch(() => {});

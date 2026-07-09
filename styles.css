@@ -602,11 +602,35 @@ input[readonly] {
   color: #fff;
 }
 
+.result-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.result-actions .primary,
+.result-actions .secondary {
+  width: 100%;
+  margin-top: 0;
+}
+
+.pdf-button {
+  border-color: #d69a38;
+  background: #fff8e7;
+  color: #7a4b0b;
+}
+
 .secondary {
   align-self: end;
   border-color: #c9d6d2;
   background: #edf4f2;
   color: var(--brand-strong);
+}
+
+.result-actions .pdf-button {
+  border-color: #d69a38;
+  background: #fff8e7;
+  color: #7a4b0b;
 }
 
 .switch-row {
@@ -918,6 +942,128 @@ input[readonly] {
   opacity: 1;
 }
 
+.print-area {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body.print-mode {
+    background: #fff;
+  }
+
+  body.print-mode > :not(.print-area) {
+    display: none !important;
+  }
+
+  body.print-mode .print-area {
+    display: block !important;
+  }
+
+  .print-sheet {
+    color: #17211f;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  }
+
+  .print-header {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0f766e;
+  }
+
+  .print-header img {
+    width: 72px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .print-header p,
+  .print-header h1,
+  .print-header span {
+    margin: 0;
+  }
+
+  .print-header p {
+    color: #0b5f59;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .print-header h1 {
+    margin: 3px 0;
+    color: #111c1a;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+
+  .print-header span {
+    color: #64736f;
+    font-size: 12px;
+  }
+
+  .print-section {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #d8e1de;
+    border-radius: 8px;
+    background: #fff;
+    break-inside: avoid;
+  }
+
+  .print-section h2 {
+    margin: 0 0 8px;
+    font-size: 16px;
+  }
+
+  .print-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .print-sheet .quote-card,
+  .print-sheet .quote-stat,
+  .print-sheet .quote-detail,
+  .print-sheet .row {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .print-sheet .quote-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .print-sheet .quote-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .print-sheet .quote-detail.wide {
+    grid-column: 1 / -1;
+  }
+
+  .print-sheet .row {
+    min-height: 32px;
+    padding: 7px 8px;
+  }
+
+  .print-sheet .row span,
+  .print-sheet .row strong,
+  .print-sheet .quote-discount-list span {
+    font-size: 11px;
+  }
+}
+
 @media (min-width: 580px) {
   .app-shell {
     padding: 22px;
@@ -948,6 +1094,10 @@ input[readonly] {
   }
 
   .switch-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .result-actions {
     grid-template-columns: 1fr 1fr;
   }
 
