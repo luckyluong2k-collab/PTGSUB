@@ -2,10 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getAuth,
   GoogleAuthProvider,
+  browserLocalPersistence,
+  getRedirectResult,
   signInWithPopup,
   signInWithRedirect,
   signOut,
   onAuthStateChanged,
+  setPersistence,
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   getFirestore,
@@ -36,6 +39,7 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
+auth.languageCode = "vi";
 
 function authErrorMessage(error) {
   const code = error?.code || "";
@@ -82,6 +86,7 @@ let currentUserData = null;
 let currentIsAdmin = false;
 let lastLoggedCode = "";
 let historyTimer = 0;
+let redirectResultChecked = false;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -122,6 +127,26 @@ function updateBrowserWarning(force = false) {
   if (browserWarning) browserWarning.hidden = !shouldShow;
   if (openBrowserLink) openBrowserLink.href = window.location.href;
   return shouldShow;
+}
+
+async function prepareGoogleLogin() {
+  await setPersistence(auth, browserLocalPersistence);
+}
+
+async function checkRedirectLoginResult() {
+  if (redirectResultChecked) return;
+  redirectResultChecked = true;
+  try {
+    await prepareGoogleLogin();
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      setStatus("Đã nhận đăng nhập Google, đang kiểm tra quyền truy cập...");
+    }
+  } catch (error) {
+    if (String(error?.message || error).includes("disallowed_useragent")) updateBrowserWarning(true);
+    setStatus(`Không hoàn tất đăng nhập Google: ${authErrorMessage(error)}`);
+    openDrawer();
+  }
 }
 
 function setMenuAuthState(isInsideApp) {
@@ -475,6 +500,7 @@ if (loginBtn) {
     try {
       loginBtn.disabled = true;
       loginBtn.textContent = "Đang mở Google...";
+      await prepareGoogleLogin();
       if (isMobileDevice()) {
         await signInWithRedirect(auth, provider);
         return;
@@ -510,6 +536,7 @@ document.addEventListener("input", (event) => {
 
 hideApp("Vui lòng đăng nhập bằng Gmail để truy cập website.");
 updateBrowserWarning(false);
+checkRedirectLoginResult();
 
 onAuthStateChanged(auth, async (user) => {
   try {

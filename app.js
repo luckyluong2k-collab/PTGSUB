@@ -205,6 +205,10 @@ const els = {
   copyBtn: document.querySelector("#copyBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
   pdfPrintArea: document.querySelector("#pdfPrintArea"),
+  pdfOptionsDialog: document.querySelector("#pdfOptionsDialog"),
+  pdfScenarioInputs: document.querySelectorAll("[data-pdf-scenario]"),
+  pdfOptionsCancel: document.querySelector("#pdfOptionsCancel"),
+  pdfOptionsExport: document.querySelector("#pdfOptionsExport"),
   resetBtn: document.querySelector("#resetBtn"),
   scenarioButtons: document.querySelectorAll(".segmented button"),
   filterTower: document.querySelector("#filterTower"),
@@ -526,6 +530,16 @@ function normalizeSheetUnitType(rawType, policyGroup) {
   return rawType || "";
 }
 
+function isUnavailableSheetStatus(status) {
+  const normalized = normalizeHeaderText(status);
+  return (
+    normalized.includes("da ban") ||
+    normalized.includes("thu hoi") ||
+    normalized.includes("ngung ban") ||
+    normalized.includes("tam dung")
+  );
+}
+
 function inferPolicyGroup(code, tower, rawType, title) {
   const normalizedTitle = normalizeHeaderText(title);
   const normalizedType = normalizeHeaderText(rawType);
@@ -555,6 +569,7 @@ function parseGoogleSheetUnits(response) {
   const viewIdx = shortColumnIndex(labels, findColumn(labels, ["view", "vi tri"]), 60);
   const directionIdx = shortColumnIndex(labels, findColumn(labels, ["huong"]), 30);
   const floorIdx = shortColumnIndex(labels, findColumn(labels, ["tang cao", "tang"], ["dtang", "tang 1"]), 35);
+  const statusIdx = shortColumnIndex(labels, findColumn(labels, ["tinh trang", "trang thai"]), 40);
   const areaIdx = shortColumnIndex(labels, findColumn(labels, ["dien tich thong thuy", "dien tich dat", "dien tich", "dtd", "dt d"]), 60);
   const constructionIdx = shortColumnIndex(labels, findColumn(labels, ["tong dtxd", "tong dien tich xay dung"]), 50);
   const baseNetIdx = findColumn(labels, ["gia chua", "chua gom vat", "chua vat", "gia tho chua"]);
@@ -580,6 +595,8 @@ function parseGoogleSheetUnits(response) {
     }
     code = normalizeUnitCode(code);
     if (!isSupportedSheetCode(code)) return;
+
+    if (isUnavailableSheetStatus(gvizValue(row, statusIdx))) return;
 
     const rawType = gvizValue(row, rawTypeIdx);
     const tower = inferTowerFromCode(code, gvizValue(row, towerIdx));
@@ -938,7 +955,7 @@ function buildTtsSchedule(result) {
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
     [
-      `Thanh toán sớm ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
+      `Thanh toán sớm lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
       Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit)),
     ],
   ];
@@ -1202,11 +1219,11 @@ function quoteCardDiscountSummary(discounts) {
 
 function renderQuoteCard(result, isLoan, isTts) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
-  const scenario = scenarioLabel(activeScenario, result.policy);
+  const scenario = scenarioLabel(result.scenario, result.policy);
   const depositRow = result.schedule[0] || ["Cọc", 0];
   const paymentRow = result.schedule[1] || ["Đợt tiếp theo", 0];
   const stats = [
-    quoteCardStat("Tổng giá thanh toán", money(result.total), "VND", "primary"),
+    quoteCardStat("Giá Cuối Phải TT", money(result.total), "VND", "green"),
   ];
 
   if (isLoan) {
@@ -1216,18 +1233,19 @@ function renderQuoteCard(result, isLoan, isTts) {
     stats.push(quoteCardStat(depositRow[0], money(depositRow[1]), "Cọc", "warm"));
     stats.push(quoteCardStat(paymentRow[0], money(paymentRow[1]), "TTS", "blue"));
   } else {
-    stats.push(quoteCardStat("Giá đã gồm VAT/KPBT", money(result.listedGross), "VAT", "warm"));
-    stats.push(quoteCardStat("Giá thô sau CK", money(result.rawGrossAfterDiscount), "CK", "blue"));
+    stats.push(quoteCardStat("Giá Niêm Yết", money(result.listedGross), "VAT", "warm"));
+    stats.push(quoteCardStat("Giá thô sau CK", "", "CK", "blue"));
   }
 
+  const rawGrossAfterDiscountText = result.scenario === "standard" ? "" : money(result.rawGrossAfterDiscount);
   const details = [
     quoteCardDetail("Mã căn", unitCode),
     quoteCardDetail("Nhóm tòa", result.policy.name),
     ...(result.policy.customerHandover
       ? [quoteCardDetail("Ngày dự kiến nhận bàn giao nhà", formatDateText(result.policy.customerHandover))]
       : []),
-    quoteCardDetail("Giá đã gồm VAT/KPBT", money(result.listedGross)),
-    quoteCardDetail("Giá thô sau CK", money(result.rawGrossAfterDiscount)),
+    quoteCardDetail("Giá Niêm Yết", money(result.listedGross)),
+    quoteCardDetail("Giá thô sau CK", rawGrossAfterDiscountText),
     quoteCardDetail("Giá nội thất/hoàn thiện", money(result.completion)),
   ];
 
@@ -1277,8 +1295,8 @@ function buildPdfSheet(result, isLoan, isTts) {
       <header class="print-header">
         <img src="sun-group-logo.png" alt="Sun Group">
         <div>
-          <p>PTGSUB</p>
-          <h1>Phiếu tính giá</h1>
+          <p>Sun Urban City Hà Nam</p>
+          <h1>Bảng tính giá Vhomes - Đối tác top 1 Sun Group</h1>
           <span>${safeText(unitCode)} - ${safeText(result.policy.name)} | Ngày báo giá: ${safeText(quoteDate)}</span>
         </div>
       </header>
@@ -1301,17 +1319,73 @@ function buildPdfSheet(result, isLoan, isTts) {
     </article>`;
 }
 
-function exportPdf() {
+function pdfExportDateText(date = new Date()) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}-${month}-${date.getFullYear()}`;
+}
+
+function pdfDocumentTitle() {
+  const unitCode = normalizeUnitCode(els.unitCode.value) || "Can-ho";
+  return `Bảng tính giá Vhomes - ${unitCode} - ${pdfExportDateText()}`;
+}
+
+function isTtsScenario(scenario) {
+  return ["tts50", "tts70", "tts95"].includes(scenario);
+}
+
+function buildPdfDocument(scenarios) {
+  return scenarios.map((scenario) => {
+    const result = calculate({ scenario });
+    return buildPdfSheet(result, scenario === "loan", isTtsScenario(scenario));
+  }).join("");
+}
+
+function selectedPdfScenarios() {
+  return Array.from(els.pdfScenarioInputs)
+    .filter((input) => input.checked)
+    .map((input) => input.value);
+}
+
+function syncPdfScenarioLabels() {
+  const policy = policies[els.policyGroup.value] || policies.P3P9;
+  els.pdfScenarioInputs.forEach((input) => {
+    const text = input.closest("label")?.querySelector("span");
+    if (text) text.textContent = scenarioLabel(input.value, policy);
+  });
+}
+
+function openPdfOptions() {
+  syncPdfScenarioLabels();
+  els.pdfScenarioInputs.forEach((input) => {
+    input.checked = input.value === activeScenario;
+  });
+
+  if (els.pdfOptionsDialog?.showModal) {
+    els.pdfOptionsDialog.showModal();
+    return;
+  }
+
+  exportPdf([activeScenario]);
+}
+
+function exportPdf(scenarios = [activeScenario]) {
+  const selectedScenarios = scenarios.filter(Boolean);
+  if (!selectedScenarios.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+
   render();
-  const result = calculate();
-  const isLoan = activeScenario === "loan";
-  const isTts = ["tts50", "tts70", "tts95"].includes(activeScenario);
-  els.pdfPrintArea.innerHTML = buildPdfSheet(result, isLoan, isTts);
+  const originalTitle = document.title;
+  document.title = pdfDocumentTitle();
+  els.pdfPrintArea.innerHTML = buildPdfDocument(selectedScenarios);
   document.body.classList.add("print-mode");
   showToast("Đang mở hộp thoại lưu PDF");
 
   const cleanup = () => {
     document.body.classList.remove("print-mode");
+    document.title = originalTitle;
     window.removeEventListener("afterprint", cleanup);
   };
 
@@ -1358,18 +1432,18 @@ function render() {
 function makeQuoteText(result) {
   const parts = [
     `${els.unitCode.value.trim() || "Căn hộ"} - ${result.policy.name}`,
-    `Phương án: ${scenarioLabel(activeScenario, result.policy)}`,
+    `Phương án: ${scenarioLabel(result.scenario, result.policy)}`,
     `Mã căn: ${els.unitCode.value.trim() || "Căn hộ"}`,
     ...(result.policy.customerHandover ? [`Ngày dự kiến nhận bàn giao nhà: ${formatDateText(result.policy.customerHandover)}`] : []),
-    `Giá đã gồm VAT/KPBT: ${money(result.listedGross)}`,
-    `Tổng giá: ${money(result.total)}`,
+    `Giá Niêm Yết: ${money(result.listedGross)}`,
+    `Giá Cuối Phải TT: ${money(result.total)}`,
   ];
-  if (activeScenario === "loan") {
+  if (result.scenario === "loan") {
     parts.push(`Trả trước 25%: ${money(result.upfront)}`);
     parts.push(`NH giải ngân ${percent(result.loanRatio)}: ${money(result.bankDisbursement)}`);
     parts.push(`HTLS: ${result.policy.loanSupport}`);
   }
-  parts.push(`Giá thô sau CK: ${money(result.rawGrossAfterDiscount)}`);
+  parts.push(`Giá thô sau CK: ${result.scenario === "standard" ? "" : money(result.rawGrossAfterDiscount)}`);
   if (result.completion) parts.push(`Nội thất/hoàn thiện: ${money(result.completion)}`);
   return parts.join("\n");
 }
@@ -1488,10 +1562,24 @@ els.copyBtn.addEventListener("click", async () => {
   }
 });
 
-els.pdfBtn.addEventListener("click", exportPdf);
+els.pdfBtn.addEventListener("click", openPdfOptions);
+
+els.pdfOptionsCancel.addEventListener("click", () => {
+  els.pdfOptionsDialog.close();
+});
+
+els.pdfOptionsExport.addEventListener("click", () => {
+  const scenarios = selectedPdfScenarios();
+  if (!scenarios.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+  els.pdfOptionsDialog.close();
+  exportPdf(scenarios);
+});
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js?v=47").catch(() => {});
+  navigator.serviceWorker.register("service-worker.js?v=52").catch(() => {});
 }
 
 syncBaseFromGross();

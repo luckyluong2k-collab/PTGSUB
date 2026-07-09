@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
-  <title>B&#7843;ng T&#237;nh Gi&#225; &#272;&#7913;c L&#432;&#417;ng Sun Group</title>
+  <title>Bảng tính giá Vhomes - Đối tác top 1 Sun Group</title>
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=48">
+  <link rel="stylesheet" href="styles.css?v=52">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -296,10 +296,28 @@
     </section>
   </main>
 
+  <dialog class="pdf-options-dialog" id="pdfOptionsDialog" aria-labelledby="pdfOptionsTitle">
+    <div class="pdf-options-card">
+      <h2 id="pdfOptionsTitle">Chọn phương án xuất PDF</h2>
+      <p>Chọn một hoặc nhiều phương án để gộp chung trong một file.</p>
+      <div class="pdf-option-list">
+        <label><input type="checkbox" value="loan" data-pdf-scenario> <span>Có vay</span></label>
+        <label><input type="checkbox" value="standard" data-pdf-scenario> <span>Không vay</span></label>
+        <label><input type="checkbox" value="tts50" data-pdf-scenario> <span>TTS 50%</span></label>
+        <label><input type="checkbox" value="tts70" data-pdf-scenario> <span>TTS 70%</span></label>
+        <label><input type="checkbox" value="tts95" data-pdf-scenario> <span>TTS 95%</span></label>
+      </div>
+      <div class="pdf-options-actions">
+        <button class="secondary" id="pdfOptionsCancel" type="button">Hủy</button>
+        <button class="primary" id="pdfOptionsExport" type="button">Xuất PDF</button>
+      </div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="unit-data.js?v=48"></script>
-  <script src="app.js?v=48"></script>
-  <script type="module" src="firebase-auth.js?v=48"></script>
+  <script src="unit-data.js?v=52"></script>
+  <script src="app.js?v=52"></script>
+  <script type="module" src="firebase-auth.js?v=52"></script>
 </body>
 </html>
