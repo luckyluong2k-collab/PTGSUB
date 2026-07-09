@@ -209,6 +209,72 @@ function formatDate(value) {
   return new Date(ms).toLocaleString("vi-VN");
 }
 
+function normalizeHistoryEntries(searches = []) {
+  const seen = new Set();
+  const entries = Array.isArray(searches) ? searches : [];
+  const normalized = [];
+
+  entries.forEach((entry) => {
+    const code = normalizeUnitCode(entry?.code);
+    if (!code || seen.has(code)) return;
+    seen.add(code);
+    const pinned = Boolean(entry?.pinned);
+    normalized.push({
+      ...entry,
+      code,
+      pinned,
+      pinnedAt: pinned ? timestampMs(entry?.pinnedAt) || timestampMs(entry?.at) || Date.now() : 0,
+    });
+  });
+
+  return normalized;
+}
+
+function sortHistoryEntries(searches = []) {
+  return normalizeHistoryEntries(searches).sort((a, b) => {
+    if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    const aTime = timestampMs(a.pinned ? a.pinnedAt || a.at : a.at);
+    const bTime = timestampMs(b.pinned ? b.pinnedAt || b.at : b.at);
+    return bTime - aTime;
+  });
+}
+
+function limitHistoryEntries(searches = []) {
+  const sorted = sortHistoryEntries(searches);
+  const pinned = sorted.filter((entry) => entry.pinned);
+  const normalLimit = Math.max(0, HISTORY_LIMIT - pinned.length);
+  const normal = sorted.filter((entry) => !entry.pinned).slice(0, normalLimit);
+  return [...pinned, ...normal];
+}
+
+function mergeHistoryEntries(current = [], item) {
+  const code = normalizeUnitCode(item?.code);
+  if (!code) return limitHistoryEntries(current);
+
+  let pinned = false;
+  let pinnedAt = 0;
+  const rest = [];
+
+  normalizeHistoryEntries(current).forEach((entry) => {
+    if (normalizeUnitCode(entry?.code) === code) {
+      pinned = Boolean(entry.pinned);
+      pinnedAt = timestampMs(entry.pinnedAt) || timestampMs(entry.at) || Date.now();
+      return;
+    }
+    rest.push(entry);
+  });
+
+  return limitHistoryEntries([
+    {
+      ...item,
+      code,
+      pinned,
+      pinnedAt: pinned ? pinnedAt : 0,
+    },
+    ...rest,
+  ]);
+}
+
 function isAdminEmail(email) {
   return normalizeEmail(email) === ADMIN_EMAIL;
 }
@@ -230,7 +296,7 @@ function normalizeUserData(user, data = {}) {
     displayName: user.displayName || data.displayName || "",
     approved: adminEmail ? true : Boolean(data.approved),
     role: adminEmail ? "admin" : data.role || "user",
-    recentSearches: Array.isArray(data.recentSearches) ? data.recentSearches : [],
+    recentSearches: limitHistoryEntries(data.recentSearches),
   };
 }
 
@@ -278,7 +344,7 @@ async function ensureUserDoc(user) {
   };
 
   if (oldSearches.length > HISTORY_LIMIT) {
-    patch.recentSearches = oldSearches.slice(0, HISTORY_LIMIT);
+    patch.recentSearches = limitHistoryEntries(oldSearches);
   }
 
   if (adminEmail) {
@@ -323,11 +389,10 @@ async function saveCurrentSearch(force = false) {
   lastLoggedCode = item.code;
 
   const userRef = doc(db, "users", currentUserId);
-  const snap = await getDoc(userRef);
+  const snap = await getFreshUserDoc(userRef);
   const oldData = snap.data() || {};
   const current = Array.isArray(oldData.recentSearches) ? oldData.recentSearches : [];
-  const withoutSameCode = current.filter((entry) => normalizeUnitCode(entry?.code) !== item.code);
-  const recentSearches = [item, ...withoutSameCode].slice(0, HISTORY_LIMIT);
+  const recentSearches = mergeHistoryEntries(current, item);
 
   await updateDoc(userRef, {
     recentSearches,
@@ -345,17 +410,57 @@ function scheduleSaveCurrentSearch(force = false) {
   }, force ? 150 : 900);
 }
 
+async function togglePinnedSearch(code) {
+  if (!currentUserId || !currentUserData?.approved) return;
+  const normalizedCode = normalizeUnitCode(code);
+  if (!normalizedCode) return;
+
+  const previousSearches = normalizeHistoryEntries(currentUserData.recentSearches);
+  const current = previousSearches;
+  let changed = false;
+  const recentSearches = limitHistoryEntries(
+    current.map((entry) => {
+      if (normalizeUnitCode(entry?.code) !== normalizedCode) return entry;
+      changed = true;
+      const pinned = !Boolean(entry.pinned);
+      return {
+        ...entry,
+        pinned,
+        pinnedAt: pinned ? Date.now() : 0,
+      };
+    })
+  );
+
+  if (!changed) return;
+
+  currentUserData = { ...currentUserData, recentSearches };
+  renderMyHistory(recentSearches);
+
+  try {
+    await updateDoc(doc(db, "users", currentUserId), {
+      recentSearches,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    currentUserData = { ...currentUserData, recentSearches: previousSearches };
+    renderMyHistory(previousSearches);
+    throw error;
+  }
+}
+
 function renderHistoryList(container, searches = []) {
   if (!container) return;
   container.textContent = "";
-  if (!searches.length) {
+  const canPin = container === myHistoryList && currentUserId && currentUserData?.approved;
+  const entries = canPin ? limitHistoryEntries(searches) : sortHistoryEntries(searches).slice(0, HISTORY_LIMIT);
+  if (!entries.length) {
     container.innerHTML = `<div class="history-card">Chưa có lịch sử tra căn.</div>`;
     return;
   }
 
-  searches.slice(0, HISTORY_LIMIT).forEach((item) => {
+  entries.forEach((item) => {
     const card = document.createElement("div");
-    card.className = "history-card";
+    card.className = item.pinned ? "history-card pinned" : "history-card";
     card.innerHTML = `
       <strong>${escapeHtml(item.code || "Không rõ mã căn")}</strong>
       <span class="history-meta">
@@ -365,6 +470,44 @@ function renderHistoryList(container, searches = []) {
         ${escapeHtml(formatDate(item.at))}
       </span>
     `;
+
+    const title = card.querySelector("strong");
+    if (title) {
+      const titleRow = document.createElement("div");
+      titleRow.className = "history-card-head";
+      title.replaceWith(titleRow);
+      titleRow.appendChild(title);
+
+      if (canPin) {
+        const pinBtn = document.createElement("button");
+        pinBtn.className = item.pinned ? "history-pin-btn active" : "history-pin-btn";
+        pinBtn.type = "button";
+        pinBtn.textContent = item.pinned ? "★" : "☆";
+        pinBtn.title = item.pinned ? "Bỏ ghim căn này" : "Ghim căn quan trọng";
+        pinBtn.setAttribute("aria-label", pinBtn.title);
+        pinBtn.addEventListener("click", async () => {
+          pinBtn.disabled = true;
+          try {
+            await togglePinnedSearch(item.code);
+          } catch {
+            setStatus("Chưa lưu được đánh dấu sao. Vui lòng thử lại.");
+            pinBtn.disabled = false;
+          }
+        });
+        titleRow.appendChild(pinBtn);
+      }
+    }
+
+    const meta = card.querySelector(".history-meta");
+    if (meta) {
+      meta.innerHTML = `
+        ${escapeHtml(item.unitType || "")}${item.area ? ` · ${escapeHtml(item.area)} m²` : ""}<br>
+        ${item.totalPrice ? `Giá cuối: ${escapeHtml(item.totalPrice)}<br>` : ""}
+        ${item.scenario ? `Phương án: ${escapeHtml(item.scenario)}<br>` : ""}
+        Thời gian tra: ${escapeHtml(formatDate(item.at))}
+        ${item.pinned ? `<br><span class="history-pin-label">Đã ghim</span>` : ""}
+      `;
+    }
 
     const useBtn = document.createElement("button");
     useBtn.className = "history-mini-btn";
@@ -467,7 +610,7 @@ function userCard(id, data) {
   const normalizedEmail = normalizeEmail(email);
   const isSelf = id === currentUserId || normalizedEmail === currentUserEmail;
   const isAdminUser = role === "admin" || isAdminEmail(normalizedEmail);
-  const searches = Array.isArray(data.recentSearches) ? data.recentSearches.slice(0, HISTORY_LIMIT) : [];
+  const searches = limitHistoryEntries(data.recentSearches);
 
   const card = document.createElement("div");
   card.className = "admin-user-card";

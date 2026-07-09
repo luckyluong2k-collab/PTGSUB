@@ -1957,9 +1957,47 @@ input[readonly] {
   background: #f8fcfb;
 }
 
+.history-card.pinned {
+  border-color: #efb75d;
+  background: #fffaf0;
+  box-shadow: 0 8px 18px rgba(154, 100, 20, 0.12);
+}
+
 .admin-user-card strong,
 .history-card strong {
   overflow-wrap: anywhere;
+}
+
+.history-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.history-pin-btn {
+  flex: 0 0 34px;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid #e1c58b;
+  border-radius: 999px;
+  background: #fff8e7;
+  color: #9b5a00;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.history-pin-btn.active {
+  border-color: #d99021;
+  background: #f3b44e;
+  color: #10201d;
+}
+
+.history-pin-btn:disabled {
+  cursor: wait;
+  opacity: 0.75;
 }
 
 .admin-empty {
@@ -1991,6 +2029,18 @@ input[readonly] {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
+}
+
+.history-pin-label {
+  display: inline-flex;
+  width: max-content;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fff0d8;
+  color: #8a5108;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .history-mini-btn {
