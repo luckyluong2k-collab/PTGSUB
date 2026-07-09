@@ -35,6 +35,7 @@ service cloud.firestore {
         "displayName",
         "approved",
         "role",
+        "accessExpiresAt",
         "recentSearches",
         "createdAt",
         "updatedAt",

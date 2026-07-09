@@ -35,6 +35,13 @@ const firebaseConfig = {
 
 const ADMIN_EMAIL = "luckyluong2k@gmail.com";
 const HISTORY_LIMIT = 10;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const ACCESS_DURATION_LABELS = {
+  week: "1 tuần",
+  month: "1 tháng",
+  year: "1 năm",
+  custom: "Tùy chọn ngày",
+};
 
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
@@ -90,6 +97,7 @@ let lastLoggedCode = "";
 let historyTimer = 0;
 let redirectResultChecked = false;
 let approvalPollTimer = 0;
+let accessExpiryTimer = 0;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -110,6 +118,76 @@ function normalizeUnitCode(value) {
 
 function moneyText(value) {
   return String(value || "").trim();
+}
+
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function dateInputValue(ms) {
+  const date = ms && ms > Date.now() ? new Date(ms) : new Date(Date.now() + 30 * DAY_MS);
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+function endOfLocalDateMs(value) {
+  if (!value) return 0;
+  const [year, month, day] = String(value).split("-").map(Number);
+  if (!year || !month || !day) return 0;
+  return new Date(year, month - 1, day, 23, 59, 59, 999).getTime();
+}
+
+function accessExpiresMs(data = {}) {
+  return timestampMs(data.accessExpiresAt);
+}
+
+function isAccessExpired(data = {}) {
+  const expiresMs = accessExpiresMs(data);
+  return Boolean(expiresMs && expiresMs <= Date.now());
+}
+
+function isUserAccessAllowed(data = {}, isAdminUser = false) {
+  if (isAdminUser) return true;
+  return Boolean(data.approved) && !isAccessExpired(data);
+}
+
+function accessExpiryLabel(data = {}) {
+  const expiresMs = accessExpiresMs(data);
+  if (!expiresMs) return "Chưa đặt hạn";
+  const prefix = expiresMs <= Date.now() ? "Hết hạn" : "Hạn dùng";
+  return `${prefix}: ${new Date(expiresMs).toLocaleString("vi-VN")}`;
+}
+
+function accessDurationMs(duration, customDate = "", baseMs = 0) {
+  if (duration === "custom") return endOfLocalDateMs(customDate);
+
+  const date = new Date(Math.max(Date.now(), baseMs || 0));
+  if (duration === "week") date.setDate(date.getDate() + 7);
+  else if (duration === "year") date.setFullYear(date.getFullYear() + 1);
+  else date.setMonth(date.getMonth() + 1);
+  return date.getTime();
+}
+
+function stopAccessExpiryTimer() {
+  window.clearTimeout(accessExpiryTimer);
+  accessExpiryTimer = 0;
+}
+
+function scheduleAccessExpiryTimer(data = {}) {
+  stopAccessExpiryTimer();
+  if (currentIsAdmin) return;
+
+  const expiresMs = accessExpiresMs(data);
+  if (!expiresMs) return;
+
+  const delay = expiresMs - Date.now();
+  if (delay <= 0) {
+    showExpiredAccess(currentUserEmail);
+    return;
+  }
+
+  accessExpiryTimer = window.setTimeout(() => {
+    showExpiredAccess(currentUserEmail);
+  }, Math.min(delay, 2147483647));
 }
 
 function setStatus(message) {
@@ -546,6 +624,7 @@ async function enterApprovedApp(user, data) {
 
   showApp(user.email);
   renderMyHistory(data.recentSearches || []);
+  scheduleAccessExpiryTimer(data);
 
   if (currentIsAdmin) {
     try {
@@ -570,14 +649,29 @@ function showPendingApproval(user) {
   openDrawer();
 }
 
+function showExpiredAccess(userOrEmail) {
+  stopAccessExpiryTimer();
+  if (appContent) appContent.hidden = true;
+  if (adminPanel) adminPanel.hidden = true;
+  if (myHistoryPanel) myHistoryPanel.hidden = true;
+  if (loginBtn) loginBtn.hidden = true;
+  if (logoutBtn) logoutBtn.hidden = false;
+  setMenuAuthState(false);
+  const email = typeof userOrEmail === "string" ? userOrEmail : userOrEmail?.email || currentUserEmail;
+  setStatus(`Gmail ${email} đã hết hạn truy cập. Vui lòng liên hệ admin để gia hạn.`);
+  openDrawer();
+}
+
 function startApprovalPolling(user) {
   stopApprovalPolling();
   approvalPollTimer = window.setInterval(async () => {
     try {
       const data = await readUserData(user);
       if (!data) return;
-      const approved = data.approved || isAdminEmail(user.email) || data.role === "admin";
-      if (approved) await enterApprovedApp(user, data);
+      const adminUser = isAdminEmail(user.email) || data.role === "admin";
+      const approved = data.approved || adminUser;
+      if (approved && isUserAccessAllowed(data, adminUser)) await enterApprovedApp(user, data);
+      else if (approved && isAccessExpired(data)) showExpiredAccess(user);
     } catch {}
   }, 5000);
 }
@@ -600,7 +694,24 @@ async function handleSignedInUser(user) {
     return;
   }
 
+  if (!isUserAccessAllowed(data, currentIsAdmin)) {
+    showExpiredAccess(user);
+    return;
+  }
+
   await enterApprovedApp(user, data);
+}
+
+function adminAccessBadgeText(approved, isAdminUser, data) {
+  if (isAdminUser) return approved ? "Đã duyệt · Admin" : "Admin";
+  if (!approved) return "Chờ duyệt";
+  return accessExpiryLabel(data);
+}
+
+function adminAccessBadgeClass(approved, isAdminUser, data) {
+  if (isAdminUser) return "admin-badge";
+  if (!approved) return "admin-badge pending";
+  return isAccessExpired(data) ? "admin-badge expired" : "admin-badge active";
 }
 
 function userCard(id, data) {
@@ -611,6 +722,8 @@ function userCard(id, data) {
   const isSelf = id === currentUserId || normalizedEmail === currentUserEmail;
   const isAdminUser = role === "admin" || isAdminEmail(normalizedEmail);
   const searches = limitHistoryEntries(data.recentSearches);
+  const badgeText = adminAccessBadgeText(approved, isAdminUser, data);
+  const badgeClass = adminAccessBadgeClass(approved, isAdminUser, data);
 
   const card = document.createElement("div");
   card.className = "admin-user-card";
@@ -625,18 +738,64 @@ function userCard(id, data) {
     <div class="admin-user-actions"></div>
   `;
 
+  const badge = card.querySelector(".admin-badge");
+  if (badge) {
+    badge.className = badgeClass;
+    badge.textContent = badgeText;
+  }
+
   renderHistoryList(card.querySelector(".history-list"), searches);
 
   const actions = card.querySelector(".admin-user-actions");
   if (!isSelf && !isAdminUser) {
+    const accessControls = document.createElement("div");
+    accessControls.className = "admin-access-controls";
+    accessControls.innerHTML = `
+      <label>
+        <span>Gia hạn</span>
+        <select class="admin-access-duration">
+          <option value="week">${ACCESS_DURATION_LABELS.week}</option>
+          <option value="month" selected>${ACCESS_DURATION_LABELS.month}</option>
+          <option value="year">${ACCESS_DURATION_LABELS.year}</option>
+          <option value="custom">${ACCESS_DURATION_LABELS.custom}</option>
+        </select>
+      </label>
+      <label class="admin-access-custom" hidden>
+        <span>Chọn ngày hết hạn</span>
+        <input type="date" class="admin-access-date" value="${dateInputValue(accessExpiresMs(data))}">
+      </label>
+    `;
+    const durationSelect = accessControls.querySelector(".admin-access-duration");
+    const customDateWrap = accessControls.querySelector(".admin-access-custom");
+    const customDateInput = accessControls.querySelector(".admin-access-date");
+    durationSelect.addEventListener("change", () => {
+      customDateWrap.hidden = durationSelect.value !== "custom";
+    });
+
     const approveBtn = document.createElement("button");
     approveBtn.className = "primary";
     approveBtn.type = "button";
+    approveBtn.textContent = approved ? "Gia hạn" : "Duyệt theo hạn";
     approveBtn.textContent = approved ? "Duyệt lại" : "Duyệt";
+    approveBtn.textContent = approved ? "Gia hạn" : "Duyệt theo hạn";
     approveBtn.addEventListener("click", async () => {
       approveBtn.disabled = true;
+      approveBtn.textContent = "Đang cập nhật...";
       approveBtn.textContent = "Đang duyệt...";
-      await updateDoc(doc(db, "users", id), { approved: true, role: "user", updatedAt: serverTimestamp() });
+      approveBtn.textContent = "Đang cập nhật...";
+      const accessExpiresAt = accessDurationMs(durationSelect.value, customDateInput.value, accessExpiresMs(data));
+      if (!accessExpiresAt) {
+        approveBtn.disabled = false;
+        approveBtn.textContent = approved ? "Gia hạn" : "Duyệt theo hạn";
+        setStatus("Vui lòng chọn ngày hết hạn hợp lệ.");
+        return;
+      }
+      await updateDoc(doc(db, "users", id), {
+        approved: true,
+        role: "user",
+        accessExpiresAt,
+        updatedAt: serverTimestamp(),
+      });
       await renderAdminUsers();
     });
 
@@ -647,11 +806,16 @@ function userCard(id, data) {
     blockBtn.addEventListener("click", async () => {
       blockBtn.disabled = true;
       blockBtn.textContent = "Đang cập nhật...";
-      await updateDoc(doc(db, "users", id), { approved: false, role: "user", updatedAt: serverTimestamp() });
+      await updateDoc(doc(db, "users", id), {
+        approved: false,
+        role: "user",
+        accessExpiresAt: 0,
+        updatedAt: serverTimestamp(),
+      });
       await renderAdminUsers();
     });
 
-    actions.append(approveBtn, blockBtn);
+    actions.append(accessControls, approveBtn, blockBtn);
   } else {
     actions.remove();
   }
@@ -796,9 +960,10 @@ checkRedirectLoginResult();
 
 onAuthStateChanged(auth, async (user) => {
   try {
-    if (!user) {
-      stopApprovalPolling();
-      currentUserId = "";
+      if (!user) {
+        stopApprovalPolling();
+        stopAccessExpiryTimer();
+        currentUserId = "";
       currentUserEmail = "";
       currentUserData = null;
       currentIsAdmin = false;
@@ -821,6 +986,11 @@ onAuthStateChanged(auth, async (user) => {
     if (!data.approved && !currentIsAdmin) {
       showPendingApproval(user);
       startApprovalPolling(user);
+      return;
+    }
+
+    if (!isUserAccessAllowed(data, currentIsAdmin)) {
+      showExpiredAccess(user);
       return;
     }
 

@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v60-pinned-history";
+const CACHE_NAME = "park-pricing-v63-access-expiry";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=60",
-  "./unit-data.js?v=60",
-  "./app.js?v=60",
-  "./firebase-auth.js?v=60",
+  "./styles.css?v=63",
+  "./unit-data.js?v=63",
+  "./app.js?v=63",
+  "./firebase-auth.js?v=63",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",

@@ -1678,6 +1678,17 @@ input[readonly] {
   box-shadow: 0 7px 0 #e8b852, 0 16px 26px rgba(138, 58, 8, 0.16);
 }
 
+.address-copy-section {
+  border-color: #9bcfc7;
+  background: #f2fffc;
+  box-shadow: 0 6px 0 #9bcfc7, 0 12px 22px rgba(15, 118, 110, 0.12);
+}
+
+.address-copy-section:hover {
+  border-color: #6dbcb1;
+  box-shadow: 0 7px 0 #8ac9c0, 0 16px 26px rgba(15, 118, 110, 0.16);
+}
+
 .menu-section {
   overflow: hidden;
 }
@@ -1783,6 +1794,43 @@ input[readonly] {
   color: #8a3a08;
   font-weight: 900;
   text-decoration: none;
+}
+
+.address-copy-list {
+  gap: 9px;
+}
+
+.address-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #b8d9d4;
+  border-radius: 8px;
+  background: #f8fffd;
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 900;
+  text-align: left;
+}
+
+.address-copy-btn::after {
+  content: "Copy";
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e2f2ef;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.address-copy-btn:hover {
+  border-color: #80c8bd;
+  background: #ecfaf7;
 }
 
 .menu-section-summary-icon {
@@ -2023,6 +2071,47 @@ input[readonly] {
   color: var(--brand-strong);
   font-size: 12px;
   font-weight: 900;
+}
+
+.admin-badge.pending {
+  background: #fff3df;
+  color: #8a3a08;
+}
+
+.admin-badge.expired {
+  background: #fde8e5;
+  color: #b42318;
+}
+
+.admin-access-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid #d6e3e0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.admin-access-controls label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-access-controls select,
+.admin-access-controls input {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 1px solid #cfdcd8;
+  border-radius: 8px;
+  background: #fbfffe;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .history-meta {

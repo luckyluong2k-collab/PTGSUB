@@ -557,6 +557,10 @@ function isUnavailableSheetStatus(status) {
   );
 }
 
+function rowHasUnavailableSheetStatus(row) {
+  return (row.c || []).some((cell) => isUnavailableSheetStatus(gvizCellText(cell)));
+}
+
 function inferPolicyGroup(code, tower, rawType, title) {
   const normalizedTitle = normalizeHeaderText(title);
   const normalizedType = normalizeHeaderText(rawType);
@@ -613,7 +617,7 @@ function parseGoogleSheetUnits(response) {
     code = normalizeUnitCode(code);
     if (!isSupportedSheetCode(code)) return;
 
-    if (isUnavailableSheetStatus(gvizValue(row, statusIdx))) return;
+    if (isUnavailableSheetStatus(gvizValue(row, statusIdx)) || rowHasUnavailableSheetStatus(row)) return;
 
     const rawType = gvizValue(row, rawTypeIdx);
     const tower = inferTowerFromCode(code, gvizValue(row, towerIdx));
@@ -1680,6 +1684,25 @@ function showToast(message) {
   window.setTimeout(() => els.toast.classList.remove("show"), 1800);
 }
 
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const input = document.createElement("textarea");
+  input.value = text;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.left = "-999px";
+  input.style.top = "0";
+  document.body.appendChild(input);
+  input.select();
+  const copied = document.execCommand("copy");
+  input.remove();
+  if (!copied) throw new Error("Clipboard unavailable");
+}
+
 function resetDefaults() {
   els.unitCode.value = "P90316";
   els.policyGroup.value = "P3P9";
@@ -1768,6 +1791,19 @@ els.comparisonCards.addEventListener("click", (event) => {
   els.pricingForm.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
+document.addEventListener("click", async (event) => {
+  const copyMapBtn = event.target.closest("[data-copy-map-link]");
+  if (!copyMapBtn) return;
+  const link = copyMapBtn.dataset.copyMapLink;
+  if (!link) return;
+  try {
+    await copyTextToClipboard(link);
+    showToast(`Đã sao chép: ${copyMapBtn.textContent.trim()}`);
+  } catch {
+    showToast("Không sao chép được link trên trình duyệt này");
+  }
+});
+
 els.scenarioButtons.forEach((button) => {
   button.addEventListener("click", () => {
     activeScenario = button.dataset.scenario;
@@ -1827,7 +1863,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=60", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=63", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
