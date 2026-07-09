@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "park-pricing-v38-visible-login";
+const CACHE_NAME = "park-pricing-v39-login-intro";
 const ASSETS = [
   "./",
   "./index.html",
@@ -26,15 +26,3 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });
-
-
-
-
-
-
-
-
-
-
-
-
