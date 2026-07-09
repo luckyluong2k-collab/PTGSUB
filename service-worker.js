@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v40-sun-logo";
+const CACHE_NAME = "park-pricing-v41-camera-history";
 const ASSETS = [
   "./",
   "./index.html",

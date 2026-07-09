@@ -35,6 +35,10 @@
       <div class="auth-actions">
         <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
         <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
+        <a class="camera-360-link" href="https://pano.cool/@TicaLand/ti-n-subc-08-06?s=w8DL1v">
+          <span class="camera-360-icon" aria-hidden="true">360</span>
+          <span>Camera 360</span>
+        </a>
         <a class="zalo-login-link" href="http://zalo.me/0387335227" target="_blank" rel="noopener" aria-label="Liên hệ Zalo 0387.335.227">
           <svg viewBox="0 0 36 36" aria-hidden="true">
             <rect x="2" y="2" width="32" height="32" rx="8"/>
@@ -43,10 +47,10 @@
           <span>Liên hệ Zalo: <b>0387.335.227</b></span>
         </a>
       </div>
-      <div class="history-panel" id="myHistoryPanel" hidden>
-        <h2>Lịch sử căn đã tra</h2>
+      <details class="history-panel" id="myHistoryPanel" hidden>
+        <summary class="history-panel-summary">Lịch sử căn đã tra</summary>
         <div id="myHistoryList" class="history-list"></div>
-      </div>
+      </details>
       <div class="admin-panel" id="adminPanel" hidden>
         <h2>Quản lý tài khoản</h2>
         <div id="adminUsers" class="admin-users"></div>
