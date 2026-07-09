@@ -28,7 +28,7 @@ const firebaseConfig = {
 };
 
 const ADMIN_EMAIL = "luckyluong2k@gmail.com";
-const HISTORY_LIMIT = 40;
+const HISTORY_LIMIT = 10;
 
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
@@ -168,12 +168,17 @@ async function ensureUserDoc(user) {
   }
 
   const oldData = snap.data() || {};
+  const oldSearches = Array.isArray(oldData.recentSearches) ? oldData.recentSearches : [];
   const patch = {
     email,
     displayName: user.displayName || oldData.displayName || "",
     lastLoginAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
+
+  if (oldSearches.length > HISTORY_LIMIT) {
+    patch.recentSearches = oldSearches.slice(0, HISTORY_LIMIT);
+  }
 
   if (adminEmail) {
     patch.approved = true;
@@ -188,7 +193,7 @@ async function ensureUserDoc(user) {
     email,
     approved: adminEmail ? true : Boolean(oldData.approved),
     role: adminEmail ? "admin" : oldData.role || "user",
-    recentSearches: Array.isArray(oldData.recentSearches) ? oldData.recentSearches : [],
+    recentSearches: Array.isArray(patch.recentSearches) ? patch.recentSearches : oldSearches,
   };
 }
 
@@ -290,7 +295,7 @@ function userCard(id, data) {
   const normalizedEmail = normalizeEmail(email);
   const isSelf = id === currentUserId || normalizedEmail === currentUserEmail;
   const isAdminUser = role === "admin" || isAdminEmail(normalizedEmail);
-  const searches = Array.isArray(data.recentSearches) ? data.recentSearches : [];
+  const searches = Array.isArray(data.recentSearches) ? data.recentSearches.slice(0, HISTORY_LIMIT) : [];
 
   const card = document.createElement("div");
   card.className = "admin-user-card";
@@ -339,6 +344,29 @@ function userCard(id, data) {
   return card;
 }
 
+function adminUserSection(title, users, emptyText) {
+  const section = document.createElement("section");
+  section.className = "admin-user-section";
+
+  const heading = document.createElement("h3");
+  heading.textContent = `${title} (${users.length})`;
+
+  const list = document.createElement("div");
+  list.className = "admin-users";
+
+  if (users.length) {
+    users.forEach(({ id, data }) => list.appendChild(userCard(id, data)));
+  } else {
+    const empty = document.createElement("div");
+    empty.className = "admin-empty";
+    empty.textContent = emptyText;
+    list.appendChild(empty);
+  }
+
+  section.append(heading, list);
+  return section;
+}
+
 async function renderAdminUsers() {
   if (!adminPanel || !adminUsers) return;
 
@@ -350,12 +378,7 @@ async function renderAdminUsers() {
     const docs = [];
     snaps.forEach((snap) => docs.push({ id: snap.id, data: snap.data() || {} }));
 
-    docs.sort((a, b) => {
-      const pendingA = a.data.approved ? 1 : 0;
-      const pendingB = b.data.approved ? 1 : 0;
-      if (pendingA !== pendingB) return pendingA - pendingB;
-      return String(a.data.email || "").localeCompare(String(b.data.email || ""));
-    });
+    docs.sort((a, b) => String(a.data.email || "").localeCompare(String(b.data.email || "")));
 
     adminUsers.textContent = "";
     if (!docs.length) {
@@ -363,7 +386,13 @@ async function renderAdminUsers() {
       return;
     }
 
-    docs.forEach(({ id, data }) => adminUsers.appendChild(userCard(id, data)));
+    const pendingUsers = docs.filter(({ data }) => !Boolean(data.approved));
+    const approvedUsers = docs.filter(({ data }) => Boolean(data.approved));
+
+    adminUsers.append(
+      adminUserSection("Tài khoản chờ duyệt", pendingUsers, "Không có tài khoản chờ duyệt."),
+      adminUserSection("Tài khoản đã duyệt", approvedUsers, "Chưa có tài khoản đã duyệt.")
+    );
   } catch (error) {
     adminUsers.innerHTML = `
       <div class="admin-user-card">

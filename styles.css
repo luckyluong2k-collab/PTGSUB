@@ -873,10 +873,83 @@ input[readonly] {
   line-height: 1.45;
 }
 
+.login-intro {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #cfe0dc;
+  border-radius: 8px;
+  background: #f8fcfb;
+}
+
+.login-intro strong {
+  color: var(--brand-strong);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.login-intro ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
+  color: #344a45;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.login-intro p {
+  margin: 0;
+  color: #344a45;
+  font-size: 13px;
+}
+
+.login-intro b {
+  color: var(--brand-strong);
+}
+
 .auth-actions {
   display: grid;
   gap: 10px;
   margin-top: 14px;
+}
+
+.zalo-login-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 9px 12px;
+  border: 1px solid #b7d8ee;
+  border-radius: 8px;
+  background: #eef8ff;
+  color: #075f9f;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.zalo-login-link svg {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+}
+
+.zalo-login-link rect {
+  fill: #0a8fe8;
+}
+
+.zalo-login-link text {
+  fill: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.zalo-login-link span {
+  min-width: 0;
 }
 
 .admin-panel,
@@ -897,6 +970,21 @@ input[readonly] {
   gap: 10px;
 }
 
+.admin-user-section {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-user-section + .admin-user-section {
+  margin-top: 14px;
+}
+
+.admin-user-section h3 {
+  margin: 0;
+  color: var(--brand-strong);
+  font-size: 14px;
+}
+
 .admin-user-card,
 .history-card {
   display: grid;
@@ -910,6 +998,15 @@ input[readonly] {
 .admin-user-card strong,
 .history-card strong {
   overflow-wrap: anywhere;
+}
+
+.admin-empty {
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  background: #f8fcfb;
 }
 
 .admin-user-actions {

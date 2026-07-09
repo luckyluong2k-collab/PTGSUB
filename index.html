@@ -10,7 +10,7 @@
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
-    <span>Tài khoản</span>
+    <span>Menu</span>
   </button>
 
   <aside class="auth-drawer" id="authGate" aria-label="Quản lý đăng nhập">
@@ -19,16 +19,33 @@
       <p class="eyebrow">Quyền truy cập</p>
       <h1>Quản lý đăng nhập</h1>
       <p id="authStatus">Vui lòng đăng nhập bằng Gmail. Nếu là tài khoản mới, bạn cần chờ quản trị viên duyệt.</p>
+      <div class="login-intro" aria-label="Giới thiệu ứng dụng">
+        <strong>App hỗ trợ tư vấn và tính giá Sun Group nhanh hơn</strong>
+        <ul>
+          <li>Tự động tính giá cuối, trả trước và tiến độ thanh toán.</li>
+          <li>Lọc, so sánh căn theo tòa, loại căn, tầng, view và giá.</li>
+          <li>Lưu lịch sử 10 căn đã tra gần nhất để mở lại nhanh.</li>
+          <li>Quản lý tài khoản Gmail đã duyệt và đang chờ duyệt.</li>
+        </ul>
+        <p><b>Chỉ 99k/vĩnh viễn</b>, được hỗ trợ cập nhật liên tục và còn nhiều chức năng khác nữa.</p>
+      </div>
       <div class="auth-actions">
         <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
         <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
+        <a class="zalo-login-link" href="http://zalo.me/0387335227" target="_blank" rel="noopener" aria-label="Liên hệ Zalo 0387.335.227">
+          <svg viewBox="0 0 36 36" aria-hidden="true">
+            <rect x="2" y="2" width="32" height="32" rx="8"/>
+            <text x="18" y="22" text-anchor="middle">Zalo</text>
+          </svg>
+          <span>Liên hệ Zalo: <b>0387.335.227</b></span>
+        </a>
       </div>
       <div class="history-panel" id="myHistoryPanel" hidden>
         <h2>Lịch sử căn đã tra</h2>
         <div id="myHistoryList" class="history-list"></div>
       </div>
       <div class="admin-panel" id="adminPanel" hidden>
-        <h2>Quản lý người dùng</h2>
+        <h2>Quản lý tài khoản</h2>
         <div id="adminUsers" class="admin-users"></div>
       </div>
     </div>
