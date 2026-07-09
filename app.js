@@ -834,7 +834,7 @@ function discountStepFromJuly2026(dateText) {
   if (Number.isNaN(d.getTime())) return 0;
   const monthOffset = (d.getFullYear() - 2026) * 12 + (d.getMonth() - 6);
   const step = monthOffset + (d.getDate() >= 25 ? 1 : 0);
-  return Math.max(0, step);
+  return step;
 }
 
 function rollingTtsRate(policy, scenario, dateText) {
@@ -1827,7 +1827,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=58", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=59", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });

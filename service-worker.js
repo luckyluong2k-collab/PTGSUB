@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v58-mobile-auth-server-check";
+const CACHE_NAME = "park-pricing-v59-tts-history-step";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=58",
-  "./unit-data.js?v=58",
-  "./app.js?v=58",
-  "./firebase-auth.js?v=58",
+  "./styles.css?v=59",
+  "./unit-data.js?v=59",
+  "./app.js?v=59",
+  "./firebase-auth.js?v=59",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",
