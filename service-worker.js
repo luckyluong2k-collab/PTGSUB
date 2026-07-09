@@ -1,10 +1,11 @@
-﻿const CACHE_NAME = "park-pricing-v32";
+﻿const CACHE_NAME = "park-pricing-v33-auth";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./unit-data.js",
   "./app.js",
+  "./firebase-auth.js",
   "./manifest.webmanifest",
   "./icon.svg",
 ];

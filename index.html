@@ -9,7 +9,23 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="app-shell">
+  <section class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <p class="eyebrow">Quyền truy cập</p>
+      <h1>Đăng nhập Gmail để vào web</h1>
+      <p id="authStatus">Vui lòng đăng nhập bằng Gmail. Nếu là tài khoản mới, bạn cần chờ quản trị viên duyệt.</p>
+      <div class="auth-actions">
+        <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
+        <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
+      </div>
+      <div class="admin-panel" id="adminPanel" hidden>
+        <h2>Quản lý người dùng</h2>
+        <div id="adminUsers" class="admin-users"></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="app-shell" id="appContent" hidden>
     <header class="topbar brand-hero">
       <div class="brand-copy">
         <p class="eyebrow">Sun Urban City</p>
@@ -194,6 +210,7 @@
   <div class="toast" id="toast" role="status"></div>
   <script src="unit-data.js"></script>
   <script src="app.js"></script>
+  <script type="module" src="firebase-auth.js"></script>
 </body>
 </html>
 

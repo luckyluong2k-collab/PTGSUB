@@ -729,3 +729,76 @@ input[readonly] {
 
 
 
+
+/* Gmail approval gate - added only for access control, does not affect pricing calculation */
+.auth-gate {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.auth-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.auth-card h1 {
+  margin: 0 0 10px;
+  color: var(--brand-strong);
+}
+
+.auth-card p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-panel {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.admin-users {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-user-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fcfb;
+}
+
+.admin-user-card strong {
+  overflow-wrap: anywhere;
+}
+
+.admin-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  width: max-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e2f2ef;
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 900;
+}
