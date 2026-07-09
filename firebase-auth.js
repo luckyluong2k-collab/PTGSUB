@@ -68,6 +68,9 @@ const adminPanel = document.querySelector("#adminPanel");
 const adminUsers = document.querySelector("#adminUsers");
 const myHistoryPanel = document.querySelector("#myHistoryPanel");
 const myHistoryList = document.querySelector("#myHistoryList");
+const loginIntro = document.querySelector("#loginIntro");
+const loginMenuSection = document.querySelector("#loginMenuSection");
+const protectedMenuItems = Array.from(document.querySelectorAll("[data-auth-menu]"));
 
 let currentUserId = "";
 let currentUserEmail = "";
@@ -101,6 +104,14 @@ function setStatus(message) {
   if (authStatus) authStatus.textContent = message;
 }
 
+function setMenuAuthState(isInsideApp) {
+  if (loginIntro) loginIntro.hidden = isInsideApp;
+  if (loginMenuSection) loginMenuSection.open = !isInsideApp;
+  protectedMenuItems.forEach((item) => {
+    item.hidden = !isInsideApp;
+  });
+}
+
 function openDrawer() {
   if (authGate) authGate.hidden = false;
   if (accountTab) accountTab.setAttribute("aria-expanded", "true");
@@ -115,6 +126,7 @@ function showApp(userEmail) {
   if (appContent) appContent.hidden = false;
   if (loginBtn) loginBtn.hidden = true;
   if (logoutBtn) logoutBtn.hidden = false;
+  setMenuAuthState(true);
   setStatus(`Đã đăng nhập: ${userEmail}`);
 }
 
@@ -124,6 +136,7 @@ function hideApp(message) {
   if (logoutBtn) logoutBtn.hidden = true;
   if (adminPanel) adminPanel.hidden = true;
   if (myHistoryPanel) myHistoryPanel.hidden = true;
+  setMenuAuthState(false);
   setStatus(message);
   openDrawer();
 }
@@ -284,6 +297,7 @@ function renderHistoryList(container, searches = []) {
 
 function renderMyHistory(searches = []) {
   if (!myHistoryPanel || !myHistoryList) return;
+  if (myHistoryPanel.hidden) myHistoryPanel.open = false;
   myHistoryPanel.hidden = false;
   renderHistoryList(myHistoryList, searches);
 }
@@ -370,6 +384,7 @@ function adminUserSection(title, users, emptyText) {
 async function renderAdminUsers() {
   if (!adminPanel || !adminUsers) return;
 
+  if (adminPanel.hidden) adminPanel.open = false;
   adminPanel.hidden = false;
   adminUsers.textContent = "Đang tải danh sách người dùng...";
 
@@ -471,6 +486,7 @@ onAuthStateChanged(auth, async (user) => {
       if (appContent) appContent.hidden = true;
       if (adminPanel) adminPanel.hidden = true;
       if (myHistoryPanel) myHistoryPanel.hidden = true;
+      setMenuAuthState(false);
       setStatus(`Gmail ${user.email} đang chờ quản trị viên phê duyệt.`);
       openDrawer();
       return;
