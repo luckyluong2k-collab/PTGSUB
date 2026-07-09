@@ -8,6 +8,7 @@
     fixedDiscounts: { Studio: 70000000, "1BR+": 100000000, "2BR": 150000000 },
     completionUnits: { Studio: 5100000, "1BR+": 4600000, "2BR": 5400000 },
     ttsJuly: { tts95: 0.125, tts70: 0.10, tts50: 0.08 },
+    effectiveDate: "2026-04-16",
     handover: "2027-05-30",
     customerHandover: "2027-05-30",
     loanSupport: "HTLS 24 tháng, không muộn hơn 15/08/2028",
@@ -21,6 +22,7 @@
     fixedDiscounts: {},
     completionUnits: { Studio: 4722222, "1BR+": 4259259, "2BR": 5000000 },
     ttsJuly: { tts95: 0.095, tts70: 0.065, tts50: 0.035 },
+    effectiveDate: "2026-05-01",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
     loanSupport: "HTLS 24 tháng, không muộn hơn 15/07/2028",
@@ -35,6 +37,7 @@
     completionUnits: {},
     ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.035 },
     earlyBird: 0.01,
+    effectiveDate: "2026-06-20",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
     loanSupport: "HTLS 30 tháng, không quá 31/10/2028",
@@ -49,6 +52,7 @@
     completionUnits: {},
     ttsJuly: { tts95: 0.105, tts70: 0.055, tts50: 0.025 },
     earlyBird: 0.01,
+    effectiveDate: "2026-03-11",
     handover: "2028-12-31",
     customerHandover: "2027-12-31",
     loanSupport: "HTLS 30 tháng, không quá 31/10/2028",
@@ -66,6 +70,7 @@
     tmdvDiscount: 0.10,
     tmdvDefault: true,
     ttsJuly: { tts95: 0.125, tts70: 0.08, tts50: 0.06 },
+    effectiveDate: "2026-04-01",
     handover: "2027-05-30",
     loanSupport: "HTLS 30 tháng, không quá 24/09/2028",
   },
@@ -82,6 +87,7 @@
     tmdvDiscount: 0.10,
     tmdvDefault: true,
     ttsJuly: { tts95: 0.14, tts70: 0.09, tts50: 0.065 },
+    effectiveDate: "2026-05-06",
     handover: "2027-09-30",
     loanSupport: "HTLS 30 tháng, không quá 24/09/2028",
   },
@@ -98,6 +104,7 @@
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
     ttsJuly: { tts95: 0.21, tts70: 0.145, tts50: 0.12 },
+    effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
   },
@@ -114,6 +121,7 @@
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
     ttsJuly: { tts95: 0.16, tts70: 0.095, tts50: 0.07 },
+    effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
   },
@@ -204,6 +212,14 @@ const els = {
   scheduleRows: document.querySelector("#scheduleRows"),
   copyBtn: document.querySelector("#copyBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
+  ttsChartPanel: document.querySelector("#ttsChartPanel"),
+  ttsPriceChart: document.querySelector("#ttsPriceChart"),
+  ttsChartTooltip: document.querySelector("#ttsChartTooltip"),
+  ttsChartNow: document.querySelector("#ttsChartNow"),
+  ttsChartMethod: document.querySelector("#ttsChartMethod"),
+  ttsChartCurrent: document.querySelector("#ttsChartCurrent"),
+  ttsChartEnd: document.querySelector("#ttsChartEnd"),
+  ttsChartButtons: document.querySelectorAll("[data-tts-chart-scenario]"),
   pdfPrintArea: document.querySelector("#pdfPrintArea"),
   pdfOptionsDialog: document.querySelector("#pdfOptionsDialog"),
   pdfScenarioInputs: document.querySelectorAll("[data-pdf-scenario]"),
@@ -226,6 +242,7 @@ const els = {
 };
 
 let activeScenario = "loan";
+let activeTtsChartScenario = "tts95";
 let lastQuoteText = "";
 let lastPolicyKey = "";
 let lastAutoFilledCode = "";
@@ -947,15 +964,16 @@ function ttsDeadlineFromQuote(dateText) {
 function buildTtsSchedule(result) {
   const ttsRatio = ttsRatioFromScenario(result.scenario, result.policy);
   const deposit = depositByType[result.unitType] || 0;
-  const quoteDate = dateFromText(els.quoteDate.value);
-  const deadline = ttsDeadlineFromQuote(els.quoteDate.value);
+  const quoteDateText = result.quoteDate || els.quoteDate.value;
+  const quoteDate = dateFromText(quoteDateText);
+  const deadline = ttsDeadlineFromQuote(quoteDateText);
   const handoverDate = dateFromText(result.policy.handover);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
   const paymentBasisRawWithVat = result.paymentBasisRawWithVat || result.rawWithVat;
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
     [
-      `Thanh toán sớm lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
+      `Thanh toán lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
       Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit)),
     ],
   ];
@@ -1020,6 +1038,7 @@ function calculate(options = {}) {
   const baseNet = parseMoney(els.baseNet.value);
   const loanRatio = Math.max(0, Math.min(100, parseNumber(els.loanRatio.value))) / 100;
   const scenario = options.scenario || activeScenario;
+  const quoteDateText = options.quoteDate || els.quoteDate.value;
   const includeGuarantee = options.includeGuarantee ?? els.bankGuarantee.checked;
   const discounts = [];
 
@@ -1063,7 +1082,7 @@ function calculate(options = {}) {
     remaining = applyDiscount(discounts, "CK bảo lãnh NH 1%", 0.01, remaining);
   }
 
-  const ttsRate = rollingTtsRate(policy, scenario, els.quoteDate.value);
+  const ttsRate = rollingTtsRate(policy, scenario, quoteDateText);
   if (ttsRate) {
     remaining = applyDiscount(discounts, `CK ${scenarioLabel(scenario, policy)} ${percent(ttsRate)}`, ttsRate, remaining);
   }
@@ -1080,7 +1099,7 @@ function calculate(options = {}) {
   const total = rawGrossAfterDiscount + completion;
   const rawWithVat = netAfterDiscount + vat;
   const noGuaranteeBasis = includeGuarantee
-    ? calculate({ scenario, includeGuarantee: false })
+    ? calculate({ scenario, quoteDate: quoteDateText, includeGuarantee: false })
     : null;
   const paymentBasisRawWithVat = noGuaranteeBasis
     ? noGuaranteeBasis.netAfterDiscount + noGuaranteeBasis.vat
@@ -1122,6 +1141,7 @@ function calculate(options = {}) {
     schedule = buildTtsSchedule({
       policy,
       scenario,
+      quoteDate: quoteDateText,
       unitType,
       area,
       netAfterDiscount,
@@ -1135,6 +1155,7 @@ function calculate(options = {}) {
 
   return {
     policy,
+    quoteDate: quoteDateText,
     scenario,
     unitType,
     area,
@@ -1396,6 +1417,210 @@ function exportPdf(scenarios = [activeScenario]) {
   }, 80);
 }
 
+function isoDate(dateValue) {
+  const d = dateValue instanceof Date ? dateValue : dateFromText(dateValue);
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
+function addMonths(dateValue, count) {
+  const d = dateValue instanceof Date ? new Date(dateValue) : dateFromText(dateValue);
+  d.setMonth(d.getMonth() + count);
+  return d;
+}
+
+function monthText(dateValue) {
+  const d = dateValue instanceof Date ? dateValue : dateFromText(dateValue);
+  return `T${d.getMonth() + 1}/${d.getFullYear()}`;
+}
+
+function firstTtsChangeDateAfter(dateValue) {
+  const start = dateValue instanceof Date ? new Date(dateValue) : dateFromText(dateValue);
+  const d = new Date(start.getFullYear(), start.getMonth(), 25);
+  if (d.getTime() <= start.getTime()) d.setMonth(d.getMonth() + 1);
+  return d;
+}
+
+function nearestDateIndex(points, targetDate) {
+  const target = targetDate.getTime();
+  return points.reduce((best, point, index) => {
+    const diff = Math.abs(point.date.getTime() - target);
+    return diff < best.diff ? { index, diff } : best;
+  }, { index: 0, diff: Infinity }).index;
+}
+
+function buildTtsChartPoints(policy, scenario) {
+  const start = dateFromText(policy.effectiveDate || "2026-07-01");
+  const current = dateFromText(els.quoteDate.value);
+  const dates = new Map([[isoDate(start), start]]);
+  let cursor = firstTtsChangeDateAfter(start);
+
+  for (let index = 0; index < 60; index += 1) {
+    dates.set(isoDate(cursor), new Date(cursor));
+    if (rollingTtsRate(policy, scenario, isoDate(cursor)) <= 0) break;
+    cursor = addMonths(cursor, 1);
+  }
+
+  const endDate = Array.from(dates.values()).sort((a, b) => a - b).at(-1);
+  if (current.getTime() >= start.getTime() && current.getTime() <= endDate.getTime()) {
+    dates.set(isoDate(current), current);
+  }
+
+  return Array.from(dates.values())
+    .sort((a, b) => a - b)
+    .map((date) => {
+      const quoteDate = isoDate(date);
+      const result = calculate({ scenario, quoteDate });
+      return {
+        date,
+        quoteDate,
+        label: monthText(date),
+        price: result.total,
+        rate: rollingTtsRate(policy, scenario, quoteDate),
+      };
+    });
+}
+
+function showTtsChartPoint(index, visible = true) {
+  const state = els.ttsPriceChart?._chartState;
+  if (!state || !state.points[index]) return;
+
+  const point = state.points[index];
+  const hoverLine = els.ttsPriceChart.querySelector("#ttsChartHoverLine");
+  const hoverDot = els.ttsPriceChart.querySelector("#ttsChartHoverDot");
+  if (hoverLine) {
+    hoverLine.setAttribute("x1", point.x);
+    hoverLine.setAttribute("x2", point.x);
+    hoverLine.style.opacity = visible ? "0.7" : "0";
+  }
+  if (hoverDot) {
+    hoverDot.setAttribute("cx", point.x);
+    hoverDot.setAttribute("cy", point.y);
+    hoverDot.style.opacity = visible ? "1" : "0";
+  }
+
+  const rect = els.ttsPriceChart.getBoundingClientRect();
+  const scaleX = rect.width / state.width;
+  const scaleY = rect.height / state.height;
+  els.ttsChartTooltip.innerHTML = `
+    <span>${safeText(scenarioLabel(activeTtsChartScenario, state.policy))} - ${safeText(formatDateText(point.date))}</span>
+    <strong>${safeText(money(point.price))}</strong>
+    <em>CK còn ${safeText(percent(point.rate))}</em>
+  `;
+  els.ttsChartTooltip.style.left = `${point.x * scaleX + 12}px`;
+  els.ttsChartTooltip.style.top = `${point.y * scaleY + 12}px`;
+  els.ttsChartTooltip.classList.toggle("visible", visible);
+}
+
+function nearestTtsChartPoint(clientX) {
+  const state = els.ttsPriceChart?._chartState;
+  if (!state) return 0;
+  const rect = els.ttsPriceChart.getBoundingClientRect();
+  const svgX = (clientX - rect.left) * state.width / rect.width;
+  return state.points.reduce((best, point, index) => {
+    const diff = Math.abs(point.x - svgX);
+    return diff < best.diff ? { index, diff } : best;
+  }, { index: 0, diff: Infinity }).index;
+}
+
+function renderTtsChart() {
+  if (!els.ttsPriceChart) return;
+
+  const policy = policies[els.policyGroup.value] || policies.P3P9;
+  const points = buildTtsChartPoints(policy, activeTtsChartScenario);
+  const currentDate = dateFromText(els.quoteDate.value);
+  const currentIndex = nearestDateIndex(points, currentDate);
+  const currentPoint = points[currentIndex];
+  const endPoint = points[points.length - 1];
+  const color = activeTtsChartScenario === "tts50"
+    ? "#2563eb"
+    : activeTtsChartScenario === "tts70"
+      ? "#7c3aed"
+      : "#be123c";
+  const soft = activeTtsChartScenario === "tts50"
+    ? "#eaf1ff"
+    : activeTtsChartScenario === "tts70"
+      ? "#f1eaff"
+      : "#fff0f3";
+
+  const width = 720;
+  const height = 330;
+  const margin = { top: 24, right: 18, bottom: 54, left: 76 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const prices = points.map((point) => point.price);
+  const rawMin = Math.min(...prices);
+  const rawMax = Math.max(...prices);
+  const padding = Math.max(50000000, (rawMax - rawMin) * 0.15);
+  const minValue = Math.max(0, Math.floor((rawMin - padding) / 50000000) * 50000000);
+  const maxValue = Math.ceil((rawMax + padding) / 50000000) * 50000000 || 1;
+  const span = Math.max(1, maxValue - minValue);
+  const xStep = plotWidth / Math.max(1, points.length - 1);
+  const toX = (index) => margin.left + index * xStep;
+  const toY = (value) => margin.top + (maxValue - value) / span * plotHeight;
+  const chartPoints = points.map((point, index) => ({
+    ...point,
+    x: toX(index),
+    y: toY(point.price),
+  }));
+  const path = chartPoints.map((point, index) => `${index ? "L" : "M"} ${point.x} ${point.y}`).join(" ");
+  const area = `${path} L ${chartPoints.at(-1).x} ${height - margin.bottom} L ${chartPoints[0].x} ${height - margin.bottom} Z`;
+  const ticks = Array.from({ length: 5 }, (_, index) => minValue + span / 4 * index);
+  const labelEvery = Math.max(1, Math.ceil(points.length / 7));
+  const currentX = chartPoints[currentIndex].x;
+  const bandWidth = Math.max(22, xStep * 0.78);
+
+  els.ttsPriceChart.innerHTML = `
+    <rect class="tts-current-band" x="${currentX - bandWidth / 2}" y="${margin.top}" width="${bandWidth}" height="${plotHeight}"></rect>
+    ${ticks.map((value) => {
+      const y = toY(value);
+      return `
+        <line class="tts-grid-line" x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}"></line>
+        <text class="tts-axis-label" x="${margin.left - 9}" y="${y + 4}" text-anchor="end">${(value / 1000000000).toLocaleString("vi-VN", { maximumFractionDigits: 2 })} tỷ</text>
+      `;
+    }).join("")}
+    ${chartPoints.map((point, index) => {
+      const showLabel = index === 0 || index === points.length - 1 || index === currentIndex || index % labelEvery === 0;
+      return `
+        <line class="tts-grid-line" x1="${point.x}" y1="${margin.top}" x2="${point.x}" y2="${height - margin.bottom}" opacity="${showLabel ? "0.65" : "0.25"}"></line>
+        ${showLabel ? `<text class="tts-axis-label" x="${point.x}" y="${height - 20}" text-anchor="middle">${safeText(point.label)}</text>` : ""}
+      `;
+    }).join("")}
+    <line class="tts-axis-line" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"></line>
+    <line class="tts-axis-line" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"></line>
+    <text class="tts-axis-title" x="${margin.left}" y="16">Giá Phải TT</text>
+    <text class="tts-axis-title" x="${width - margin.right}" y="${height - 5}" text-anchor="end">Đơn vị: tháng</text>
+    <line class="tts-current-line" x1="${currentX}" y1="${margin.top}" x2="${currentX}" y2="${height - margin.bottom}"></line>
+    <text class="tts-current-label" x="${Math.min(currentX + 8, width - 90)}" y="${margin.top + 17}">Hiện tại</text>
+    <path class="tts-area" d="${area}" fill="${color}"></path>
+    <path class="tts-line" d="${path}" stroke="${color}"></path>
+    ${chartPoints.map((point, index) => `
+      <circle class="tts-dot" cx="${point.x}" cy="${point.y}" r="${index === currentIndex ? 7 : 5}" fill="${color}" data-index="${index}"></circle>
+    `).join("")}
+    <line id="ttsChartHoverLine" class="tts-hover-line" x1="0" y1="${margin.top}" x2="0" y2="${height - margin.bottom}"></line>
+    <circle id="ttsChartHoverDot" class="tts-hover-dot" cx="0" cy="0" r="8" fill="${color}"></circle>
+  `;
+
+  els.ttsPriceChart._chartState = {
+    width,
+    height,
+    points: chartPoints,
+    policy,
+  };
+  els.ttsChartNow.textContent = `Hiện tại: ${formatDateText(currentPoint.date)}`;
+  els.ttsChartMethod.textContent = scenarioLabel(activeTtsChartScenario, policy);
+  els.ttsChartCurrent.textContent = money(currentPoint.price);
+  els.ttsChartEnd.textContent = money(endPoint.price);
+  els.ttsChartPanel.style.setProperty("--tts-chart-color", color);
+  els.ttsChartPanel.style.setProperty("--tts-chart-soft", soft);
+  els.ttsChartButtons.forEach((button) => {
+    button.textContent = scenarioLabel(button.dataset.ttsChartScenario, policy);
+    button.classList.toggle("active", button.dataset.ttsChartScenario === activeTtsChartScenario);
+  });
+  showTtsChartPoint(currentIndex, false);
+}
+
 function render() {
   const policy = policies[els.policyGroup.value] || policies.P3P9;
   syncPolicyControls(policy);
@@ -1425,6 +1650,7 @@ function render() {
 
   els.discountRows.innerHTML = discountRowsHtml(result);
   els.scheduleRows.innerHTML = scheduleRowsHtml(result);
+  renderTtsChart();
 
   lastQuoteText = makeQuoteText(result);
 }
@@ -1578,10 +1804,53 @@ els.pdfOptionsExport.addEventListener("click", () => {
   exportPdf(scenarios);
 });
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js?v=52").catch(() => {});
+els.ttsChartButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activeTtsChartScenario = button.dataset.ttsChartScenario;
+    renderTtsChart();
+  });
+});
+
+els.ttsPriceChart.addEventListener("pointermove", (event) => {
+  showTtsChartPoint(nearestTtsChartPoint(event.clientX), true);
+});
+
+els.ttsPriceChart.addEventListener("pointerdown", (event) => {
+  els.ttsPriceChart.setPointerCapture(event.pointerId);
+  showTtsChartPoint(nearestTtsChartPoint(event.clientX), true);
+});
+
+els.ttsPriceChart.addEventListener("pointerleave", () => {
+  showTtsChartPoint(nearestDateIndex(els.ttsPriceChart._chartState.points, dateFromText(els.quoteDate.value)), false);
+});
+
+function installServiceWorkerUpdates() {
+  if (!("serviceWorker" in navigator)) return;
+
+  navigator.serviceWorker.register("service-worker.js?v=58", { updateViaCache: "none" })
+    .then((registration) => {
+      const activateWaitingWorker = () => {
+        registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+      };
+
+      activateWaitingWorker();
+      registration.addEventListener("updatefound", () => {
+        const worker = registration.installing;
+        if (!worker) return;
+
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            worker.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+
+      registration.update().catch(() => {});
+    })
+    .catch(() => {});
 }
 
+installServiceWorkerUpdates();
 syncBaseFromGross();
 document.querySelectorAll("[data-money-input]").forEach(formatMoneyInput);
 populateFinderOptions();

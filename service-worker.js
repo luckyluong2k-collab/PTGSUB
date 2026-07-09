@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v52-pdf-options";
+const CACHE_NAME = "park-pricing-v58-mobile-auth-server-check";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=52",
-  "./unit-data.js?v=52",
-  "./app.js?v=52",
-  "./firebase-auth.js?v=52",
+  "./styles.css?v=58",
+  "./unit-data.js?v=58",
+  "./app.js?v=58",
+  "./firebase-auth.js?v=58",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",
@@ -19,13 +19,36 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+async function refreshOpenAppTabs() {
+  const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+  await Promise.all(clients.map((client) => {
+    const url = new URL(client.url);
+    const isAppPage = url.origin === self.location.origin
+      && !url.pathname.startsWith("/__/")
+      && (url.pathname === "/" || url.pathname.endsWith("/index.html"));
+
+    if (!isAppPage || typeof client.navigate !== "function") return null;
+    return client.navigate(client.url).catch(() => null);
+  }));
+}
+
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
-    )
-  );
-  event.waitUntil(self.clients.claim());
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const oldKeys = keys.filter((key) => key !== CACHE_NAME);
+    await Promise.all(oldKeys.map((key) => caches.delete(key)));
+    await self.clients.claim();
+
+    if (oldKeys.some((key) => key.startsWith("park-pricing-"))) {
+      await refreshOpenAppTabs();
+    }
+  })());
 });
 
 self.addEventListener("fetch", (event) => {

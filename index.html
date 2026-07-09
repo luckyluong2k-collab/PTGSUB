@@ -4,12 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Bảng tính giá Vhomes - Đối tác top 1 Sun Group</title>
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=52">
+  <link rel="stylesheet" href="styles.css?v=58">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -31,7 +34,7 @@
           <li><b>📚 Tra Cứu CSBH Siêu Tốc:</b> Lưu trữ và tìm kiếm nhanh file chính sách, bảng hàng gốc mà không cần lục tìm trên các nhóm chat.</li>
         </ul>
         <p><b>🚀 Ứng dụng đang trong quá trình liên tục cập nhật các tính năng đột phá mới!</b></p>
-        <p><b>💰 Sở hữu ngay:</b> Chỉ 99k / Sử dụng vĩnh viễn.</p>
+        <p><b>💰 Sở hữu ngay:</b> Chỉ <span class="price-highlight">99k</span> / Sử dụng vĩnh viễn.</p>
       </div>
 
       <div class="menu-sections">
@@ -283,6 +286,29 @@
         <button class="primary" id="copyBtn" type="button">Sao ch&#233;p b&#225;o gi&#225;</button>
         <button class="secondary pdf-button" id="pdfBtn" type="button">Xu&#7845;t PDF</button>
       </div>
+      <div class="tts-chart-panel" id="ttsChartPanel">
+        <div class="tts-chart-head">
+          <div>
+            <span>Bi&#7875;u &#273;&#7891; TTS</span>
+            <h3>Gi&#225; Ph&#7843;i Thanh To&#225;n Theo Th&#225;ng</h3>
+          </div>
+          <strong id="ttsChartNow">Hi&#7879;n t&#7841;i</strong>
+        </div>
+        <div class="tts-chart-wrap">
+          <svg id="ttsPriceChart" viewBox="0 0 720 330" role="img" aria-label="Bi&#7875;u &#273;&#7891; gi&#225; ph&#7843;i thanh to&#225;n theo th&#225;ng"></svg>
+          <div class="tts-chart-tooltip" id="ttsChartTooltip" aria-hidden="true"></div>
+        </div>
+        <div class="tts-chart-meta">
+          <div><span>Ph&#432;&#417;ng th&#7913;c</span><strong id="ttsChartMethod">TTS 95%</strong></div>
+          <div><span>Gi&#225; hi&#7879;n t&#7841;i</span><strong id="ttsChartCurrent">0 &#273;</strong></div>
+          <div><span>K&#7871;t th&#250;c CK</span><strong id="ttsChartEnd">0 &#273;</strong></div>
+        </div>
+        <div class="tts-chart-tabs" role="radiogroup" aria-label="Ch&#7885;n ph&#432;&#417;ng th&#7913;c TTS cho bi&#7875;u &#273;&#7891;">
+          <button type="button" data-tts-chart-scenario="tts50">TTS 50%</button>
+          <button type="button" data-tts-chart-scenario="tts70">TTS 70%</button>
+          <button type="button" data-tts-chart-scenario="tts95" class="active">TTS 95%</button>
+        </div>
+      </div>
     </section>
 
     <section class="panel compact">
@@ -316,8 +342,8 @@
 
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="unit-data.js?v=52"></script>
-  <script src="app.js?v=52"></script>
-  <script type="module" src="firebase-auth.js?v=52"></script>
+  <script src="unit-data.js?v=58"></script>
+  <script src="app.js?v=58"></script>
+  <script type="module" src="firebase-auth.js?v=58"></script>
 </body>
 </html>

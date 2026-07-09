@@ -3,6 +3,7 @@ import {
   getAuth,
   GoogleAuthProvider,
   browserLocalPersistence,
+  browserSessionPersistence,
   getRedirectResult,
   signInWithPopup,
   signInWithRedirect,
@@ -15,6 +16,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocFromServer,
   getDocs,
   setDoc,
   updateDoc,
@@ -87,6 +89,7 @@ let currentIsAdmin = false;
 let lastLoggedCode = "";
 let historyTimer = 0;
 let redirectResultChecked = false;
+let approvalPollTimer = 0;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -130,7 +133,11 @@ function updateBrowserWarning(force = false) {
 }
 
 async function prepareGoogleLogin() {
-  await setPersistence(auth, browserLocalPersistence);
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+  } catch {
+    await setPersistence(auth, browserSessionPersistence);
+  }
 }
 
 async function checkRedirectLoginResult() {
@@ -142,6 +149,7 @@ async function checkRedirectLoginResult() {
     if (result?.user) {
       setStatus("Đã nhận đăng nhập Google, đang kiểm tra quyền truy cập...");
     }
+    if (result?.user) await handleSignedInUser(result.user);
   } catch (error) {
     if (String(error?.message || error).includes("disallowed_useragent")) updateBrowserWarning(true);
     setStatus(`Không hoàn tất đăng nhập Google: ${authErrorMessage(error)}`);
@@ -205,9 +213,37 @@ function isAdminEmail(email) {
   return normalizeEmail(email) === ADMIN_EMAIL;
 }
 
+async function getFreshUserDoc(userRef) {
+  try {
+    return await getDocFromServer(userRef);
+  } catch {
+    return getDoc(userRef);
+  }
+}
+
+function normalizeUserData(user, data = {}) {
+  const email = normalizeEmail(user.email);
+  const adminEmail = isAdminEmail(email);
+  return {
+    ...data,
+    email,
+    displayName: user.displayName || data.displayName || "",
+    approved: adminEmail ? true : Boolean(data.approved),
+    role: adminEmail ? "admin" : data.role || "user",
+    recentSearches: Array.isArray(data.recentSearches) ? data.recentSearches : [],
+  };
+}
+
+async function readUserData(user) {
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getFreshUserDoc(userRef);
+  if (!snap.exists()) return null;
+  return normalizeUserData(user, snap.data() || {});
+}
+
 async function ensureUserDoc(user) {
   const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
+  const snap = await getFreshUserDoc(userRef);
   const email = normalizeEmail(user.email);
   const adminEmail = isAdminEmail(email);
 
@@ -222,8 +258,14 @@ async function ensureUserDoc(user) {
       updatedAt: serverTimestamp(),
       lastLoginAt: serverTimestamp(),
     };
-    await setDoc(userRef, data);
-    return { ...data, recentSearches: [] };
+    try {
+      await setDoc(userRef, data);
+      return { ...data, recentSearches: [] };
+    } catch (error) {
+      const retry = await getFreshUserDoc(userRef);
+      if (retry.exists()) return normalizeUserData(user, retry.data() || {});
+      throw error;
+    }
   }
 
   const oldData = snap.data() || {};
@@ -244,16 +286,17 @@ async function ensureUserDoc(user) {
     patch.role = "admin";
   }
 
-  await updateDoc(userRef, patch);
+  try {
+    await updateDoc(userRef, patch);
+  } catch {
+    return normalizeUserData(user, oldData);
+  }
 
-  return {
+  return normalizeUserData(user, {
     ...oldData,
     ...patch,
-    email,
-    approved: adminEmail ? true : Boolean(oldData.approved),
-    role: adminEmail ? "admin" : oldData.role || "user",
     recentSearches: Array.isArray(patch.recentSearches) ? patch.recentSearches : oldSearches,
-  };
+  });
 }
 
 function readCurrentSearch() {
@@ -346,6 +389,75 @@ function renderMyHistory(searches = []) {
   if (myHistoryPanel.hidden) myHistoryPanel.open = false;
   myHistoryPanel.hidden = false;
   renderHistoryList(myHistoryList, searches);
+}
+
+function stopApprovalPolling() {
+  window.clearInterval(approvalPollTimer);
+  approvalPollTimer = 0;
+}
+
+async function enterApprovedApp(user, data) {
+  stopApprovalPolling();
+  currentUserData = data;
+  currentIsAdmin = isAdminEmail(currentUserEmail) || data.role === "admin";
+
+  showApp(user.email);
+  renderMyHistory(data.recentSearches || []);
+
+  if (currentIsAdmin) {
+    try {
+      await renderAdminUsers();
+    } catch {
+      if (adminPanel) adminPanel.hidden = true;
+    }
+  } else if (adminPanel) {
+    adminPanel.hidden = true;
+  }
+
+  closeDrawer();
+  window.setTimeout(() => scheduleSaveCurrentSearch(true), 1000);
+}
+
+function showPendingApproval(user) {
+  if (appContent) appContent.hidden = true;
+  if (adminPanel) adminPanel.hidden = true;
+  if (myHistoryPanel) myHistoryPanel.hidden = true;
+  setMenuAuthState(false);
+  setStatus(`Gmail ${user.email} đang chờ quản trị viên phê duyệt. Nếu vừa được duyệt, hệ thống sẽ tự cập nhật sau vài giây.`);
+  openDrawer();
+}
+
+function startApprovalPolling(user) {
+  stopApprovalPolling();
+  approvalPollTimer = window.setInterval(async () => {
+    try {
+      const data = await readUserData(user);
+      if (!data) return;
+      const approved = data.approved || isAdminEmail(user.email) || data.role === "admin";
+      if (approved) await enterApprovedApp(user, data);
+    } catch {}
+  }, 5000);
+}
+
+async function handleSignedInUser(user) {
+  currentUserId = user.uid;
+  currentUserEmail = normalizeEmail(user.email);
+
+  if (loginBtn) loginBtn.hidden = true;
+  if (logoutBtn) logoutBtn.hidden = false;
+  setStatus("Đang kiểm tra quyền truy cập...");
+
+  const data = await ensureUserDoc(user);
+  currentUserData = data;
+  currentIsAdmin = isAdminEmail(currentUserEmail) || data.role === "admin";
+
+  if (!data.approved && !currentIsAdmin) {
+    showPendingApproval(user);
+    startApprovalPolling(user);
+    return;
+  }
+
+  await enterApprovedApp(user, data);
 }
 
 function userCard(id, data) {
@@ -501,13 +613,14 @@ if (loginBtn) {
       loginBtn.disabled = true;
       loginBtn.textContent = "Đang mở Google...";
       await prepareGoogleLogin();
-      if (isMobileDevice()) {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
       await signInWithPopup(auth, provider);
     } catch (error) {
-      if (error?.code === "auth/popup-blocked" || error?.code === "auth/cancelled-popup-request") {
+      if (
+        error?.code === "auth/popup-blocked"
+        || error?.code === "auth/cancelled-popup-request"
+        || error?.code === "auth/operation-not-supported-in-this-environment"
+        || (isMobileDevice() && error?.code === "auth/popup-closed-by-user")
+      ) {
         await signInWithRedirect(auth, provider);
         return;
       }
@@ -541,6 +654,7 @@ checkRedirectLoginResult();
 onAuthStateChanged(auth, async (user) => {
   try {
     if (!user) {
+      stopApprovalPolling();
       currentUserId = "";
       currentUserEmail = "";
       currentUserData = null;
@@ -560,6 +674,15 @@ onAuthStateChanged(auth, async (user) => {
     const data = await ensureUserDoc(user);
     currentUserData = data;
     currentIsAdmin = isAdminEmail(currentUserEmail) || data.role === "admin";
+
+    if (!data.approved && !currentIsAdmin) {
+      showPendingApproval(user);
+      startApprovalPolling(user);
+      return;
+    }
+
+    await enterApprovedApp(user, data);
+    return;
 
     if (!data.approved && !currentIsAdmin) {
       if (appContent) appContent.hidden = true;
