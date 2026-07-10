@@ -136,7 +136,8 @@ const depositByType = {
   "Biệt thự": 300000000,
 };
 
-let unitCatalog = window.unitCatalog || {};
+let unitCatalog = {};
+window.unitCatalog = unitCatalog;
 const grossDividedPolicyKeys = new Set([
   "P3P9",
   "P10P18",
@@ -148,29 +149,13 @@ const grossDividedPolicyKeys = new Set([
 
 const GOOGLE_SHEET_ID = "1zkzQCRqIgNtcMktWxE8PDc0fF4tuvMl9eY-ehHYfSiM";
 const GOOGLE_SHEET_GIDS = [
-  "0",
-  "104698895",
-  "1047554448",
   "1056952990",
-  "1196473667",
-  "144200157",
-  "1510790688",
-  "1822392935",
-  "1937317102",
-  "2015572114",
-  "2045467558",
-  "2120496955",
-  "280930221",
-  "304330379",
-  "374942218",
-  "403799908",
-  "442507581",
-  "501285108",
-  "657713870",
   "696857310",
-  "794845269",
-  "814954545",
-  "854202727",
+  "1047554448",
+  "304330379",
+  "2045467558",
+  "1510790688",
+  "442507581",
 ];
 
 const scenarioLabels = {
@@ -903,6 +888,14 @@ function gvizMoney(row, index) {
   return index >= 0 ? gvizCellMoney(row.c?.[index]) : 0;
 }
 
+function rowText(row) {
+  return (row.c || []).map(gvizCellText).filter(Boolean).join(" ");
+}
+
+function rowLabels(row) {
+  return (row.c || []).map(gvizCellText);
+}
+
 function findColumn(labels, includes, excludes = []) {
   const includeNeedles = includes.map(normalizeHeaderText);
   const excludeNeedles = excludes.map(normalizeHeaderText);
@@ -921,6 +914,99 @@ function findColumn(labels, includes, excludes = []) {
 function shortColumnIndex(labels, index, maxLength = 60) {
   if (index < 0) return -1;
   return normalizeHeaderText(labels[index]).length <= maxLength ? index : -1;
+}
+
+function preferredColumnIndex(labels, candidates, maxLength = 90) {
+  for (const candidate of candidates) {
+    const index = shortColumnIndex(
+      labels,
+      findColumn(labels, candidate.includes, candidate.excludes || []),
+      candidate.maxLength || maxLength
+    );
+    if (index >= 0) return index;
+  }
+  return -1;
+}
+
+function headerScore(labels) {
+  const normalized = labels.map(normalizeHeaderText);
+  const has = (needle) => normalized.some((label) => label.includes(needle));
+  let score = 0;
+  if (has("ma can")) score += 4;
+  if (has("dien tich")) score += 2;
+  if (has("tong gia") || has("gia ban")) score += 2;
+  if (has("tinh trang") || has("trang thai")) score += 2;
+  if (has("loai can")) score += 1;
+  if (has("toa")) score += 1;
+  return score;
+}
+
+function detectSheetHeader(table) {
+  const fallbackLabels = table.cols.map((column) => column.label || column.id || "");
+  let best = {
+    labels: fallbackLabels,
+    startRow: 0,
+    score: headerScore(fallbackLabels),
+  };
+
+  table.rows.slice(0, 80).forEach((row, index) => {
+    const labels = rowLabels(row);
+    const score = headerScore(labels);
+    if (score > best.score) {
+      best = {
+        labels,
+        startRow: index + 1,
+        score,
+      };
+    }
+  });
+
+  return best.score >= 6 ? best : { labels: fallbackLabels, startRow: 0, score: best.score };
+}
+
+function statusNoteColumnIndexes(labels) {
+  const needles = ["tinh trang", "trang thai", "ghi chu", "note", "status"];
+  return labels.reduce((indexes, label, index) => {
+    const normalized = normalizeHeaderText(label);
+    if (needles.some((needle) => normalized.includes(needle))) indexes.push(index);
+    return indexes;
+  }, []);
+}
+
+function extractSheetCode(row, codeIdx) {
+  const directCode = normalizeUnitCode(gvizValue(row, codeIdx));
+  if (isSupportedSheetCode(directCode)) return directCode;
+
+  const codeCell = (row.c || []).find((cell) => {
+    return isSupportedSheetCode(normalizeUnitCode(gvizCellText(cell)));
+  });
+  return normalizeUnitCode(gvizCellText(codeCell));
+}
+
+function nonEmptyUnitValueCount(unit) {
+  return Object.values(unit).filter((value) => {
+    return value !== null && value !== undefined && String(value).trim() !== "" && value !== 0;
+  }).length;
+}
+
+function mergeCatalogUnit(catalog, metaByCode, code, unit, meta) {
+  const current = catalog[code];
+  if (!current) {
+    catalog[code] = unit;
+    metaByCode[code] = meta;
+    return;
+  }
+
+  const incomingCount = nonEmptyUnitValueCount(unit);
+  const currentCount = nonEmptyUnitValueCount(current);
+  const currentMeta = metaByCode[code] || { gidIndex: -1, rowIndex: -1 };
+  const incomingOrder = meta.gidIndex * 100000 + meta.rowIndex;
+  const currentOrder = currentMeta.gidIndex * 100000 + currentMeta.rowIndex;
+
+  if (incomingCount > currentCount || (incomingCount === currentCount && incomingOrder >= currentOrder)) {
+    catalog[code] = unit;
+    metaByCode[code] = meta;
+  }
 }
 
 function inferTowerFromCode(code, rawTower = "") {
@@ -964,32 +1050,26 @@ function isUnavailableSheetStatus(status) {
   const normalized = normalizeHeaderText(status);
   if (!normalized) return false;
   const phrases = [
-    "da ban",
-    "ban het",
+    "da xoa",
+    "da an",
+    "da bo",
+    "da thu hoi",
     "thu hoi",
     "ngung ban",
-    "tam dung",
     "khong ban",
-    "da xoa",
-    "bi xoa",
     "da huy",
-    "huy can",
-    "dang lock",
-    "lock can",
-    "hidden",
-    "deleted",
-    "sold",
-    "cancelled",
-    "canceled",
   ];
   if (phrases.some((phrase) => normalized.includes(phrase))) return true;
-  return ["an", "xoa", "huy", "lock"].some((word) => {
+  return ["xoa", "an", "bo", "huy", "khoa"].some((word) => {
     return new RegExp(`(^| )${word}( |$)`).test(normalized);
   });
 }
 
-function rowHasUnavailableSheetStatus(row) {
-  return (row.c || []).some((cell) => isUnavailableSheetStatus(gvizCellText(cell)));
+function rowHasUnavailableSheetStatus(row, statusNoteIndexes = []) {
+  const cells = statusNoteIndexes.length
+    ? statusNoteIndexes.map((index) => row.c?.[index])
+    : (row.c || []);
+  return cells.some((cell) => isUnavailableSheetStatus(gvizCellText(cell)));
 }
 
 function inferPolicyGroup(code, tower, rawType, title) {
@@ -1009,51 +1089,92 @@ function inferPolicyGroup(code, tower, rawType, title) {
   return "";
 }
 
-function parseGoogleSheetUnits(response) {
+function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
   const table = response?.table;
-  if (!table?.rows?.length) return {};
-  const labels = table.cols.map((column) => column.label || "");
-  const title = labels.join(" ");
-  if (normalizeHeaderText(title).includes("ma tran")) return {};
-  const codeIdx = shortColumnIndex(labels, findColumn(labels, ["ma can"]), 35);
-  const rawTypeIdx = shortColumnIndex(labels, findColumn(labels, ["loai can", "vi tri", "phan khu"]), 60);
+  const stats = {
+    gid,
+    readRows: 0,
+    acceptedRows: 0,
+    rejectedRows: 0,
+  };
+  if (!table?.rows?.length) return { units: {}, stats, metaByCode: {} };
+  const detected = detectSheetHeader(table);
+  const labels = detected.labels;
+  const title = [
+    ...table.cols.map((column) => column.label || column.id || ""),
+    ...table.rows.slice(0, detected.startRow).map(rowText),
+  ].join(" ");
+  if (normalizeHeaderText(title).includes("ma tran")) return { units: {}, stats, metaByCode: {} };
+  const codeIdx = shortColumnIndex(labels, findColumn(labels, ["ma can"]), 40);
+  const rawTypeIdx = preferredColumnIndex(labels, [
+    { includes: ["loai can"] },
+    { includes: ["vi tri"], excludes: ["chi can", "tinh trang", "trang thai"] },
+    { includes: ["phan khu"] },
+  ], 80);
   const towerIdx = shortColumnIndex(labels, findColumn(labels, ["toa"]), 30);
-  const viewIdx = shortColumnIndex(labels, findColumn(labels, ["view", "vi tri"]), 60);
+  const viewIdx = preferredColumnIndex(labels, [
+    { includes: ["view"] },
+    { includes: ["vi tri"], excludes: ["chi can", "tinh trang", "trang thai"] },
+  ], 80);
   const directionIdx = shortColumnIndex(labels, findColumn(labels, ["huong"]), 30);
-  const floorIdx = shortColumnIndex(labels, findColumn(labels, ["tang cao", "tang"], ["dtang", "tang 1"]), 35);
-  const statusIdx = shortColumnIndex(labels, findColumn(labels, ["tinh trang", "trang thai"]), 40);
-  const areaIdx = shortColumnIndex(labels, findColumn(labels, ["dien tich thong thuy", "dien tich dat", "dien tich", "dtd", "dt d"]), 60);
-  const constructionIdx = shortColumnIndex(labels, findColumn(labels, ["tong dtxd", "tong dien tich xay dung"]), 50);
-  const baseNetIdx = findColumn(labels, ["gia chua", "chua gom vat", "chua vat", "gia tho chua"]);
-  const grossIdx = findColumn(labels, [
-    "gia da gom vat",
-    "gia bao gom vat",
-    "gia tho gom vat",
-    "bao gom vat kpbt",
-    "bao gom vat kpbt noi that",
-    "tong gia ban can ho bao gom vat",
-    "tong gia gom vat",
-    "tong gia ban ra thi truong vat la tam tinh",
-    "tong tien thanh toan",
-  ], ["chua"]);
+  const floorIdx = preferredColumnIndex(labels, [
+    { includes: ["tang cao"] },
+    { includes: ["tang"], excludes: ["dtang", "tang 1"] },
+  ], 45);
+  const areaIdx = preferredColumnIndex(labels, [
+    { includes: ["dien tich thong thuy"] },
+    { includes: ["dien tich dat"] },
+    { includes: ["dien tich"], excludes: ["xay dung"] },
+    { includes: ["dtd"] },
+    { includes: ["dt d"] },
+  ], 80);
+  const constructionIdx = preferredColumnIndex(labels, [
+    { includes: ["tong dtxd"] },
+    { includes: ["tong dien tich xay dung"] },
+    { includes: ["dtxd"], excludes: ["tang 1"] },
+  ], 80);
+  const baseNetIdx = preferredColumnIndex(labels, [
+    { includes: ["gia chua"], excludes: ["tts"] },
+    { includes: ["chua gom vat"], excludes: ["tts"] },
+    { includes: ["chua vat"], excludes: ["tts"] },
+    { includes: ["gia tho chua"], excludes: ["tts"] },
+  ], 150);
+  const grossIdx = preferredColumnIndex(labels, [
+    { includes: ["tong gia ban can ho bao gom vat"], excludes: ["chua", "tts"] },
+    { includes: ["tong gia gom vat"], excludes: ["chua", "tts"] },
+    { includes: ["gia da gom vat"], excludes: ["chua", "tts"] },
+    { includes: ["bao gom vat kpbt"], excludes: ["chua", "tts"] },
+    { includes: ["tong gia ban ra thi truong"], excludes: ["tts"] },
+    { includes: ["gia ban ra thi truong"], excludes: ["tts"] },
+    { includes: ["tong tien thanh toan"], excludes: ["tts"] },
+  ], 170);
+  const noteIndexes = statusNoteColumnIndexes(labels);
   const units = {};
+  const metaByCode = {};
 
-  table.rows.forEach((row) => {
-    const rowCells = row.c || [];
-    let code = codeIdx >= 0 ? gvizValue(row, codeIdx) : "";
-    if (!code) {
-      const codeCell = rowCells.find((cell) => /^[PC]\d{3,}[A-Z0-9]*$/i.test(gvizCellText(cell)));
-      code = gvizCellText(codeCell);
+  table.rows.slice(detected.startRow).forEach((row, rowIndex) => {
+    stats.readRows += 1;
+    const rejectRow = () => {
+      stats.rejectedRows += 1;
+    };
+    const code = extractSheetCode(row, codeIdx);
+    if (!isSupportedSheetCode(code)) {
+      rejectRow();
+      return;
     }
-    code = normalizeUnitCode(code);
-    if (!isSupportedSheetCode(code)) return;
 
-    if (isUnavailableSheetStatus(gvizValue(row, statusIdx)) || rowHasUnavailableSheetStatus(row)) return;
+    if (rowHasUnavailableSheetStatus(row, noteIndexes)) {
+      rejectRow();
+      return;
+    }
 
     const rawType = gvizValue(row, rawTypeIdx);
     const tower = inferTowerFromCode(code, gvizValue(row, towerIdx));
     const policyGroup = inferPolicyGroup(code, tower, rawType, title);
-    if (!policyGroup || !policies[policyGroup]) return;
+    if (!policyGroup || !policies[policyGroup]) {
+      rejectRow();
+      return;
+    }
 
     let listedGross = gvizMoney(row, grossIdx);
     let baseNet = gvizMoney(row, baseNetIdx);
@@ -1066,28 +1187,26 @@ function parseGoogleSheetUnits(response) {
     if (!baseNet && listedGross && grossDividedPolicyKeys.has(policyGroup)) {
       baseNet = round(listedGross / 1.12);
     }
-    if (listedGross && listedGross < 1000000000) return;
-    if (!baseNet && listedGross && (policyGroup === "LOWRISE_LK" || policyGroup === "LOWRISE_BT")) {
+    if (!baseNet && listedGross && area && (policyGroup === "LOWRISE_LK" || policyGroup === "LOWRISE_BT")) {
       const policy = policies[policyGroup];
       const landUseRightValue = policy.landUseRightUnitPrice
         ? round(policy.landUseRightUnitPrice * area)
         : 0;
       baseNet = round((listedGross + landUseRightValue * vatRate(policy)) / grossFactor(policy));
     }
-    if (!listedGross || !area) return;
 
     const unitType = normalizeSheetUnitType(rawType, policyGroup);
     const unit = {
       policyGroup,
-      unitType,
-      area,
-      listedGross,
       source: "google-sheet",
     };
+    if (unitType) unit.unitType = unitType;
+    if (area) unit.area = area;
+    if (listedGross) unit.listedGross = listedGross;
     if (baseNet) unit.baseNet = baseNet;
     if (tower) unit.tower = tower;
     if (policyGroup === "LOWRISE_LK" || policyGroup === "LOWRISE_BT") {
-      unit.landArea = area;
+      if (area) unit.landArea = area;
       if (constructionArea) unit.constructionArea = constructionArea;
       if (rawType) unit.view = rawType;
     } else {
@@ -1100,9 +1219,14 @@ function parseGoogleSheetUnits(response) {
     const floor = parsedCode.floor || gvizValue(row, floorIdx) || inferFloorFromCode(code, tower);
     if (floor) unit.floor = parsedCode.floor || String(parseSheetNumber(floor) || floor);
     if (parsedCode.apartment) unit.apartmentNo = parsedCode.apartment;
-    units[code] = unit;
+    mergeCatalogUnit(units, metaByCode, code, unit, {
+      gid,
+      gidIndex,
+      rowIndex: detected.startRow + rowIndex,
+    });
+    stats.acceptedRows += 1;
   });
-  return units;
+  return { units, stats, metaByCode };
 }
 
 function loadGoogleSheet(gid) {
@@ -1133,14 +1257,33 @@ function loadGoogleSheet(gid) {
 }
 
 async function refreshCatalogFromGoogle({ showSuccessToast = true } = {}) {
-  const results = await Promise.allSettled(GOOGLE_SHEET_GIDS.map(loadGoogleSheet));
+  const sheetJobs = GOOGLE_SHEET_GIDS.map((gid, gidIndex) => {
+    return loadGoogleSheet(gid).then((response) => ({ gid, gidIndex, response }));
+  });
+  const results = await Promise.allSettled(sheetJobs);
   const freshCatalog = {};
-  results.forEach((result) => {
-    if (result.status !== "fulfilled") return;
-    Object.assign(freshCatalog, parseGoogleSheetUnits(result.value));
+  const freshMetaByCode = {};
+  results.forEach((result, resultIndex) => {
+    const gid = GOOGLE_SHEET_GIDS[resultIndex];
+    if (result.status !== "fulfilled") {
+      console.warn(`[Google Sheet ${gid}] lỗi đồng bộ:`, result.reason);
+      return;
+    }
+
+    const { units, stats, metaByCode } = parseGoogleSheetUnits(result.value.response, {
+      gid: result.value.gid,
+      gidIndex: result.value.gidIndex,
+    });
+    Object.entries(units).forEach(([code, unit]) => {
+      mergeCatalogUnit(freshCatalog, freshMetaByCode, code, unit, metaByCode[code]);
+    });
+    console.log(
+      `[Google Sheet ${stats.gid}] đọc ${stats.readRows} dòng, loại ${stats.rejectedRows} dòng, nhận ${stats.acceptedRows} dòng`
+    );
   });
   const freshCount = Object.keys(freshCatalog).length;
-  if (!freshCount) throw new Error("Không có căn đang mở bán trong bảng hàng");
+  console.log(`[Google Sheet] tổng mã sau khi gộp: ${freshCount}`);
+  if (!freshCount) throw new Error("Không có mã căn hợp lệ trong bảng hàng");
   unitCatalog = freshCatalog;
   window.unitCatalog = unitCatalog;
   catalogLoading = false;
