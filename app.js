@@ -849,17 +849,29 @@ function fillFilterSelect(select, label, values) {
 }
 
 let catalogEntries = [];
+let catalogLoading = true;
+
+function isSaleCatalogCode(code) {
+  const normalized = normalizeUnitCode(code);
+  return /^P\d{3,}[A-Z0-9]*$/.test(normalized) || /^C\d{3,}[A-Z0-9]*$/.test(normalized);
+}
 
 function rebuildCatalogEntries() {
-  catalogEntries = Object.entries(unitCatalog).map(([code, unit]) => {
+  const sanitizedCatalog = {};
+  catalogEntries = Object.entries(unitCatalog).reduce((entries, [code, unit]) => {
     const normalizedCode = normalizeUnitCode(code);
+    if (!isSaleCatalogCode(normalizedCode)) return entries;
     const parsed = parseUnitCodeParts(normalizedCode);
     const normalizedUnit = { ...unit };
     if (parsed.tower) normalizedUnit.tower = parsed.tower;
     if (parsed.floor) normalizedUnit.floor = parsed.floor;
     if (parsed.apartment) normalizedUnit.apartmentNo = parsed.apartment;
-    return { code: normalizedCode, unit: normalizedUnit };
-  });
+    sanitizedCatalog[normalizedCode] = normalizedUnit;
+    entries.push({ code: normalizedCode, unit: normalizedUnit });
+    return entries;
+  }, []);
+  unitCatalog = sanitizedCatalog;
+  window.unitCatalog = unitCatalog;
 }
 
 rebuildCatalogEntries();
@@ -930,11 +942,11 @@ function isPodiumType(value) {
 }
 
 function isLowRiseCode(code) {
-  return /^[CF]\d{3,}[A-Z0-9]*$/.test(normalizeUnitCode(code));
+  return /^C\d{3,}[A-Z0-9]*$/.test(normalizeUnitCode(code));
 }
 
 function isSupportedSheetCode(code) {
-  return /^P\d{3,}[A-Z0-9]*$/.test(normalizeUnitCode(code)) || isLowRiseCode(code);
+  return isSaleCatalogCode(code);
 }
 
 function normalizeSheetUnitType(rawType, policyGroup) {
@@ -950,12 +962,30 @@ function normalizeSheetUnitType(rawType, policyGroup) {
 
 function isUnavailableSheetStatus(status) {
   const normalized = normalizeHeaderText(status);
-  return (
-    normalized.includes("da ban") ||
-    normalized.includes("thu hoi") ||
-    normalized.includes("ngung ban") ||
-    normalized.includes("tam dung")
-  );
+  if (!normalized) return false;
+  const phrases = [
+    "da ban",
+    "ban het",
+    "thu hoi",
+    "ngung ban",
+    "tam dung",
+    "khong ban",
+    "da xoa",
+    "bi xoa",
+    "da huy",
+    "huy can",
+    "dang lock",
+    "lock can",
+    "hidden",
+    "deleted",
+    "sold",
+    "cancelled",
+    "canceled",
+  ];
+  if (phrases.some((phrase) => normalized.includes(phrase))) return true;
+  return ["an", "xoa", "huy", "lock"].some((word) => {
+    return new RegExp(`(^| )${word}( |$)`).test(normalized);
+  });
 }
 
 function rowHasUnavailableSheetStatus(row) {
@@ -1012,7 +1042,7 @@ function parseGoogleSheetUnits(response) {
     const rowCells = row.c || [];
     let code = codeIdx >= 0 ? gvizValue(row, codeIdx) : "";
     if (!code) {
-      const codeCell = rowCells.find((cell) => /^[PCF]\d{3,}[A-Z0-9]*$/i.test(gvizCellText(cell)));
+      const codeCell = rowCells.find((cell) => /^[PC]\d{3,}[A-Z0-9]*$/i.test(gvizCellText(cell)));
       code = gvizCellText(codeCell);
     }
     code = normalizeUnitCode(code);
@@ -1102,7 +1132,7 @@ function loadGoogleSheet(gid) {
   });
 }
 
-async function refreshCatalogFromGoogle() {
+async function refreshCatalogFromGoogle({ showSuccessToast = true } = {}) {
   const results = await Promise.allSettled(GOOGLE_SHEET_GIDS.map(loadGoogleSheet));
   const freshCatalog = {};
   results.forEach((result) => {
@@ -1110,16 +1140,18 @@ async function refreshCatalogFromGoogle() {
     Object.assign(freshCatalog, parseGoogleSheetUnits(result.value));
   });
   const freshCount = Object.keys(freshCatalog).length;
-  if (!freshCount) return;
+  if (!freshCount) throw new Error("Không có căn đang mở bán trong bảng hàng");
   unitCatalog = freshCatalog;
   window.unitCatalog = unitCatalog;
+  catalogLoading = false;
   rebuildCatalogEntries();
   populateFinderOptions();
   lastAutoFilledCode = "";
   applyUnitCatalog();
   renderFinder();
   render();
-  showToast(`Đã lọc còn ${freshCount} căn theo bảng hàng`);
+  if (showSuccessToast) showToast(`Đã lọc còn ${freshCount} căn theo bảng hàng`);
+  return freshCount;
 }
 
 function populateFinderOptions() {
@@ -1160,6 +1192,12 @@ function unitCard({ code, unit }) {
 }
 
 function renderFinder() {
+  if (catalogLoading) {
+    els.filterCount.textContent = "Đang tải bảng hàng";
+    els.comparisonCards.innerHTML = '<div class="finder-empty">Đang kết nối Google Sheet để lọc căn đang mở bán...</div>';
+    return;
+  }
+
   const tower = normalizeFacet(els.filterTower.value);
   const type = normalizeFacet(els.filterType.value);
   const floor = normalizeFacet(els.filterFloor.value);
@@ -2922,7 +2960,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=76", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=77", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
@@ -2948,10 +2986,17 @@ function installServiceWorkerUpdates() {
 installServiceWorkerUpdates();
 syncBaseFromGross();
 document.querySelectorAll("[data-money-input]").forEach(formatMoneyInput);
-populateFinderOptions();
 renderFinder();
 render();
-refreshCatalogFromGoogle().catch(() => {});
+refreshCatalogFromGoogle()
+  .catch((error) => {
+    catalogLoading = false;
+    rebuildCatalogEntries();
+    populateFinderOptions();
+    renderFinder();
+    render();
+    showToast(error?.message || "Không đọc được bảng hàng mới");
+  });
 
 
 

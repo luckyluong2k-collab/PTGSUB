@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v76-menu-admin-overlay";
+const CACHE_NAME = "park-pricing-v77-live-sheet-inventory";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=76",
-  "./unit-data.js?v=63",
-  "./app.js?v=76",
+  "./unit-data.js?v=64",
+  "./app.js?v=77",
   "./firebase-auth.js?v=75",
   "./manifest.webmanifest",
   "./icon.svg",
