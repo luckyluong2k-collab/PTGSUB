@@ -79,6 +79,8 @@ const loginBtn = document.querySelector("#loginBtn");
 const logoutBtn = document.querySelector("#logoutBtn");
 const authStatus = document.querySelector("#authStatus");
 const adminPanel = document.querySelector("#adminPanel");
+const adminOpenBtn = document.querySelector("#adminOpenBtn");
+const adminCloseBtn = document.querySelector("#adminCloseBtn");
 const adminUsers = document.querySelector("#adminUsers");
 const myHistoryPanel = document.querySelector("#myHistoryPanel");
 const myHistoryList = document.querySelector("#myHistoryList");
@@ -262,6 +264,22 @@ function setMenuAuthState(isInsideApp) {
   protectedMenuItems.forEach((item) => {
     item.hidden = !isInsideApp;
   });
+  if (!isInsideApp) setAdminMenuVisible(false);
+}
+
+function setAdminMenuVisible(isVisible) {
+  if (adminOpenBtn) adminOpenBtn.hidden = !isVisible;
+}
+
+function closeAdminPanel() {
+  if (adminPanel) adminPanel.hidden = true;
+}
+
+async function openAdminPanel() {
+  if (!currentIsAdmin) return;
+  closeDrawer();
+  if (adminPanel) adminPanel.hidden = false;
+  await renderAdminUsers({ open: true });
 }
 
 function openDrawer() {
@@ -286,7 +304,7 @@ function hideApp(message) {
   if (appContent) appContent.hidden = true;
   if (loginBtn) loginBtn.hidden = false;
   if (logoutBtn) logoutBtn.hidden = true;
-  if (adminPanel) adminPanel.hidden = true;
+  closeAdminPanel();
   if (myHistoryPanel) myHistoryPanel.hidden = true;
   setMenuAuthState(false);
   updateBrowserWarning(false);
@@ -646,16 +664,8 @@ async function enterApprovedApp(user, data) {
   showApp(user.email, data);
   renderMyHistory(data.recentSearches || []);
   scheduleAccessExpiryTimer(data);
-
-  if (currentIsAdmin) {
-    try {
-      await renderAdminUsers();
-    } catch {
-      if (adminPanel) adminPanel.hidden = true;
-    }
-  } else if (adminPanel) {
-    adminPanel.hidden = true;
-  }
+  setAdminMenuVisible(currentIsAdmin);
+  if (!currentIsAdmin) closeAdminPanel();
 
   closeDrawer();
   window.setTimeout(() => scheduleSaveCurrentSearch(true), 1000);
@@ -663,7 +673,7 @@ async function enterApprovedApp(user, data) {
 
 function showPendingApproval(user) {
   if (appContent) appContent.hidden = true;
-  if (adminPanel) adminPanel.hidden = true;
+  closeAdminPanel();
   if (myHistoryPanel) myHistoryPanel.hidden = true;
   setMenuAuthState(false);
   setStatus(`Gmail ${user.email} đang chờ quản trị viên phê duyệt. Nếu vừa được duyệt, hệ thống sẽ tự cập nhật sau vài giây.`);
@@ -673,7 +683,7 @@ function showPendingApproval(user) {
 function showExpiredAccess(userOrEmail) {
   stopAccessExpiryTimer();
   if (appContent) appContent.hidden = true;
-  if (adminPanel) adminPanel.hidden = true;
+  closeAdminPanel();
   if (myHistoryPanel) myHistoryPanel.hidden = true;
   if (loginBtn) loginBtn.hidden = true;
   if (logoutBtn) logoutBtn.hidden = false;
@@ -723,14 +733,20 @@ async function handleSignedInUser(user) {
   await enterApprovedApp(user, data);
 }
 
+function isBlockedUser(data = {}) {
+  return !Boolean(data.approved) && data.accessExpiresAt === 0;
+}
+
 function adminAccessBadgeText(approved, isAdminUser, data) {
   if (isAdminUser) return approved ? "Đã duyệt · Admin" : "Admin";
+  if (!approved && isBlockedUser(data)) return "Bị ban";
   if (!approved) return "Chờ duyệt";
   return accessExpiryLabel(data);
 }
 
 function adminAccessBadgeClass(approved, isAdminUser, data) {
   if (isAdminUser) return "admin-badge";
+  if (!approved && isBlockedUser(data)) return "admin-badge banned";
   if (!approved) return "admin-badge pending";
   return isAccessExpired(data) ? "admin-badge expired" : "admin-badge active";
 }
@@ -742,6 +758,7 @@ function userCard(id, data) {
   const normalizedEmail = normalizeEmail(email);
   const isSelf = id === currentUserId || normalizedEmail === currentUserEmail;
   const isAdminUser = role === "admin" || isAdminEmail(normalizedEmail);
+  const blocked = isBlockedUser(data);
   const searches = limitHistoryEntries(data.recentSearches);
   const badgeText = adminAccessBadgeText(approved, isAdminUser, data);
   const badgeClass = adminAccessBadgeClass(approved, isAdminUser, data);
@@ -817,23 +834,23 @@ function userCard(id, data) {
         accessExpiresAt,
         updatedAt: serverTimestamp(),
       });
-      await renderAdminUsers();
+      await renderAdminUsers({ open: true });
     });
 
     const blockBtn = document.createElement("button");
     blockBtn.className = "filter-reset";
     blockBtn.type = "button";
-    blockBtn.textContent = approved ? "Chặn" : "Giữ chờ duyệt";
+    blockBtn.textContent = blocked ? "Đưa về chờ duyệt" : "Ban";
     blockBtn.addEventListener("click", async () => {
       blockBtn.disabled = true;
       blockBtn.textContent = "Đang cập nhật...";
       await updateDoc(doc(db, "users", id), {
         approved: false,
         role: "user",
-        accessExpiresAt: 0,
+        accessExpiresAt: blocked ? null : 0,
         updatedAt: serverTimestamp(),
       });
-      await renderAdminUsers();
+      await renderAdminUsers({ open: true });
     });
 
     actions.append(accessControls, approveBtn, blockBtn);
@@ -867,11 +884,10 @@ function adminUserSection(title, users, emptyText) {
   return section;
 }
 
-async function renderAdminUsers() {
+async function renderAdminUsers({ open = false } = {}) {
   if (!adminPanel || !adminUsers) return;
 
-  if (adminPanel.hidden) adminPanel.open = false;
-  adminPanel.hidden = false;
+  if (open) adminPanel.hidden = false;
   adminUsers.textContent = "Đang tải danh sách người dùng...";
 
   try {
@@ -887,12 +903,14 @@ async function renderAdminUsers() {
       return;
     }
 
-    const pendingUsers = docs.filter(({ data }) => !Boolean(data.approved));
+    const pendingUsers = docs.filter(({ data }) => !Boolean(data.approved) && !isBlockedUser(data));
     const approvedUsers = docs.filter(({ data }) => Boolean(data.approved));
+    const bannedUsers = docs.filter(({ data }) => isBlockedUser(data));
 
     adminUsers.append(
-      adminUserSection("Tài khoản chờ duyệt", pendingUsers, "Không có tài khoản chờ duyệt."),
-      adminUserSection("Tài khoản đã duyệt", approvedUsers, "Chưa có tài khoản đã duyệt.")
+      adminUserSection("Chờ duyệt", pendingUsers, "Không có tài khoản chờ duyệt."),
+      adminUserSection("Đã duyệt", approvedUsers, "Chưa có tài khoản đã duyệt."),
+      adminUserSection("Bị ban", bannedUsers, "Không có tài khoản bị ban.")
     );
   } catch (error) {
     adminUsers.innerHTML = `
@@ -913,6 +931,26 @@ if (accountTab) {
 }
 
 if (authCloseBtn) authCloseBtn.addEventListener("click", closeDrawer);
+
+if (adminOpenBtn) {
+  adminOpenBtn.addEventListener("click", () => {
+    openAdminPanel().catch((error) => {
+      setStatus(`Không mở được quản lý tài khoản: ${authErrorMessage(error)}`);
+    });
+  });
+}
+
+if (adminCloseBtn) adminCloseBtn.addEventListener("click", closeAdminPanel);
+
+if (adminPanel) {
+  adminPanel.addEventListener("click", (event) => {
+    if (event.target === adminPanel) closeAdminPanel();
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && adminPanel && !adminPanel.hidden) closeAdminPanel();
+});
 
 if (copyAppLinkBtn) {
   copyAppLinkBtn.addEventListener("click", async () => {
@@ -1020,7 +1058,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!data.approved && !currentIsAdmin) {
       if (appContent) appContent.hidden = true;
-      if (adminPanel) adminPanel.hidden = true;
+      closeAdminPanel();
       if (myHistoryPanel) myHistoryPanel.hidden = true;
       setMenuAuthState(false);
       setStatus(`Gmail ${user.email} đang chờ quản trị viên phê duyệt.`);
@@ -1033,8 +1071,8 @@ onAuthStateChanged(auth, async (user) => {
 
     if (currentIsAdmin) {
       await renderAdminUsers();
-    } else if (adminPanel) {
-      adminPanel.hidden = true;
+    } else {
+      closeAdminPanel();
     }
 
     closeDrawer();

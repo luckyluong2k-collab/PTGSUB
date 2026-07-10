@@ -2384,6 +2384,263 @@ input[readonly] {
   font-weight: 900;
 }
 
+.menu-3d-button,
+.menu-3d-panel > summary {
+  --menu-face: #fbfffe;
+  --menu-border: #a7d2cc;
+  --menu-shadow: #78b8ae;
+  --menu-color: var(--brand-strong);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 0;
+  padding: 10px 13px;
+  border: 1px solid var(--menu-border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--menu-face) 100%);
+  color: var(--menu-color);
+  box-shadow: 0 5px 0 var(--menu-shadow), 0 15px 24px rgba(18, 38, 34, 0.12);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  transform: translateY(0);
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.menu-3d-button:hover,
+.menu-3d-button:focus-visible,
+.menu-3d-panel > summary:hover,
+.menu-3d-panel > summary:focus-visible {
+  filter: brightness(1.02);
+  outline: none;
+}
+
+.menu-3d-button:active,
+.menu-3d-panel > summary:active {
+  box-shadow: 0 2px 0 var(--menu-shadow), 0 8px 16px rgba(18, 38, 34, 0.12);
+  transform: translateY(3px);
+}
+
+.menu-3d-button span,
+.menu-3d-panel > summary {
+  min-width: 0;
+}
+
+.menu-3d-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 31px;
+  width: 31px;
+  height: 31px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.logout-menu-button {
+  --menu-face: #eef4f2;
+  --menu-border: #c9d6d2;
+  --menu-shadow: #9bb2ac;
+}
+
+.admin-menu-button {
+  --menu-face: #eef8f6;
+  --menu-border: #87c8bf;
+  --menu-shadow: #5aa99f;
+}
+
+.zalo-login-link.menu-3d-button {
+  --menu-face: #eef8ff;
+  --menu-border: #9ecdf4;
+  --menu-shadow: #67aee9;
+  --menu-color: #075f9f;
+}
+
+.history-panel.menu-3d-panel > summary {
+  --menu-face: #fbfbff;
+  --menu-border: #c4cfde;
+  --menu-shadow: #9ba9ba;
+  --menu-color: #17211f;
+}
+
+.camera-360-link.menu-3d-button {
+  --menu-face: #fff8e7;
+  --menu-border: #efc06b;
+  --menu-shadow: #d9972f;
+  --menu-color: #8a3a08;
+}
+
+.address-copy-section.menu-3d-panel > summary {
+  --menu-face: #f7fffd;
+  --menu-border: #add8d2;
+  --menu-shadow: #7dbeb4;
+}
+
+.policy-sales-link.menu-3d-button {
+  --menu-face: #f0fbf2;
+  --menu-border: #a8d8b0;
+  --menu-shadow: #75b681;
+  --menu-color: #1b5e20;
+}
+
+.menu-3d-panel {
+  overflow: visible;
+  margin-top: 0;
+  padding-top: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.menu-3d-panel[open] > summary {
+  margin-bottom: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.menu-3d-panel[open] .drawer-tool-summary,
+.menu-3d-panel[open] .history-panel-summary {
+  border-bottom: 0;
+}
+
+.menu-3d-panel .address-copy-list,
+.menu-3d-panel .history-list {
+  padding: 11px;
+  border: 1px solid var(--menu-border, #b8d9d4);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(18, 38, 34, 0.08);
+}
+
+.admin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  border: 0;
+  background: rgba(9, 32, 28, 0.56);
+}
+
+.admin-overlay[hidden] {
+  display: none !important;
+}
+
+.admin-overlay-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  width: min(1180px, 100%);
+  min-height: calc(100vh - 36px);
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid #b9d8d3;
+  border-radius: 10px;
+  background: #f8fcfb;
+  box-shadow: 0 30px 70px rgba(8, 30, 27, 0.32);
+}
+
+.admin-overlay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #d6e3e0;
+}
+
+.admin-overlay-head h2 {
+  margin: 0;
+  color: var(--brand-strong);
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.1;
+}
+
+.admin-overlay-close {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #b9d8d3;
+  border-radius: 999px;
+  background: #edf7f5;
+  color: var(--brand-strong);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 0 #9fc9c2, 0 12px 20px rgba(18, 38, 34, 0.12);
+}
+
+.admin-users-board {
+  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  min-height: 0;
+}
+
+.admin-users-board > .admin-user-section {
+  min-width: 0;
+  min-height: 0;
+}
+
+.admin-users-board > .admin-user-section + .admin-user-section {
+  margin-top: 0;
+}
+
+.admin-users-board > .admin-user-section h3 {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #b9d8d3;
+  border-radius: 8px;
+  background: #eaf6f4;
+  color: var(--brand-strong);
+  font-size: 15px;
+  box-shadow: 0 6px 14px rgba(18, 38, 34, 0.08);
+}
+
+.admin-users-board > .admin-user-section > .admin-users {
+  max-height: calc(100vh - 178px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.admin-overlay .admin-user-card {
+  background: #ffffff;
+  box-shadow: 0 9px 18px rgba(18, 38, 34, 0.07);
+}
+
+.admin-overlay .admin-user-card details summary {
+  cursor: pointer;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-overlay .admin-user-actions .primary,
+.admin-overlay .admin-user-actions .filter-reset {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 0;
+}
+
+.admin-badge.banned {
+  background: #fde8e5;
+  color: #b42318;
+}
+
 @media (max-width: 520px) {
   #multiQuoteExportDialog .pdf-options-actions {
     grid-template-columns: 1fr;
@@ -2395,6 +2652,24 @@ input[readonly] {
   .auth-drawer {
     width: min(100vw, 390px);
     padding-left: 48px;
+  }
+  .admin-overlay {
+    padding: 10px;
+  }
+  .admin-overlay-shell {
+    min-height: calc(100vh - 20px);
+    padding: 12px;
+  }
+  .admin-overlay-head {
+    align-items: flex-start;
+  }
+  .admin-users-board {
+    grid-template-columns: 1fr;
+  }
+  .admin-users-board > .admin-user-section > .admin-users {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
   .brand-logo {
     width: 58px;

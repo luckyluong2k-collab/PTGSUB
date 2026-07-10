@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v75-direction-filter-admin-collapse";
+const CACHE_NAME = "park-pricing-v76-menu-admin-overlay";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=75",
+  "./styles.css?v=76",
   "./unit-data.js?v=63",
-  "./app.js?v=75",
-  "./firebase-auth.js?v=74",
+  "./app.js?v=76",
+  "./firebase-auth.js?v=75",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",
