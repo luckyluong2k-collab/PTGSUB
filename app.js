@@ -983,6 +983,56 @@ function extractSheetCode(row, codeIdx) {
   return normalizeUnitCode(gvizCellText(codeCell));
 }
 
+function sheetCodeCellIndex(row, code) {
+  const normalizedCode = normalizeUnitCode(code);
+  return (row.c || []).findIndex((cell) => normalizeUnitCode(gvizCellText(cell)) === normalizedCode);
+}
+
+function looksLikeSheetNumber(value) {
+  return Boolean(String(value || "").trim().match(/^\d+(?:[,.]\d+)?$/));
+}
+
+function lowRiseRowValue(row, codeCellIndex, offset) {
+  return codeCellIndex >= 0 ? gvizValue(row, codeCellIndex + offset) : "";
+}
+
+function lowRiseRowNumber(row, codeCellIndex, offset) {
+  return codeCellIndex >= 0 ? gvizNumber(row, codeCellIndex + offset) : 0;
+}
+
+function lowRiseRowMoney(row, codeCellIndex, offset) {
+  return codeCellIndex >= 0 ? gvizMoney(row, codeCellIndex + offset) : 0;
+}
+
+function lowRiseCodeCellIndexes(row, code) {
+  const normalizedCode = normalizeUnitCode(code);
+  return (row.c || []).reduce((indexes, cell, index) => {
+    if (normalizeUnitCode(gvizCellText(cell)) === normalizedCode) indexes.push(index);
+    return indexes;
+  }, []);
+}
+
+function lowRiseRowDetails(row, code) {
+  const indexes = lowRiseCodeCellIndexes(row, code);
+  for (const codeCellIndex of indexes) {
+    const compactLayout = looksLikeSheetNumber(lowRiseRowValue(row, codeCellIndex, 2));
+    const offsets = compactLayout
+      ? { rawType: 1, view: 1, floor: 2, area: 3, constructionArea: 5, listedGross: 6 }
+      : { rawType: 1, view: 2, floor: 3, area: 4, constructionArea: 6, listedGross: 7 };
+    const listedGross = lowRiseRowMoney(row, codeCellIndex, offsets.listedGross);
+    if (!listedGross) continue;
+    return {
+      rawType: lowRiseRowValue(row, codeCellIndex, offsets.rawType),
+      view: lowRiseRowValue(row, codeCellIndex, offsets.view),
+      floor: lowRiseRowValue(row, codeCellIndex, offsets.floor),
+      area: lowRiseRowNumber(row, codeCellIndex, offsets.area),
+      constructionArea: lowRiseRowNumber(row, codeCellIndex, offsets.constructionArea),
+      listedGross,
+    };
+  }
+  return null;
+}
+
 function nonEmptyUnitValueCount(unit) {
   return Object.values(unit).filter((value) => {
     return value !== null && value !== undefined && String(value).trim() !== "" && value !== 0;
@@ -1050,6 +1100,8 @@ function isUnavailableSheetStatus(status) {
   const normalized = normalizeHeaderText(status);
   if (!normalized) return false;
   const phrases = [
+    "da ban",
+    "ban het",
     "da xoa",
     "da an",
     "da bo",
@@ -1058,6 +1110,7 @@ function isUnavailableSheetStatus(status) {
     "ngung ban",
     "khong ban",
     "da huy",
+    "sold",
   ];
   if (phrases.some((phrase) => normalized.includes(phrase))) return true;
   return ["xoa", "an", "bo", "huy", "khoa"].some((word) => {
@@ -1168,7 +1221,9 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
       return;
     }
 
-    const rawType = gvizValue(row, rawTypeIdx);
+    const isLowRise = isLowRiseCode(code);
+    const lowRiseDetails = isLowRise ? lowRiseRowDetails(row, code) : null;
+    const rawType = lowRiseDetails?.rawType || gvizValue(row, rawTypeIdx);
     const tower = inferTowerFromCode(code, gvizValue(row, towerIdx));
     const policyGroup = inferPolicyGroup(code, tower, rawType, title);
     if (!policyGroup || !policies[policyGroup]) {
@@ -1176,10 +1231,15 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
       return;
     }
 
-    let listedGross = gvizMoney(row, grossIdx);
+    let listedGross = lowRiseDetails?.listedGross || 0;
+    if (!listedGross) listedGross = gvizMoney(row, grossIdx);
     let baseNet = gvizMoney(row, baseNetIdx);
-    const area = gvizNumber(row, areaIdx);
-    const constructionArea = gvizNumber(row, constructionIdx);
+    const area = isLowRise
+      ? lowRiseDetails?.area || gvizNumber(row, areaIdx)
+      : gvizNumber(row, areaIdx);
+    const constructionArea = isLowRise
+      ? lowRiseDetails?.constructionArea || gvizNumber(row, constructionIdx)
+      : gvizNumber(row, constructionIdx);
 
     if (!listedGross && baseNet && grossDividedPolicyKeys.has(policyGroup)) {
       listedGross = round(baseNet * 1.12);
@@ -1208,7 +1268,11 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
     if (policyGroup === "LOWRISE_LK" || policyGroup === "LOWRISE_BT") {
       if (area) unit.landArea = area;
       if (constructionArea) unit.constructionArea = constructionArea;
-      if (rawType) unit.view = rawType;
+      if (lowRiseDetails?.view && !looksLikeSheetNumber(lowRiseDetails.view)) {
+        unit.view = lowRiseDetails.view;
+      } else if (rawType) {
+        unit.view = rawType;
+      }
     } else {
       const view = gvizValue(row, viewIdx);
       const direction = gvizValue(row, directionIdx);
@@ -1216,7 +1280,7 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
       if (direction) unit.direction = direction;
     }
     const parsedCode = parseUnitCodeParts(code);
-    const floor = parsedCode.floor || gvizValue(row, floorIdx) || inferFloorFromCode(code, tower);
+    const floor = lowRiseDetails?.floor || parsedCode.floor || gvizValue(row, floorIdx) || inferFloorFromCode(code, tower);
     if (floor) unit.floor = parsedCode.floor || String(parseSheetNumber(floor) || floor);
     if (parsedCode.apartment) unit.apartmentNo = parsedCode.apartment;
     mergeCatalogUnit(units, metaByCode, code, unit, {
