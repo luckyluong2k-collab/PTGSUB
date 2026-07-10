@@ -157,6 +157,16 @@ function accessExpiryLabel(data = {}) {
   return `${prefix}: ${new Date(expiresMs).toLocaleString("vi-VN")}`;
 }
 
+function accessExpiryBadgeClass(data = {}, isAdminUser = false) {
+  if (isAdminUser) return "auth-expiry-badge admin";
+  return isAccessExpired(data) ? "auth-expiry-badge expired" : "auth-expiry-badge active";
+}
+
+function memberAccessLabel(data = {}, isAdminUser = false) {
+  if (isAdminUser) return "Quản trị viên · Không giới hạn";
+  return accessExpiryLabel(data);
+}
+
 function accessDurationMs(duration, customDate = "", baseMs = 0) {
   if (duration === "custom") return endOfLocalDateMs(customDate);
 
@@ -191,7 +201,18 @@ function scheduleAccessExpiryTimer(data = {}) {
 }
 
 function setStatus(message) {
-  if (authStatus) authStatus.textContent = message;
+  if (!authStatus) return;
+  authStatus.classList.remove("auth-account-status");
+  authStatus.textContent = message;
+}
+
+function setMemberStatus(userEmail, data = {}, isAdminUser = false) {
+  if (!authStatus) return;
+  authStatus.classList.add("auth-account-status");
+  authStatus.innerHTML = `
+    <strong class="auth-account-email">${escapeHtml(userEmail || "")}</strong>
+    <span class="${accessExpiryBadgeClass(data, isAdminUser)}">${escapeHtml(memberAccessLabel(data, isAdminUser))}</span>
+  `;
 }
 
 function isMobileDevice() {
@@ -253,12 +274,12 @@ function closeDrawer() {
   if (accountTab) accountTab.setAttribute("aria-expanded", "false");
 }
 
-function showApp(userEmail) {
+function showApp(userEmail, data = {}) {
   if (appContent) appContent.hidden = false;
   if (loginBtn) loginBtn.hidden = true;
   if (logoutBtn) logoutBtn.hidden = false;
   setMenuAuthState(true);
-  setStatus(`Đã đăng nhập: ${userEmail}`);
+  setMemberStatus(userEmail, data, currentIsAdmin);
 }
 
 function hideApp(message) {
@@ -622,7 +643,7 @@ async function enterApprovedApp(user, data) {
   currentUserData = data;
   currentIsAdmin = isAdminEmail(currentUserEmail) || data.role === "admin";
 
-  showApp(user.email);
+  showApp(user.email, data);
   renderMyHistory(data.recentSearches || []);
   scheduleAccessExpiryTimer(data);
 

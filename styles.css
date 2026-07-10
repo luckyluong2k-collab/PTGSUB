@@ -319,9 +319,9 @@ h2 {
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 48px;
+  min-height: 52px;
   margin-bottom: 10px;
-  padding: 12px 14px;
+  padding: 13px 14px;
   border: 1px solid #b9d8d3;
   border-radius: 8px;
   background: #f4fbf9;
@@ -332,7 +332,7 @@ h2 {
 
 .finder-toggle span:first-child {
   overflow: hidden;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -340,7 +340,7 @@ h2 {
 
 .finder-toggle strong {
   color: var(--brand-strong);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   white-space: nowrap;
 }
@@ -543,20 +543,22 @@ h2 {
 label {
   display: block;
   color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 input,
 select {
   width: 100%;
-  min-height: 44px;
+  min-height: 46px;
   margin-top: 6px;
-  padding: 10px 11px;
+  padding: 11px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfdfc;
   color: var(--ink);
+  font-size: 14px;
+  font-weight: 750;
   outline: none;
 }
 
@@ -631,6 +633,227 @@ input[readonly] {
   border-color: #d69a38;
   background: #fff8e7;
   color: #7a4b0b;
+}
+
+.multi-quote-toggle {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 10px;
+  border: 1px solid #0b5f59;
+  border-radius: 8px;
+  background: #0f766e;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.16);
+}
+
+.multi-quote-toggle::after {
+  content: " v";
+  font-size: 13px;
+}
+
+.multi-quote-toggle.open::after {
+  content: " ^";
+}
+
+.multi-quote-panel {
+  margin-top: 12px;
+}
+
+.multi-quote-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.multi-quote-card {
+  display: grid;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid #c9ded9;
+  border-radius: 8px;
+  background: #fbfffe;
+  box-shadow: 0 10px 22px rgba(18, 38, 34, 0.08);
+}
+
+.multi-quote-card-loan {
+  border-color: #93cbc3;
+}
+
+.multi-quote-card-standard {
+  border-color: #d7c087;
+  background: #fffdf6;
+}
+
+.multi-quote-card-tts {
+  border-color: #b9d2f0;
+  background: #f8fbff;
+}
+
+.multi-quote-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.multi-quote-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.multi-quote-head h3 {
+  margin: 4px 0 0;
+  color: var(--brand-strong);
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.multi-quote-head em {
+  flex: 0 0 auto;
+  max-width: 112px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e2f2ef;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+  text-align: center;
+}
+
+.multi-quote-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.multi-quote-stats > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d8e4e1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.multi-quote-stats span,
+.multi-quote-details span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.multi-quote-stats strong {
+  display: block;
+  margin-top: 4px;
+  color: #0f766e;
+  font-size: 21px;
+  font-weight: 950;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.multi-quote-stats small {
+  display: block;
+  margin-top: 5px;
+  color: #7a4b0b;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.multi-quote-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.multi-quote-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #dbe5e2;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.multi-quote-details strong {
+  display: block;
+  margin-top: 4px;
+  color: #111c1a;
+  font-size: 14px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.multi-quote-note {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #d7c087;
+  border-radius: 8px;
+  background: #fff8e7;
+  color: #7a4b0b;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.unit-map-button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 10px;
+  border: 1px solid #d69a38;
+  border-radius: 8px;
+  background: #fff8e7;
+  color: #7a4b0b;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(138, 58, 8, 0.12);
+}
+
+.unit-map-button:hover,
+.unit-map-button:focus-visible {
+  border-color: #c2821e;
+  background: #fff2d7;
+  outline: none;
+}
+
+.unit-map-options-card {
+  max-width: 620px;
+}
+
+.unit-map-preview {
+  overflow: hidden;
+  border: 1px solid #c9ded9;
+  border-radius: 8px;
+  background: #f8fcfb;
+}
+
+.unit-map-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.unit-map-output-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.unit-map-output-actions[hidden] {
+  display: none !important;
+}
+
+.unit-map-output-actions .primary,
+.unit-map-output-actions .secondary {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 0;
 }
 
 .tts-chart-panel {
@@ -1407,6 +1630,15 @@ input[readonly] {
     grid-template-columns: 1fr 1fr;
   }
 
+  .multi-quote-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .multi-quote-stats,
+  .multi-quote-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .quote-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2142,6 +2374,50 @@ input[readonly] {
   color: var(--brand-strong);
   font-size: 12px;
   font-weight: 900;
+}
+
+@media (min-width: 780px) {
+  .auth-drawer {
+    width: min(500px, calc(100vw - 56px));
+    padding: 18px 18px 18px 58px;
+  }
+
+  .auth-card {
+    padding: 18px;
+  }
+
+  .menu-sections {
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .menu-section-summary,
+  .menu-section-link {
+    min-height: 58px;
+    padding: 15px 16px;
+    font-size: 17px;
+  }
+
+  .menu-section-body {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .admin-user-card,
+  .history-card {
+    padding: 14px;
+  }
+
+  .history-meta {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .history-mini-btn {
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 520px) {

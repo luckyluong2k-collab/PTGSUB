@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=63">
+  <link rel="stylesheet" href="styles.css?v=67">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -301,6 +301,13 @@
         <button class="primary" id="copyBtn" type="button">Sao ch&#233;p b&#225;o gi&#225;</button>
         <button class="secondary pdf-button" id="pdfBtn" type="button">Xu&#7845;t PDF</button>
       </div>
+      <button class="multi-quote-toggle" id="multiQuoteBtn" type="button" aria-expanded="false" aria-controls="multiQuotePanel">
+        B&#225;o gi&#225; nhi&#7873;u ph&#432;&#417;ng &#225;n
+      </button>
+      <div class="multi-quote-panel" id="multiQuotePanel" hidden>
+        <div class="multi-quote-grid" id="multiQuoteGrid"></div>
+      </div>
+      <button class="unit-map-button" id="unitMapBtn" type="button">T&#7841;o &#7843;nh ch&#7881; c&#259;n</button>
       <div class="tts-chart-panel" id="ttsChartPanel">
         <div class="tts-chart-head">
           <div>
@@ -355,10 +362,35 @@
     </div>
   </dialog>
 
+  <dialog class="pdf-options-dialog" id="unitMapDialog" aria-labelledby="unitMapTitle">
+    <div class="pdf-options-card unit-map-options-card">
+      <h2 id="unitMapTitle">T&#7841;o &#7843;nh ch&#7881; c&#259;n</h2>
+      <p>Ch&#7885;n ph&#432;&#417;ng &#225;n &#273;&#7875; app khoanh t&#242;a, khoanh c&#259;n v&#224; ghi gi&#225; cu&#7889;i l&#234;n m&#7863;t b&#7857;ng.</p>
+      <div class="pdf-option-list">
+        <label><input type="checkbox" value="loan" data-map-scenario> <span>C&#243; vay</span></label>
+        <label><input type="checkbox" value="standard" data-map-scenario> <span>Kh&#244;ng vay</span></label>
+        <label><input type="checkbox" value="tts50" data-map-scenario> <span>TTS 50%</span></label>
+        <label><input type="checkbox" value="tts70" data-map-scenario> <span>TTS 70%</span></label>
+        <label><input type="checkbox" value="tts95" data-map-scenario> <span>TTS 95%</span></label>
+      </div>
+      <div class="unit-map-preview" id="unitMapPreview" hidden>
+        <img id="unitMapPreviewImage" alt="Xem tr&#432;&#7899;c &#7843;nh ch&#7881; c&#259;n">
+      </div>
+      <div class="unit-map-output-actions" id="unitMapOutputActions" hidden>
+        <button class="primary" id="unitMapDownload" type="button">T&#7843;i &#7843;nh v&#7873;</button>
+        <button class="secondary" id="unitMapCopy" type="button">Sao ch&#233;p &#7843;nh</button>
+      </div>
+      <div class="pdf-options-actions">
+        <button class="secondary" id="unitMapCancel" type="button">H&#7911;y</button>
+        <button class="primary" id="unitMapCreate" type="button">T&#7841;o &#7843;nh</button>
+      </div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=63"></script>
-  <script src="app.js?v=63"></script>
+  <script src="app.js?v=67"></script>
   <script type="module" src="firebase-auth.js?v=63"></script>
 </body>
 </html>

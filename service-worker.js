@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v63-access-expiry";
+const CACHE_NAME = "park-pricing-v67-unit-map-actions";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=63",
+  "./styles.css?v=67",
   "./unit-data.js?v=63",
-  "./app.js?v=63",
+  "./app.js?v=67",
   "./firebase-auth.js?v=63",
   "./manifest.webmanifest",
   "./icon.svg",

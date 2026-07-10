@@ -212,6 +212,19 @@ const els = {
   scheduleRows: document.querySelector("#scheduleRows"),
   copyBtn: document.querySelector("#copyBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
+  multiQuoteBtn: document.querySelector("#multiQuoteBtn"),
+  multiQuotePanel: document.querySelector("#multiQuotePanel"),
+  multiQuoteGrid: document.querySelector("#multiQuoteGrid"),
+  unitMapBtn: document.querySelector("#unitMapBtn"),
+  unitMapDialog: document.querySelector("#unitMapDialog"),
+  mapScenarioInputs: document.querySelectorAll("[data-map-scenario]"),
+  unitMapCancel: document.querySelector("#unitMapCancel"),
+  unitMapCreate: document.querySelector("#unitMapCreate"),
+  unitMapPreview: document.querySelector("#unitMapPreview"),
+  unitMapPreviewImage: document.querySelector("#unitMapPreviewImage"),
+  unitMapOutputActions: document.querySelector("#unitMapOutputActions"),
+  unitMapDownload: document.querySelector("#unitMapDownload"),
+  unitMapCopy: document.querySelector("#unitMapCopy"),
   ttsChartPanel: document.querySelector("#ttsChartPanel"),
   ttsPriceChart: document.querySelector("#ttsPriceChart"),
   ttsChartTooltip: document.querySelector("#ttsChartTooltip"),
@@ -243,11 +256,27 @@ const els = {
 
 let activeScenario = "loan";
 let activeTtsChartScenario = "tts95";
+let multiQuoteOpen = false;
+let unitMapGeneratedImages = [];
 let lastQuoteText = "";
 let lastPolicyKey = "";
 let lastAutoFilledCode = "";
 let skipPolicyDefaultOnce = false;
 let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
+
+const unitMapImage = "phankhupark-map.png";
+const unitMapLocations = {
+  P90316: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 1025, y: 750, width: 1300, height: 870 },
+    towerRect: { x: 1181, y: 944, width: 155, height: 445 },
+    unitRect: { x: 1268, y: 1208, width: 38, height: 32 },
+    label: { x: 1370, y: 855, width: 710, height: 165 },
+    arrowStart: { x: 1370, y: 992 },
+    arrowEnd: { x: 1287, y: 1224 },
+  },
+};
 
 function parseMoney(value) {
   if (typeof value === "number") return value;
@@ -1294,6 +1323,83 @@ function renderQuoteCard(result, isLoan, isTts) {
     </article>`;
 }
 
+function multiQuoteSecondary(result) {
+  const isLoan = result.scenario === "loan";
+  const isTts = isTtsScenario(result.scenario);
+  if (isLoan) {
+    return {
+      label: "Trả trước 25%",
+      value: money(result.upfront),
+      meta: `NH giải ngân ${percent(result.loanRatio)}: ${money(result.bankDisbursement)}`,
+    };
+  }
+  if (isTts) {
+    const depositRow = result.schedule[0] || ["Cọc", 0];
+    const paymentRow = result.schedule[1] || ["Giải ngân lần 2", 0];
+    return {
+      label: depositRow[0],
+      value: money(depositRow[1]),
+      meta: `${paymentRow[0]}: ${money(paymentRow[1])}`,
+    };
+  }
+  const firstPayment = result.schedule[0] || ["Đợt 1", 0];
+  return {
+    label: firstPayment[0],
+    value: money(firstPayment[1]),
+    meta: "Không sử dụng hỗ trợ vay",
+  };
+}
+
+function renderMultiQuoteCard(result) {
+  const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const scenario = scenarioLabel(result.scenario, result.policy);
+  const secondary = multiQuoteSecondary(result);
+  const totalDiscount = result.discounts.reduce((sum, item) => sum + round(item.amount), 0);
+  const rawGrossAfterDiscountText = result.scenario === "standard" ? "" : money(result.rawGrossAfterDiscount);
+  const tone = result.scenario === "loan" ? "loan" : isTtsScenario(result.scenario) ? "tts" : "standard";
+
+  return `
+    <article class="multi-quote-card multi-quote-card-${tone}" aria-label="Báo giá ${safeText(scenario)}">
+      <div class="multi-quote-head">
+        <div>
+          <span>${safeText(unitCode)} - ${safeText(result.policy.name)}</span>
+          <h3>${safeText(scenario)}</h3>
+        </div>
+        <em>${safeText(scenario)}</em>
+      </div>
+      <div class="multi-quote-stats">
+        <div>
+          <span>Giá cuối phải trả</span>
+          <strong>${safeText(money(result.total))}</strong>
+        </div>
+        <div>
+          <span>${safeText(secondary.label)}</span>
+          <strong>${safeText(secondary.value)}</strong>
+          <small>${safeText(secondary.meta)}</small>
+        </div>
+      </div>
+      <div class="multi-quote-details">
+        <div><span>Giá niêm yết</span><strong>${safeText(money(result.listedGross))}</strong></div>
+        <div><span>Giá thô sau CK</span><strong>${safeText(rawGrossAfterDiscountText || "Theo tiến độ")}</strong></div>
+        <div><span>Nội thất/hoàn thiện</span><strong>${safeText(money(result.completion))}</strong></div>
+        <div><span>Tổng chiết khấu</span><strong>${safeText(money(totalDiscount))}</strong></div>
+      </div>
+      ${result.scenario === "loan" ? `<p class="multi-quote-note">${safeText(result.policy.loanSupport)}</p>` : ""}
+    </article>`;
+}
+
+function renderMultiQuotePanel() {
+  if (!els.multiQuotePanel || !els.multiQuoteGrid) return;
+  els.multiQuotePanel.hidden = !multiQuoteOpen;
+  els.multiQuoteBtn?.setAttribute("aria-expanded", String(multiQuoteOpen));
+  els.multiQuoteBtn?.classList.toggle("open", multiQuoteOpen);
+  if (!multiQuoteOpen) return;
+
+  els.multiQuoteGrid.innerHTML = ["loan", "standard", "tts50", "tts70", "tts95"]
+    .map((scenario) => renderMultiQuoteCard(calculate({ scenario })))
+    .join("");
+}
+
 function discountRowsHtml(result) {
   const discountRows = result.discounts.map((item) => {
     const label = item.rate ? `${item.label}` : item.label;
@@ -1419,6 +1525,232 @@ function exportPdf(scenarios = [activeScenario]) {
     window.print();
     window.setTimeout(cleanup, 60000);
   }, 80);
+}
+
+function selectedMapScenarios() {
+  return Array.from(els.mapScenarioInputs || [])
+    .filter((input) => input.checked)
+    .map((input) => input.value);
+}
+
+function syncMapScenarioLabels() {
+  const policy = policies[els.policyGroup.value] || policies.P3P9;
+  els.mapScenarioInputs.forEach((input) => {
+    const text = input.closest("label")?.querySelector("span");
+    if (text) text.textContent = scenarioLabel(input.value, policy);
+  });
+}
+
+function openUnitMapOptions() {
+  const unitCode = normalizeUnitCode(els.unitCode.value);
+  if (!unitMapLocations[unitCode]) {
+    showToast(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
+    return;
+  }
+
+  syncMapScenarioLabels();
+  els.mapScenarioInputs.forEach((input) => {
+    input.checked = input.value === activeScenario;
+  });
+  unitMapGeneratedImages = [];
+  if (els.unitMapPreview) els.unitMapPreview.hidden = true;
+  if (els.unitMapPreviewImage) els.unitMapPreviewImage.removeAttribute("src");
+  if (els.unitMapOutputActions) els.unitMapOutputActions.hidden = true;
+
+  if (els.unitMapDialog?.showModal) {
+    els.unitMapDialog.showModal();
+    return;
+  }
+
+  createUnitMapImages([activeScenario]);
+}
+
+function loadMapImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Không tải được ảnh mặt bằng"));
+    image.src = src;
+  });
+}
+
+function drawMapRect(ctx, rect, color, lineWidth, scale = 1, glow = true) {
+  ctx.save();
+  if (glow) {
+    ctx.strokeStyle = "rgba(255,255,255,0.92)";
+    ctx.lineWidth = (lineWidth + 12) * scale;
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth * scale;
+  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.restore();
+}
+
+function drawMapArrow(ctx, start, end, scale = 1) {
+  const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  const size = 42 * scale;
+  ctx.save();
+  ctx.strokeStyle = "#ff2d2d";
+  ctx.fillStyle = "#ff2d2d";
+  ctx.lineWidth = 16 * scale;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(start.x, start.y);
+  ctx.lineTo(end.x, end.y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(end.x, end.y);
+  ctx.lineTo(end.x - size * Math.cos(angle - Math.PI / 6), end.y - size * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(end.x - size * Math.cos(angle + Math.PI / 6), end.y - size * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function mapLabelLines(result) {
+  const unitCode = normalizeUnitCode(els.unitCode.value) || "Căn hộ";
+  const lines = [
+    { text: unitCode, size: 86, weight: 900, color: "#ffffff" },
+    { text: `${scenarioLabel(result.scenario, result.policy)} - Giá cuối`, size: 50, weight: 850, color: "#ffffff" },
+    { text: money(result.total), size: 72, weight: 950, color: "#ffe278" },
+  ];
+  if (result.scenario === "loan") {
+    lines.push({ text: `Trả trước 25%: ${money(result.upfront)}`, size: 48, weight: 850, color: "#ffffff" });
+  }
+  return lines;
+}
+
+function drawMapLabel(ctx, label, result, scale = 1) {
+  const lines = mapLabelLines(result);
+  const height = result.scenario === "loan" ? label.height + 150 * scale : label.height;
+  ctx.save();
+  ctx.fillStyle = "rgba(15, 118, 110, 0.92)";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+  ctx.lineWidth = 5 * scale;
+  ctx.fillRect(label.x, label.y, label.width, height);
+  ctx.strokeRect(label.x, label.y, label.width, height);
+
+  let cursorY = label.y + 72 * scale;
+  lines.forEach((line) => {
+    ctx.fillStyle = line.color;
+    ctx.font = `${line.weight} ${line.size * scale}px "Segoe UI", Arial, sans-serif`;
+    ctx.fillText(line.text, label.x + 72 * scale, cursorY);
+    cursorY += (line.size + 24) * scale;
+  });
+  ctx.restore();
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.94));
+}
+
+async function buildUnitMapImage(scenario) {
+  const unitCode = normalizeUnitCode(els.unitCode.value);
+  const location = unitMapLocations[unitCode];
+  if (!location) throw new Error(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
+
+  const result = calculate({ scenario });
+  const image = await loadMapImage(location.image);
+  const crop = location.crop;
+  const outputCanvas = document.createElement("canvas");
+  outputCanvas.width = crop.width;
+  outputCanvas.height = crop.height;
+  const ctx = outputCanvas.getContext("2d");
+  ctx.drawImage(
+    image,
+    crop.x,
+    crop.y,
+    crop.width,
+    crop.height,
+    0,
+    0,
+    crop.width,
+    crop.height
+  );
+  ctx.save();
+  ctx.translate(-crop.x, -crop.y);
+  const scale = location.scale || 1;
+  drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
+  drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
+  drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
+  drawMapLabel(ctx, location.label, result, scale);
+  ctx.restore();
+
+  return {
+    canvas: outputCanvas,
+    filename: `chi-can-${unitCode}-${scenario}.png`,
+  };
+}
+
+function downloadCanvas(canvas, filename) {
+  const link = document.createElement("a");
+  link.download = filename;
+  link.href = canvas.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function downloadUnitMapImages() {
+  if (!unitMapGeneratedImages.length) {
+    showToast("Hãy tạo ảnh trước");
+    return;
+  }
+
+  unitMapGeneratedImages.forEach(({ canvas, filename }) => downloadCanvas(canvas, filename));
+  showToast(`Đang tải ${unitMapGeneratedImages.length} ảnh`);
+}
+
+async function copyUnitMapImage() {
+  const firstImage = unitMapGeneratedImages[0];
+  if (!firstImage) {
+    showToast("Hãy tạo ảnh trước");
+    return;
+  }
+
+  if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+    showToast("Trình duyệt chưa hỗ trợ sao chép ảnh");
+    return;
+  }
+
+  const blob = await canvasToBlob(firstImage.canvas);
+  if (!blob) {
+    showToast("Không sao chép được ảnh");
+    return;
+  }
+
+  await navigator.clipboard.write([
+    new ClipboardItem({ [blob.type]: blob }),
+  ]);
+  showToast("Đã sao chép ảnh");
+}
+
+async function createUnitMapImages(scenarios = [activeScenario]) {
+  const selectedScenarios = scenarios.filter(Boolean);
+  if (!selectedScenarios.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+
+  try {
+    const generated = [];
+    for (const scenario of selectedScenarios) {
+      generated.push(await buildUnitMapImage(scenario));
+    }
+    unitMapGeneratedImages = generated;
+
+    const preview = generated[0];
+    if (els.unitMapPreview && els.unitMapPreviewImage && preview) {
+      els.unitMapPreviewImage.src = preview.canvas.toDataURL("image/png");
+      els.unitMapPreview.hidden = false;
+    }
+
+    if (els.unitMapOutputActions) els.unitMapOutputActions.hidden = false;
+    showToast(`Đã tạo ${generated.length} ảnh chỉ căn`);
+  } catch (error) {
+    showToast(error.message || "Không tạo được ảnh chỉ căn");
+  }
 }
 
 function isoDate(dateValue) {
@@ -1654,6 +1986,7 @@ function render() {
 
   els.discountRows.innerHTML = discountRowsHtml(result);
   els.scheduleRows.innerHTML = scheduleRowsHtml(result);
+  renderMultiQuotePanel();
   renderTtsChart();
 
   lastQuoteText = makeQuoteText(result);
@@ -1826,6 +2159,27 @@ els.copyBtn.addEventListener("click", async () => {
 
 els.pdfBtn.addEventListener("click", openPdfOptions);
 
+els.multiQuoteBtn?.addEventListener("click", () => {
+  multiQuoteOpen = !multiQuoteOpen;
+  renderMultiQuotePanel();
+});
+
+els.unitMapBtn?.addEventListener("click", openUnitMapOptions);
+
+els.unitMapCancel?.addEventListener("click", () => {
+  els.unitMapDialog.close();
+});
+
+els.unitMapCreate?.addEventListener("click", () => {
+  createUnitMapImages(selectedMapScenarios());
+});
+
+els.unitMapDownload?.addEventListener("click", downloadUnitMapImages);
+
+els.unitMapCopy?.addEventListener("click", () => {
+  copyUnitMapImage().catch(() => showToast("Không sao chép được ảnh"));
+});
+
 els.pdfOptionsCancel.addEventListener("click", () => {
   els.pdfOptionsDialog.close();
 });
@@ -1863,7 +2217,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=63", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=67", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
