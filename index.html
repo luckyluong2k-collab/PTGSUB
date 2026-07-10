@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=73">
+  <link rel="stylesheet" href="styles.css?v=75">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -22,88 +22,47 @@
   <aside class="auth-drawer" id="authGate" aria-label="Quản lý đăng nhập">
     <div class="auth-card">
       <button class="auth-close" id="authCloseBtn" type="button" aria-label="Đóng bảng tài khoản">×</button>
-      <p class="eyebrow">Menu</p>
-      <h1>PTGSUB</h1>
+      <p class="eyebrow">Quyền truy cập</p>
+      <h1>Quản lý đăng nhập</h1>
+      <p id="authStatus">Vui lòng đăng nhập bằng Gmail. Nếu là tài khoản mới, bạn cần chờ quản trị viên duyệt.</p>
       <div class="login-intro" id="loginIntro" aria-label="Giới thiệu ứng dụng">
-        <strong>PTGSUB - SIÊU TRỢ LÝ TÍNH GIÁ &amp; TƯ VẤN SUN GROUP</strong>
+        <strong>App hỗ trợ tư vấn và tính giá Sun Group nhanh hơn</strong>
         <ul>
-          <li><b>⚡ 1 Lần Điền - Ra Trọn Bộ Phương Án:</b> Chỉ nhập mã căn một lần duy nhất, tự động xuất phiếu tính giá dòng tiền cho tất cả phương án (Vay, Không vay, TTS 50% - 95%).</li>
-          <li><b>🔄 Auto Cập Nhật Chiết Khấu Theo Ngày:</b> Không lo tính sai, tính sót! Hệ thống tự động update các chương trình chiết khấu, quà tặng và chính sách bán hàng mới nhất theo thời gian thực.</li>
-          <li><b>🛠️ Tích Hợp Sẵn Chính Sách Đặc Thù:</b> Tự động áp dụng chính sách thương mại dịch vụ (TMDV), gói nội thất rời... vào bài toán tài chính chỉ bằng một cú click chọn.</li>
-          <li><b>🌐 Camera 360° Toàn Cảnh Dự Án:</b> Cho khách hàng trải nghiệm thực tế ảo, xem vị trí và hướng view trực quan ngay trên giao diện app.</li>
-          <li><b>📚 Tra Cứu CSBH Siêu Tốc:</b> Lưu trữ và tìm kiếm nhanh file chính sách, bảng hàng gốc mà không cần lục tìm trên các nhóm chat.</li>
+          <li>Tự động tính giá cuối, trả trước và tiến độ thanh toán.</li>
+          <li>Lọc, so sánh căn theo tòa, loại căn, tầng, view và giá.</li>
+          <li>Lưu lịch sử 10 căn đã tra gần nhất để mở lại nhanh.</li>
+          <li>Quản lý tài khoản Gmail đã duyệt và đang chờ duyệt.</li>
         </ul>
-        <p><b>🚀 Ứng dụng đang trong quá trình liên tục cập nhật các tính năng đột phá mới!</b></p>
-        <p><b>💰 Sở hữu ngay:</b> Chỉ <span class="price-highlight">99k</span> / Sử dụng vĩnh viễn.</p>
+        <p><b>Chỉ 99k/vĩnh viễn</b>, được hỗ trợ cập nhật liên tục và còn nhiều chức năng khác nữa.</p>
       </div>
 
-      <div class="menu-sections">
-        <details class="menu-section" id="loginMenuSection" open>
-          <summary class="menu-section-summary">Quản lý đăng nhập</summary>
-          <div class="menu-section-body">
-            <p id="authStatus">Vui lòng đăng nhập bằng Gmail để truy cập website.</p>
-            <div class="browser-warning" id="browserWarning" hidden>
-              <strong>Điện thoại cần mở bằng Safari/Chrome</strong>
-              <span>Google chặn đăng nhập trong trình duyệt nhúng của Zalo, Facebook, Messenger. Hãy bấm dấu ba chấm rồi chọn mở bằng Safari/Chrome, hoặc sao chép link bên dưới.</span>
-              <div class="browser-warning-actions">
-                <button class="filter-reset" id="copyAppLinkBtn" type="button">Sao chép link web</button>
-                <a id="openBrowserLink" href="./">Mở lại web</a>
-              </div>
-            </div>
-            <div class="auth-actions">
-              <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
-              <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
-              <a class="zalo-login-link" href="http://zalo.me/0387335227" target="_blank" rel="noopener" aria-label="Liên hệ Zalo 0387.335.227">
-                <svg viewBox="0 0 36 36" aria-hidden="true">
-                  <rect x="2" y="2" width="32" height="32" rx="8"/>
-                  <text x="18" y="22" text-anchor="middle">Zalo</text>
-                </svg>
-                <span>Liên hệ Zalo: <b>0387.335.227</b></span>
-              </a>
-            </div>
-          </div>
-        </details>
+      <div class="browser-warning" id="browserWarning" hidden>
+        <strong>Điện thoại cần mở bằng Safari/Chrome</strong>
+        <span>Google chặn đăng nhập trong trình duyệt nhúng của Zalo, Facebook, Messenger. Hãy bấm dấu ba chấm rồi chọn mở bằng Safari/Chrome, hoặc sao chép link bên dưới.</span>
+        <div class="browser-warning-actions">
+          <button class="filter-reset" id="copyAppLinkBtn" type="button">Sao chép link web</button>
+          <a id="openBrowserLink" href="./">Mở lại web</a>
+        </div>
+      </div>
 
-        <details class="menu-section history-panel" id="myHistoryPanel" hidden>
-          <summary class="menu-section-summary">Lịch sử căn đã tra</summary>
-          <div class="menu-section-body">
-            <div id="myHistoryList" class="history-list"></div>
-          </div>
-        </details>
+      <div class="auth-actions">
+        <button class="primary" id="loginBtn" type="button">Đăng nhập bằng Google</button>
+        <button class="filter-reset" id="logoutBtn" type="button" hidden>Đăng xuất</button>
+        <a class="camera-360-link" id="camera360Section" data-auth-menu hidden href="https://pano.cool/@TicaLand/ti-n-subc-08-06?s=w8DL1v">
+          <span class="camera-360-icon" aria-hidden="true">360</span>
+          <span>Camera 360</span>
+        </a>
+        <a class="zalo-login-link" href="http://zalo.me/0387335227" target="_blank" rel="noopener" aria-label="Liên hệ Zalo 0387.335.227">
+          <svg viewBox="0 0 36 36" aria-hidden="true">
+            <rect x="2" y="2" width="32" height="32" rx="8"/>
+            <text x="18" y="22" text-anchor="middle">Zalo</text>
+          </svg>
+          <span>Liên hệ Zalo: <b>0387.335.227</b></span>
+        </a>
 
-        <details class="menu-section admin-panel" id="adminPanel" hidden>
-          <summary class="menu-section-summary">Quản lý tài khoản</summary>
-          <div class="menu-section-body">
-            <div id="adminUsers" class="admin-users"></div>
-          </div>
-        </details>
-
-        <details class="menu-section menu-tool-section" id="camera360Section" data-auth-menu hidden>
-          <summary class="menu-section-summary menu-section-summary-icon">
-            <span class="flycam-badge" aria-hidden="true">
-              <svg viewBox="0 0 48 48">
-                <circle cx="10" cy="10" r="6"/>
-                <circle cx="38" cy="10" r="6"/>
-                <circle cx="10" cy="38" r="6"/>
-                <circle cx="38" cy="38" r="6"/>
-                <path d="M16 16l6 6m10-6-6 6m-10 10 6-6m10 6-6-6"/>
-                <rect x="18" y="18" width="12" height="12" rx="3"/>
-                <path d="M21 31h6"/>
-              </svg>
-            </span>
-            <span>Camera 360</span>
-          </summary>
-          <div class="menu-section-body">
-            <a class="camera-360-link" href="https://pano.cool/@TicaLand/ti-n-subc-08-06?s=w8DL1v">
-              <span class="camera-360-icon" aria-hidden="true">360</span>
-              <span>Mở Camera 360</span>
-            </a>
-          </div>
-        </details>
-
-        <details class="menu-section address-copy-section" id="projectAddressSection" data-auth-menu hidden>
-          <summary class="menu-section-summary">Sao ch&#233;p &#273;&#7883;a ch&#7881; d&#7921; &#225;n</summary>
-          <div class="menu-section-body address-copy-list">
+        <details class="drawer-tool-panel address-copy-section" id="projectAddressSection" data-auth-menu hidden>
+          <summary class="drawer-tool-summary">Sao ch&#233;p &#273;&#7883;a ch&#7881; d&#7921; &#225;n</summary>
+          <div class="address-copy-list">
             <button class="address-copy-btn" type="button" data-copy-map-link="https://maps.app.goo.gl/uinSnCDMWyV8Utsy7">
               V&#7883; tr&#237; qu&#7843;ng tr&#432;&#7901;ng Tr&#7889;ng &#272;&#7885;i Tam
             </button>
@@ -116,7 +75,7 @@
           </div>
         </details>
 
-        <a class="menu-section-link policy-sales-link" id="policySalesLink" data-auth-menu hidden href="https://drive.google.com/drive/folders/1ZA3WswiEDGjdhiq_V2DbQy9T6aFUCivZ">
+        <a class="policy-sales-link" id="policySalesLink" data-auth-menu hidden href="https://drive.google.com/drive/folders/1ZA3WswiEDGjdhiq_V2DbQy9T6aFUCivZ">
           <svg viewBox="0 0 36 36" aria-hidden="true">
             <path class="drive-green" d="M13.1 4.5h9.8l10 17.3h-9.8z"/>
             <path class="drive-yellow" d="M13.1 4.5 3.1 21.8l4.9 8.5 10-17.3z"/>
@@ -124,6 +83,16 @@
           </svg>
           <span>Chính sách bán hàng</span>
         </a>
+      </div>
+
+      <details class="history-panel" id="myHistoryPanel" hidden>
+        <summary class="history-panel-summary">Lịch sử căn đã tra</summary>
+        <div id="myHistoryList" class="history-list"></div>
+      </details>
+
+      <div class="admin-panel" id="adminPanel" hidden>
+        <h2>Quản lý tài khoản</h2>
+        <div id="adminUsers" class="admin-users"></div>
       </div>
     </div>
   </aside>
@@ -413,7 +382,7 @@
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=63"></script>
-  <script src="app.js?v=73"></script>
-  <script type="module" src="firebase-auth.js?v=73"></script>
+  <script src="app.js?v=74"></script>
+  <script type="module" src="firebase-auth.js?v=74"></script>
 </body>
 </html>
