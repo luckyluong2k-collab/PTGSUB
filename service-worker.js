@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v73-park-tower-map";
+const CACHE_NAME = "park-pricing-v75-direction-filter-admin-collapse";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=73",
+  "./styles.css?v=75",
   "./unit-data.js?v=63",
-  "./app.js?v=73",
-  "./firebase-auth.js?v=73",
+  "./app.js?v=75",
+  "./firebase-auth.js?v=74",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",

@@ -253,6 +253,7 @@ const els = {
   filterType: document.querySelector("#filterType"),
   filterFloor: document.querySelector("#filterFloor"),
   filterView: document.querySelector("#filterView"),
+  filterDirection: document.querySelector("#filterDirection"),
   filterPriceSort: document.querySelector("#filterPriceSort"),
   filterToggle: document.querySelector("#filterToggle"),
   filterPanel: document.querySelector("#finderPanel"),
@@ -1060,6 +1061,7 @@ function populateFinderOptions() {
   fillFilterSelect(els.filterType, "loại căn", optionValues(catalogEntries, ({ unit }) => unit.unitType));
   fillFilterSelect(els.filterFloor, "tầng", optionValues(catalogEntries, ({ code, unit }) => unitFloor(unit, code)));
   fillFilterSelect(els.filterView, "view", optionValues(catalogEntries, ({ unit }) => unit.view));
+  fillFilterSelect(els.filterDirection, "hướng", optionValues(catalogEntries, ({ unit }) => unit.direction));
 }
 
 function unitCard({ code, unit }) {
@@ -1096,6 +1098,7 @@ function renderFinder() {
   const type = normalizeFacet(els.filterType.value);
   const floor = normalizeFacet(els.filterFloor.value);
   const view = normalizeFacet(els.filterView.value);
+  const direction = normalizeFacet(els.filterDirection.value);
   const priceSort = els.filterPriceSort.value === "desc" ? -1 : 1;
 
   const matches = catalogEntries
@@ -1104,6 +1107,7 @@ function renderFinder() {
       if (type && normalizeFacet(unit.unitType) !== type) return false;
       if (floor && normalizeFacet(unitFloor(unit, code)) !== floor) return false;
       if (view && normalizeFacet(unit.view) !== view) return false;
+      if (direction && normalizeFacet(unit.direction) !== direction) return false;
       return true;
     })
     .sort((a, b) =>
@@ -2852,7 +2856,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=74", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=75", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
