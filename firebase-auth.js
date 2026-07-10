@@ -1028,7 +1028,7 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    showApp(user.email);
+    showApp(user.email, data);
     renderMyHistory(data.recentSearches || []);
 
     if (currentIsAdmin) {

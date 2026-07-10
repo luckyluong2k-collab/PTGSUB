@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=67">
+  <link rel="stylesheet" href="styles.css?v=73">
 </head>
 <body>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -306,6 +306,10 @@
       </button>
       <div class="multi-quote-panel" id="multiQuotePanel" hidden>
         <div class="multi-quote-grid" id="multiQuoteGrid"></div>
+        <div class="multi-quote-actions">
+          <button class="primary" id="multiQuoteImageBtn" type="button">T&#7843;i &#7843;nh b&#225;o gi&#225;</button>
+          <button class="secondary pdf-button" id="multiQuotePdfBtn" type="button">Xu&#7845;t PDF b&#225;o gi&#225;</button>
+        </div>
       </div>
       <button class="unit-map-button" id="unitMapBtn" type="button">T&#7841;o &#7843;nh ch&#7881; c&#259;n</button>
       <div class="tts-chart-panel" id="ttsChartPanel">
@@ -362,6 +366,25 @@
     </div>
   </dialog>
 
+  <dialog class="pdf-options-dialog" id="multiQuoteExportDialog" aria-labelledby="multiQuoteExportTitle">
+    <div class="pdf-options-card">
+      <h2 id="multiQuoteExportTitle">Ch&#7885;n ph&#432;&#417;ng &#225;n b&#225;o gi&#225;</h2>
+      <p>Ch&#7885;n ph&#432;&#417;ng &#225;n &#273;&#7875; g&#233;p c&#225;c card v&#224;o chung m&#7897;t trang.</p>
+      <div class="pdf-option-list">
+        <label><input type="checkbox" value="loan" data-multi-export-scenario> <span>C&#243; vay</span></label>
+        <label><input type="checkbox" value="standard" data-multi-export-scenario> <span>Kh&#244;ng vay</span></label>
+        <label><input type="checkbox" value="tts50" data-multi-export-scenario> <span>TTS 50%</span></label>
+        <label><input type="checkbox" value="tts70" data-multi-export-scenario> <span>TTS 70%</span></label>
+        <label><input type="checkbox" value="tts95" data-multi-export-scenario> <span>TTS 95%</span></label>
+      </div>
+      <div class="pdf-options-actions">
+        <button class="secondary" id="multiQuoteExportCancel" type="button">H&#7911;y</button>
+        <button class="secondary pdf-button" id="multiQuoteExportPdf" type="button">Xu&#7845;t PDF</button>
+        <button class="primary" id="multiQuoteExportImage" type="button">T&#7843;i &#7843;nh</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog class="pdf-options-dialog" id="unitMapDialog" aria-labelledby="unitMapTitle">
     <div class="pdf-options-card unit-map-options-card">
       <h2 id="unitMapTitle">T&#7841;o &#7843;nh ch&#7881; c&#259;n</h2>
@@ -390,7 +413,7 @@
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=63"></script>
-  <script src="app.js?v=67"></script>
-  <script type="module" src="firebase-auth.js?v=63"></script>
+  <script src="app.js?v=73"></script>
+  <script type="module" src="firebase-auth.js?v=73"></script>
 </body>
 </html>

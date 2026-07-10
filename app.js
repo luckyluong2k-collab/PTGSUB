@@ -181,6 +181,8 @@ const scenarioLabels = {
   tts95: "TTS 95%",
 };
 
+const quoteScenarios = ["loan", "standard", "tts50", "tts70", "tts95"];
+
 function scenarioLabel(scenario, policy = policies.P3P9) {
   return policy?.scenarioLabels?.[scenario] || scenarioLabels[scenario] || scenario;
 }
@@ -215,6 +217,13 @@ const els = {
   multiQuoteBtn: document.querySelector("#multiQuoteBtn"),
   multiQuotePanel: document.querySelector("#multiQuotePanel"),
   multiQuoteGrid: document.querySelector("#multiQuoteGrid"),
+  multiQuoteImageBtn: document.querySelector("#multiQuoteImageBtn"),
+  multiQuotePdfBtn: document.querySelector("#multiQuotePdfBtn"),
+  multiQuoteExportDialog: document.querySelector("#multiQuoteExportDialog"),
+  multiQuoteExportInputs: document.querySelectorAll("[data-multi-export-scenario]"),
+  multiQuoteExportCancel: document.querySelector("#multiQuoteExportCancel"),
+  multiQuoteExportImage: document.querySelector("#multiQuoteExportImage"),
+  multiQuoteExportPdf: document.querySelector("#multiQuoteExportPdf"),
   unitMapBtn: document.querySelector("#unitMapBtn"),
   unitMapDialog: document.querySelector("#unitMapDialog"),
   mapScenarioInputs: document.querySelectorAll("[data-map-scenario]"),
@@ -257,6 +266,7 @@ const els = {
 let activeScenario = "loan";
 let activeTtsChartScenario = "tts95";
 let multiQuoteOpen = false;
+let multiQuoteExportMode = "image";
 let unitMapGeneratedImages = [];
 let lastQuoteText = "";
 let lastPolicyKey = "";
@@ -265,16 +275,174 @@ let skipPolicyDefaultOnce = false;
 let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 
 const unitMapImage = "phankhupark-map.png";
-const unitMapLocations = {
+const unitMapExactLocations = {
   P90316: {
     image: unitMapImage,
     scale: 0.5,
     crop: { x: 1025, y: 750, width: 1300, height: 870 },
     towerRect: { x: 1181, y: 944, width: 155, height: 445 },
     unitRect: { x: 1268, y: 1208, width: 38, height: 32 },
-    label: { x: 1370, y: 855, width: 710, height: 165 },
+    label: { x: 1370, y: 855, width: 835, height: 165 },
     arrowStart: { x: 1370, y: 992 },
     arrowEnd: { x: 1287, y: 1224 },
+  },
+};
+
+function normalizeMapApartmentNo(value) {
+  return normalizeUnitCode(value).replace(/^A(?=\d)/, "");
+}
+
+function makeMapUnitCells(rows, defaults = {}) {
+  return rows.reduce((cells, row) => {
+    row.labels.forEach((label, index) => {
+      const key = normalizeMapApartmentNo(label);
+      const textWidth = /[A-Z]/.test(label) ? 24 : 20;
+      const width = row.widths?.[index] || row.width || defaults.width || textWidth;
+      const height = row.height || defaults.height || 28;
+      cells[key] = {
+        x: row.centers[index] - width / 2,
+        y: row.y,
+        width,
+        height,
+      };
+    });
+    return cells;
+  }, {});
+}
+
+function makeMapUnitColumnCells(columns, defaults = {}) {
+  return columns.reduce((cells, column) => {
+    column.labels.forEach((label, index) => {
+      const key = normalizeMapApartmentNo(label);
+      const width = column.width || defaults.width || 32;
+      const height = column.heights?.[index] || column.height || defaults.height || 24;
+      cells[key] = {
+        x: column.x - width / 2,
+        y: column.centers[index] - height / 2,
+        width,
+        height,
+      };
+    });
+    return cells;
+  }, {});
+}
+
+const parkCompactTopLabels = [
+  "20", "21", "22", "23", "24", "25", "26", "27", "28",
+  "29", "30", "31", "32", "33", "34", "35", "36", "37",
+];
+const parkCompactBottomLabels = [
+  "19", "18", "17", "16", "15", "12B", "12A", "12", "11", "10", "09",
+  "08", "07", "06", "05", "04", "03", "02", "01", "40", "39", "38",
+];
+const parkCompactTopCenters = [
+  1504, 1522, 1538, 1572, 1583, 1599, 1614, 1629, 1645,
+  1660, 1675, 1690, 1704, 1718, 1728, 1761, 1777, 1804,
+];
+const parkCompactBottomCenters = [
+  1504, 1522, 1538, 1553, 1568, 1582, 1594, 1607, 1622, 1638, 1653,
+  1668, 1683, 1698, 1713, 1728, 1740, 1755, 1769, 1782, 1796, 1810,
+];
+
+function shiftCenters(centers, offsetX) {
+  return centers.map((center) => center + offsetX);
+}
+
+function makeParkCompactTower({ offsetX = 0, cropX, towerRect, labelX }) {
+  return {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: cropX, y: 650, width: 1550, height: 850 },
+    towerRect,
+    label: { x: labelX, y: 950, width: 820, height: 165 },
+    units: makeMapUnitCells([
+      { labels: parkCompactTopLabels, centers: shiftCenters(parkCompactTopCenters, offsetX), y: 828, height: 28 },
+      { labels: parkCompactBottomLabels, centers: shiftCenters(parkCompactBottomCenters, offsetX), y: 858, height: 28 },
+    ]),
+  };
+}
+
+const unitMapTowerLayouts = {
+  P9: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 1025, y: 750, width: 1300, height: 870 },
+    towerRect: { x: 1181, y: 944, width: 155, height: 445 },
+    label: { x: 1370, y: 855, width: 835, height: 165 },
+    units: makeMapUnitColumnCells([
+      {
+        x: 1222,
+        width: 32,
+        height: 22,
+        labels: [
+          "37", "36", "35", "34", "33", "32", "31", "30", "29",
+          "28", "27", "26", "25", "24", "23", "22", "21", "20",
+        ],
+        centers: [
+          973, 989, 1005, 1040, 1054, 1068, 1082, 1097, 1112,
+          1127, 1142, 1157, 1172, 1186, 1199, 1238, 1253, 1270,
+        ],
+      },
+      {
+        x: 1287,
+        width: 32,
+        height: 22,
+        labels: [
+          "38", "39", "40", "01", "02", "03A", "03", "05", "06", "07",
+          "08", "09", "10", "11", "12", "12A", "12B", "15", "16", "17", "18", "19",
+        ],
+        centers: [
+          973, 989, 1005, 1020, 1035, 1048, 1058, 1073, 1087, 1102,
+          1117, 1131, 1146, 1161, 1176, 1190, 1199, 1213, 1224, 1238, 1253, 1270,
+        ],
+      },
+    ]),
+  },
+  P15: makeParkCompactTower({
+    cropX: 1125,
+    towerRect: { x: 1492, y: 828, width: 333, height: 64 },
+    labelX: 1840,
+  }),
+  P16: makeParkCompactTower({
+    offsetX: 344,
+    cropX: 1350,
+    towerRect: { x: 1838, y: 828, width: 327, height: 64 },
+    labelX: 1840,
+  }),
+  P18: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 1700, y: 650, width: 1700, height: 850 },
+    towerRect: { x: 2198, y: 828, width: 430, height: 64 },
+    label: { x: 2200, y: 950, width: 960, height: 165 },
+    units: makeMapUnitCells([
+      {
+        labels: [
+          "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26",
+          "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37",
+        ],
+        centers: [
+          2206, 2223, 2238, 2266, 2277, 2292, 2307, 2322, 2337, 2352, 2368,
+          2397, 2412, 2428, 2443, 2458, 2474, 2490, 2503, 2534, 2550, 2582,
+        ],
+        y: 828,
+        height: 28,
+      },
+      {
+        labels: [
+          "15", "12B", "12A", "12", "11", "10", "09", "08", "07", "06", "05",
+          "04A", "03", "02", "01", "50", "48A", "48", "47", "46", "45", "44",
+          "43", "42", "41", "40", "39", "38",
+        ],
+        centers: [
+          2206, 2223, 2238, 2253, 2268, 2282, 2297, 2312, 2328, 2343, 2358,
+          2373, 2388, 2403, 2418, 2432, 2446, 2460, 2475, 2490, 2505, 2519,
+          2534, 2549, 2564, 2578, 2592, 2612,
+        ],
+        y: 858,
+        height: 28,
+      },
+    ]),
   },
 };
 
@@ -420,6 +588,39 @@ function parseUnitCodeParts(code) {
   const floor = rest.match(/^(\d{2})/)?.[1] || "";
   const apartment = floor ? rest.slice(2) : "";
   return { tower, floor, apartment };
+}
+
+function rectCenter(rect) {
+  return {
+    x: rect.x + rect.width / 2,
+    y: rect.y + rect.height / 2,
+  };
+}
+
+function resolveUnitMapLocation(code) {
+  const unitCode = normalizeUnitCode(code);
+  if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];
+
+  const parsed = parseUnitCodeParts(unitCode);
+  const layout = unitMapTowerLayouts[parsed.tower];
+  const apartment = normalizeMapApartmentNo(parsed.apartment);
+  const unitRect = layout?.units?.[apartment];
+  if (!layout || !unitRect) return null;
+
+  const arrowEnd = rectCenter(unitRect);
+  return {
+    image: layout.image,
+    scale: layout.scale,
+    crop: layout.crop,
+    towerRect: layout.towerRect,
+    unitRect,
+    label: layout.label,
+    arrowStart: layout.arrowStart || {
+      x: layout.label.x + 42,
+      y: layout.label.y + 42,
+    },
+    arrowEnd,
+  };
 }
 
 function unitTower(unit, code = "") {
@@ -1395,9 +1596,261 @@ function renderMultiQuotePanel() {
   els.multiQuoteBtn?.classList.toggle("open", multiQuoteOpen);
   if (!multiQuoteOpen) return;
 
-  els.multiQuoteGrid.innerHTML = ["loan", "standard", "tts50", "tts70", "tts95"]
+  els.multiQuoteGrid.innerHTML = quoteScenarios
     .map((scenario) => renderMultiQuoteCard(calculate({ scenario })))
     .join("");
+}
+
+function selectedMultiQuoteExportScenarios() {
+  return Array.from(els.multiQuoteExportInputs || [])
+    .filter((input) => input.checked)
+    .map((input) => input.value);
+}
+
+function syncMultiQuoteExportLabels() {
+  const policy = policies[els.policyGroup.value] || policies.P3P9;
+  els.multiQuoteExportInputs.forEach((input) => {
+    const text = input.closest("label")?.querySelector("span");
+    if (text) text.textContent = scenarioLabel(input.value, policy);
+  });
+}
+
+function openMultiQuoteExportOptions(mode = "image") {
+  multiQuoteExportMode = mode;
+  syncMultiQuoteExportLabels();
+  els.multiQuoteExportInputs.forEach((input) => {
+    input.checked = true;
+  });
+
+  if (els.multiQuoteExportDialog?.showModal) {
+    els.multiQuoteExportDialog.showModal();
+    return;
+  }
+
+  runMultiQuoteExport(quoteScenarios, mode);
+}
+
+function canvasRoundRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function fillRoundedRect(ctx, x, y, width, height, radius, fill, stroke = "", lineWidth = 1) {
+  ctx.save();
+  canvasRoundRect(ctx, x, y, width, height, radius);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawFittedText(ctx, text, x, y, maxWidth, size, weight = 800, color = "#17211f", minSize = 18) {
+  let fontSize = size;
+  ctx.save();
+  ctx.fillStyle = color;
+  do {
+    ctx.font = `${weight} ${fontSize}px "Segoe UI", Arial, sans-serif`;
+    if (ctx.measureText(text).width <= maxWidth || fontSize <= minSize) break;
+    fontSize -= 1;
+  } while (fontSize > minSize);
+  ctx.fillText(text, x, y);
+  ctx.restore();
+  return fontSize;
+}
+
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, options = {}) {
+  const {
+    maxLines = 2,
+    size = 24,
+    weight = 800,
+    color = "#17211f",
+  } = options;
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+
+  ctx.save();
+  ctx.font = `${weight} ${size}px "Segoe UI", Arial, sans-serif`;
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+
+  ctx.fillStyle = color;
+  lines.slice(0, maxLines).forEach((item, index) => {
+    const suffix = index === maxLines - 1 && lines.length > maxLines ? "..." : "";
+    ctx.fillText(`${item}${suffix}`, x, y + index * lineHeight);
+  });
+  ctx.restore();
+  return y + Math.min(lines.length, maxLines) * lineHeight;
+}
+
+function multiQuoteExportTone(scenario) {
+  if (scenario === "loan") return { bg: "#f7fffd", border: "#8ccdc4", badge: "#e2f2ef", badgeText: "#0b5f59" };
+  if (isTtsScenario(scenario)) return { bg: "#f8fbff", border: "#b9d2f0", badge: "#e9f1ff", badgeText: "#1d4f91" };
+  return { bg: "#fffdf6", border: "#d7c087", badge: "#fff3df", badgeText: "#7a4b0b" };
+}
+
+function drawExportStat(ctx, x, y, width, label, value, meta = "") {
+  fillRoundedRect(ctx, x, y, width, 92, 12, "#ffffff", "#d8e4e1", 2);
+  drawFittedText(ctx, label, x + 16, y + 28, width - 32, 21, 850, "#64736f", 15);
+  drawFittedText(ctx, value, x + 16, y + 62, width - 32, 30, 950, "#0f766e", 21);
+  if (meta) drawFittedText(ctx, meta, x + 16, y + 84, width - 32, 18, 850, "#7a4b0b", 13);
+}
+
+function drawExportDetail(ctx, x, y, width, label, value) {
+  fillRoundedRect(ctx, x, y, width, 62, 10, "rgba(255,255,255,0.82)", "#dbe5e2", 1.5);
+  drawFittedText(ctx, label, x + 12, y + 23, width - 24, 17, 800, "#64736f", 12);
+  drawFittedText(ctx, value, x + 12, y + 48, width - 24, 20, 900, "#111c1a", 14);
+}
+
+function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
+  const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const scenario = scenarioLabel(result.scenario, result.policy);
+  const secondary = multiQuoteSecondary(result);
+  const totalDiscount = result.discounts.reduce((sum, item) => sum + round(item.amount), 0);
+  const rawGrossAfterDiscountText = result.scenario === "standard" ? "Theo tiến độ" : money(result.rawGrossAfterDiscount);
+  const tone = multiQuoteExportTone(result.scenario);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(18, 38, 34, 0.10)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 8;
+  fillRoundedRect(ctx, x, y, width, height, 16, tone.bg, tone.border, 2);
+  ctx.restore();
+
+  const pad = 24;
+  const contentX = x + pad;
+  const contentW = width - pad * 2;
+  ctx.font = '950 18px "Segoe UI", Arial, sans-serif';
+  const badgeW = Math.min(170, Math.max(118, ctx.measureText(scenario).width + 54));
+
+  drawWrappedText(ctx, `${unitCode} - ${result.policy.name}`, contentX, y + 36, contentW - badgeW - 14, 22, {
+    size: 20,
+    weight: 850,
+    color: "#64736f",
+    maxLines: 1,
+  });
+  drawFittedText(ctx, scenario, contentX, y + 72, contentW - badgeW - 14, 34, 950, "#0b5f59", 24);
+  fillRoundedRect(ctx, x + width - pad - badgeW, y + 24, badgeW, 38, 999, tone.badge);
+  drawFittedText(ctx, scenario, x + width - pad - badgeW + 18, y + 49, badgeW - 36, 18, 950, tone.badgeText, 13);
+
+  const statGap = 16;
+  const statW = (contentW - statGap) / 2;
+  drawExportStat(ctx, contentX, y + 92, statW, "Giá cuối phải trả", money(result.total));
+  drawExportStat(ctx, contentX + statW + statGap, y + 92, statW, secondary.label, secondary.value, secondary.meta);
+
+  const detailW = (contentW - statGap) / 2;
+  const detailY = y + 204;
+  drawExportDetail(ctx, contentX, detailY, detailW, "Giá niêm yết", money(result.listedGross));
+  drawExportDetail(ctx, contentX + detailW + statGap, detailY, detailW, "Giá thô sau CK", rawGrossAfterDiscountText);
+  drawExportDetail(ctx, contentX, detailY + 76, detailW, "Nội thất/hoàn thiện", money(result.completion));
+  drawExportDetail(ctx, contentX + detailW + statGap, detailY + 76, detailW, "Tổng chiết khấu", money(totalDiscount));
+}
+
+function buildMultiQuoteExportCanvas(scenarios) {
+  const selected = scenarios.filter(Boolean);
+  const results = selected.map((scenario) => calculate({ scenario }));
+  const unitCode = normalizeUnitCode(els.unitCode.value) || "CAN-HO";
+  const width = 1400;
+  const margin = 48;
+  const gap = 26;
+  const columns = selected.length === 1 ? 1 : 2;
+  const rows = Math.ceil(selected.length / columns);
+  const headerHeight = 130;
+  const cardHeight = 360;
+  const cardWidth = columns === 1 ? width - margin * 2 : (width - margin * 2 - gap) / 2;
+  const height = margin + headerHeight + rows * cardHeight + Math.max(0, rows - 1) * gap + margin;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#f4f7f6";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "#0f766e";
+  ctx.fillRect(0, 0, width, 14);
+
+  ctx.fillStyle = "#0b5f59";
+  ctx.font = '950 44px "Segoe UI", Arial, sans-serif';
+  ctx.fillText("Báo giá nhiều phương án", margin, margin + 34);
+  ctx.fillStyle = "#64736f";
+  ctx.font = '850 24px "Segoe UI", Arial, sans-serif';
+  ctx.fillText(`${unitCode} · ${results[0]?.policy?.name || ""}`, margin, margin + 70);
+  ctx.fillText(`Ngày báo giá: ${formatDateText(els.quoteDate.value)}`, margin, margin + 104);
+
+  results.forEach((result, index) => {
+    const col = index % columns;
+    const rowIndex = Math.floor(index / columns);
+    const x = margin + col * (cardWidth + gap);
+    const y = margin + headerHeight + rowIndex * (cardHeight + gap);
+    drawMultiQuoteExportCard(ctx, result, x, y, cardWidth, cardHeight);
+  });
+
+  return canvas;
+}
+
+function multiQuoteExportFileName(scenarios, ext) {
+  const unitCode = normalizeUnitCode(els.unitCode.value) || "can-ho";
+  const suffix = scenarios.join("-") || "phuong-an";
+  return `bao-gia-${unitCode}-${suffix}.${ext}`;
+}
+
+function runMultiQuoteExport(scenarios, mode = multiQuoteExportMode) {
+  const selected = scenarios.filter(Boolean);
+  if (!selected.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+
+  const canvas = buildMultiQuoteExportCanvas(selected);
+  if (mode === "pdf") {
+    const originalTitle = document.title;
+    document.title = `Báo giá nhiều phương án - ${normalizeUnitCode(els.unitCode.value) || "Căn hộ"}`;
+    els.pdfPrintArea.innerHTML = `
+      <div class="multi-quote-print-page">
+        <img src="${canvas.toDataURL("image/png")}" alt="Báo giá nhiều phương án">
+      </div>
+    `;
+    document.body.classList.add("print-mode", "multi-quote-print-mode");
+    showToast("Đang mở hộp thoại lưu PDF");
+
+    const cleanup = () => {
+      document.body.classList.remove("print-mode", "multi-quote-print-mode");
+      document.title = originalTitle;
+      window.removeEventListener("afterprint", cleanup);
+    };
+
+    window.addEventListener("afterprint", cleanup);
+    window.setTimeout(() => {
+      window.print();
+      window.setTimeout(cleanup, 60000);
+    }, 80);
+    return;
+  }
+
+  downloadCanvas(canvas, multiQuoteExportFileName(selected, "png"));
+  showToast("Đang tải ảnh báo giá");
 }
 
 function discountRowsHtml(result) {
@@ -1543,7 +1996,7 @@ function syncMapScenarioLabels() {
 
 function openUnitMapOptions() {
   const unitCode = normalizeUnitCode(els.unitCode.value);
-  if (!unitMapLocations[unitCode]) {
+  if (!resolveUnitMapLocation(unitCode)) {
     showToast(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
     return;
   }
@@ -1608,22 +2061,40 @@ function drawMapArrow(ctx, start, end, scale = 1) {
   ctx.restore();
 }
 
-function mapLabelLines(result) {
+function mapLabelLines(results = []) {
+  const list = Array.isArray(results) ? results : [results];
+  const firstResult = list[0] || {};
   const unitCode = normalizeUnitCode(els.unitCode.value) || "Căn hộ";
   const lines = [
     { text: unitCode, size: 86, weight: 900, color: "#ffffff" },
-    { text: `${scenarioLabel(result.scenario, result.policy)} - Giá cuối`, size: 50, weight: 850, color: "#ffffff" },
-    { text: money(result.total), size: 72, weight: 950, color: "#ffe278" },
   ];
-  if (result.scenario === "loan") {
-    lines.push({ text: `Trả trước 25%: ${money(result.upfront)}`, size: 48, weight: 850, color: "#ffffff" });
-  }
+
+  list.forEach((result) => {
+    const scenario = scenarioLabel(result.scenario, result.policy || firstResult.policy);
+    lines.push({
+      text: `${scenario}: ${money(result.total)}`,
+      size: list.length > 2 ? 40 : 50,
+      weight: 950,
+      color: result.scenario === "loan" ? "#ffe278" : "#ffffff",
+    });
+    if (result.scenario === "loan") {
+      lines.push({
+        text: `Trả trước 25%: ${money(result.upfront)}`,
+        size: list.length > 2 ? 31 : 42,
+        weight: 850,
+        color: "#ffffff",
+      });
+    }
+  });
+
   return lines;
 }
 
-function drawMapLabel(ctx, label, result, scale = 1) {
-  const lines = mapLabelLines(result);
-  const height = result.scenario === "loan" ? label.height + 150 * scale : label.height;
+function drawMapLabel(ctx, label, results = [], scale = 1) {
+  const list = Array.isArray(results) ? results : [results];
+  const lines = mapLabelLines(list);
+  const contentHeight = lines.reduce((sum, line) => sum + line.size + 24, 0) * scale;
+  const height = Math.max(label.height, contentHeight + 44 * scale);
   ctx.save();
   ctx.fillStyle = "rgba(15, 118, 110, 0.92)";
   ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
@@ -1645,12 +2116,13 @@ function canvasToBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.94));
 }
 
-async function buildUnitMapImage(scenario) {
+async function buildUnitMapImage(scenarios = [activeScenario]) {
+  const selected = (Array.isArray(scenarios) ? scenarios : [scenarios]).filter(Boolean);
   const unitCode = normalizeUnitCode(els.unitCode.value);
-  const location = unitMapLocations[unitCode];
+  const location = resolveUnitMapLocation(unitCode);
   if (!location) throw new Error(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
 
-  const result = calculate({ scenario });
+  const results = selected.map((scenario) => calculate({ scenario }));
   const image = await loadMapImage(location.image);
   const crop = location.crop;
   const outputCanvas = document.createElement("canvas");
@@ -1674,12 +2146,12 @@ async function buildUnitMapImage(scenario) {
   drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
   drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
   drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
-  drawMapLabel(ctx, location.label, result, scale);
+  drawMapLabel(ctx, location.label, results, scale);
   ctx.restore();
 
   return {
     canvas: outputCanvas,
-    filename: `chi-can-${unitCode}-${scenario}.png`,
+    filename: `chi-can-${unitCode}-${selected.join("-")}.png`,
   };
 }
 
@@ -1699,7 +2171,7 @@ function downloadUnitMapImages() {
   }
 
   unitMapGeneratedImages.forEach(({ canvas, filename }) => downloadCanvas(canvas, filename));
-  showToast(`Đang tải ${unitMapGeneratedImages.length} ảnh`);
+  showToast("Đang tải ảnh chỉ căn");
 }
 
 async function copyUnitMapImage() {
@@ -1727,17 +2199,14 @@ async function copyUnitMapImage() {
 }
 
 async function createUnitMapImages(scenarios = [activeScenario]) {
-  const selectedScenarios = scenarios.filter(Boolean);
+  const selectedScenarios = (Array.isArray(scenarios) ? scenarios : [scenarios]).filter(Boolean);
   if (!selectedScenarios.length) {
     showToast("Chọn ít nhất một phương án");
     return;
   }
 
   try {
-    const generated = [];
-    for (const scenario of selectedScenarios) {
-      generated.push(await buildUnitMapImage(scenario));
-    }
+    const generated = [await buildUnitMapImage(selectedScenarios)];
     unitMapGeneratedImages = generated;
 
     const preview = generated[0];
@@ -1747,7 +2216,7 @@ async function createUnitMapImages(scenarios = [activeScenario]) {
     }
 
     if (els.unitMapOutputActions) els.unitMapOutputActions.hidden = false;
-    showToast(`Đã tạo ${generated.length} ảnh chỉ căn`);
+    showToast(`Đã tạo ảnh chỉ căn với ${selectedScenarios.length} phương án`);
   } catch (error) {
     showToast(error.message || "Không tạo được ảnh chỉ căn");
   }
@@ -2164,6 +2633,34 @@ els.multiQuoteBtn?.addEventListener("click", () => {
   renderMultiQuotePanel();
 });
 
+els.multiQuoteImageBtn?.addEventListener("click", () => openMultiQuoteExportOptions("image"));
+
+els.multiQuotePdfBtn?.addEventListener("click", () => openMultiQuoteExportOptions("pdf"));
+
+els.multiQuoteExportCancel?.addEventListener("click", () => {
+  els.multiQuoteExportDialog.close();
+});
+
+els.multiQuoteExportImage?.addEventListener("click", () => {
+  const scenarios = selectedMultiQuoteExportScenarios();
+  if (!scenarios.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+  els.multiQuoteExportDialog.close();
+  runMultiQuoteExport(scenarios, "image");
+});
+
+els.multiQuoteExportPdf?.addEventListener("click", () => {
+  const scenarios = selectedMultiQuoteExportScenarios();
+  if (!scenarios.length) {
+    showToast("Chọn ít nhất một phương án");
+    return;
+  }
+  els.multiQuoteExportDialog.close();
+  runMultiQuoteExport(scenarios, "pdf");
+});
+
 els.unitMapBtn?.addEventListener("click", openUnitMapOptions);
 
 els.unitMapCancel?.addEventListener("click", () => {
@@ -2217,7 +2714,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=67", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=73", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });

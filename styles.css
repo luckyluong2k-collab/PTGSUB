@@ -636,6 +636,10 @@ input[readonly] {
 }
 
 .multi-quote-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
   min-height: 46px;
   margin-top: 10px;
@@ -649,7 +653,7 @@ input[readonly] {
 }
 
 .multi-quote-toggle::after {
-  content: " v";
+  content: "v";
   font-size: 13px;
 }
 
@@ -659,6 +663,20 @@ input[readonly] {
 
 .multi-quote-panel {
   margin-top: 12px;
+}
+
+.multi-quote-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.multi-quote-actions .primary,
+.multi-quote-actions .secondary {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 0;
 }
 
 .multi-quote-grid {
@@ -733,6 +751,7 @@ input[readonly] {
 
 .multi-quote-stats > div {
   min-width: 0;
+  min-height: 92px;
   padding: 10px;
   border: 1px solid #d8e4e1;
   border-radius: 8px;
@@ -752,10 +771,10 @@ input[readonly] {
   display: block;
   margin-top: 4px;
   color: #0f766e;
-  font-size: 21px;
+  font-size: clamp(17px, 2.8vw, 21px);
   font-weight: 950;
   line-height: 1.1;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 
 .multi-quote-stats small {
@@ -1139,6 +1158,23 @@ input[readonly] {
 .pdf-options-actions .secondary {
   width: 100%;
   margin-top: 0;
+}
+
+#multiQuoteExportDialog .pdf-options-actions {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.multi-quote-print-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.multi-quote-print-page img {
+  display: block;
+  max-width: 100%;
+  max-height: 184mm;
+  object-fit: contain;
 }
 
 .switch-row {
@@ -1630,11 +1666,14 @@ input[readonly] {
     grid-template-columns: 1fr 1fr;
   }
 
+  .multi-quote-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .multi-quote-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .multi-quote-stats,
   .multi-quote-details {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1797,6 +1836,46 @@ input[readonly] {
 .auth-card p {
   color: var(--muted);
   line-height: 1.45;
+}
+
+.auth-account-status {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  margin: 0;
+}
+
+.auth-account-email {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.auth-expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e2f2ef;
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.auth-expiry-badge.expired {
+  background: #fde8e5;
+  color: #b42318;
+}
+
+.auth-expiry-badge.admin {
+  background: #fff3df;
+  color: #8a3a08;
 }
 
 .login-intro {
@@ -2421,6 +2500,9 @@ input[readonly] {
 }
 
 @media (max-width: 520px) {
+  #multiQuoteExportDialog .pdf-options-actions {
+    grid-template-columns: 1fr;
+  }
   .account-tab {
     top: auto;
     bottom: 76px;
