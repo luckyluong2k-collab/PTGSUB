@@ -295,16 +295,19 @@ function normalizeMapApartmentNo(value) {
 function makeMapUnitCells(rows, defaults = {}) {
   return rows.reduce((cells, row) => {
     row.labels.forEach((label, index) => {
-      const key = normalizeMapApartmentNo(label);
+      const keys = String(label).split("/").map(normalizeMapApartmentNo);
       const textWidth = /[A-Z]/.test(label) ? 24 : 20;
       const width = row.widths?.[index] || row.width || defaults.width || textWidth;
       const height = row.height || defaults.height || 28;
-      cells[key] = {
+      const rect = {
         x: row.centers[index] - width / 2,
         y: row.y,
         width,
         height,
       };
+      keys.forEach((key) => {
+        cells[key] = rect;
+      });
     });
     return cells;
   }, {});
@@ -313,15 +316,18 @@ function makeMapUnitCells(rows, defaults = {}) {
 function makeMapUnitColumnCells(columns, defaults = {}) {
   return columns.reduce((cells, column) => {
     column.labels.forEach((label, index) => {
-      const key = normalizeMapApartmentNo(label);
+      const keys = String(label).split("/").map(normalizeMapApartmentNo);
       const width = column.width || defaults.width || 32;
       const height = column.heights?.[index] || column.height || defaults.height || 24;
-      cells[key] = {
+      const rect = {
         x: column.x - width / 2,
         y: column.centers[index] - height / 2,
         width,
         height,
       };
+      keys.forEach((key) => {
+        cells[key] = rect;
+      });
     });
     return cells;
   }, {});
@@ -363,6 +369,29 @@ function makeParkCompactTower({ offsetX = 0, cropX, towerRect, labelX }) {
 }
 
 const unitMapTowerLayouts = {
+  P7: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 900, y: 600, width: 1000, height: 700 },
+    towerRect: { x: 1206, y: 676, width: 84, height: 226 },
+    label: { x: 1300, y: 705, width: 560, height: 165 },
+    units: makeMapUnitColumnCells([
+      {
+        x: 1226,
+        width: 30,
+        height: 18,
+        labels: ["19", "18", "17", "16", "15", "12B", "12A", "12", "11", "10", "09", "08"],
+        centers: [689, 708, 727, 745, 762, 778, 817, 833, 849, 864, 880, 890],
+      },
+      {
+        x: 1270,
+        width: 30,
+        height: 18,
+        labels: ["20", "21", "22", "23", "24", "25", "26", "03A", "03", "05", "06", "07", "28"],
+        centers: [689, 708, 727, 745, 762, 778, 793, 817, 833, 849, 864, 880, 890],
+      },
+    ]),
+  },
   P9: {
     image: unitMapImage,
     scale: 0.5,
@@ -395,6 +424,81 @@ const unitMapTowerLayouts = {
           973, 989, 1005, 1020, 1035, 1048, 1058, 1073, 1087, 1102,
           1117, 1131, 1146, 1161, 1176, 1190, 1199, 1213, 1224, 1238, 1253, 1270,
         ],
+      },
+    ]),
+  },
+  P24: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 880, y: 1300, width: 1200, height: 980 },
+    towerRect: { x: 1067, y: 1519, width: 110, height: 313 },
+    label: { x: 1190, y: 1440, width: 680, height: 165 },
+    units: makeMapUnitColumnCells([
+      {
+        x: 1113,
+        width: 32,
+        height: 18,
+        labels: [
+          "04", "03", "02", "01", "39/40", "38", "37", "36", "35", "34",
+          "33", "32", "31", "29/30", "28", "27", "26", "25", "24", "23",
+        ],
+        centers: [
+          1530, 1543, 1557, 1585, 1601, 1616, 1631, 1646, 1661, 1677,
+          1692, 1708, 1723, 1739, 1754, 1769, 1784, 1800, 1819, 1830,
+        ],
+      },
+      {
+        x: 1150,
+        width: 32,
+        height: 18,
+        labels: ["06", "07", "08", "09", "10", "11", "12", "12A", "12B", "15", "16", "17", "18", "19", "20", "21", "22"],
+        centers: [1530, 1543, 1557, 1601, 1616, 1631, 1646, 1661, 1677, 1692, 1708, 1723, 1739, 1754, 1769, 1800, 1830],
+      },
+    ]),
+  },
+  P25: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 1010, y: 1300, width: 1200, height: 980 },
+    towerRect: { x: 1218, y: 1519, width: 128, height: 313 },
+    label: { x: 1360, y: 1440, width: 680, height: 165 },
+    units: makeMapUnitColumnCells([
+      {
+        x: 1244,
+        width: 34,
+        height: 18,
+        labels: ["37", "36", "35", "34", "33/34", "32", "31", "30", "29", "28", "27", "26", "25", "23/24", "21/22", "20"],
+        centers: [1529, 1544, 1558, 1598, 1614, 1630, 1645, 1660, 1676, 1691, 1706, 1722, 1737, 1753, 1798, 1822],
+      },
+      {
+        x: 1296,
+        width: 34,
+        height: 18,
+        labels: ["38", "39", "40", "01", "02", "03", "03A", "05", "06", "07", "08", "09", "10", "11", "12", "12A", "12B", "15", "16", "17", "18", "19"],
+        centers: [1529, 1544, 1558, 1573, 1588, 1603, 1614, 1630, 1645, 1660, 1676, 1691, 1706, 1722, 1737, 1753, 1764, 1794, 1808, 1822, 1830, 1830],
+      },
+    ]),
+  },
+  P26: {
+    image: unitMapImage,
+    scale: 0.5,
+    crop: { x: 880, y: 1700, width: 1200, height: 580 },
+    towerRect: { x: 1067, y: 1873, width: 110, height: 214 },
+    label: { x: 1190, y: 1870, width: 680, height: 165 },
+    units: makeMapUnitColumnCells([
+      {
+        x: 1113,
+        width: 32,
+        height: 18,
+        labels: ["09", "07", "06", "05", "03A", "03", "02", "01", "24", "23", "22", "20/21", "19"],
+        centers: [1882, 1907, 1922, 1937, 1953, 1968, 1984, 1998, 2013, 2028, 2044, 2058, 2080],
+      },
+      {
+        x: 1150,
+        width: 32,
+        height: 18,
+        labels: ["08", "10", "11", "12", "12A", "12B", "15", "16", "17", "18"],
+        centers: [1882, 1922, 1937, 1953, 1968, 2013, 2028, 2044, 2058, 2080],
       },
     ]),
   },
