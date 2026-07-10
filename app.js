@@ -1533,6 +1533,12 @@ function safeText(value) {
     .replace(/'/g, "&#039;");
 }
 
+function quoteUnitLabel(result = {}) {
+  const unitCode = normalizeUnitCode(els.unitCode.value) || els.unitCode.value.trim() || "Căn hộ";
+  const unitType = String(result.unitType || els.unitType.value || "").trim();
+  return unitType ? `${unitCode} - ${unitType}` : unitCode;
+}
+
 function quoteCardStat(label, value, icon, tone = "primary") {
   return `
     <div class="quote-stat quote-stat-${tone}">
@@ -1578,6 +1584,7 @@ function quoteCardDiscountSummary(discounts) {
 
 function renderQuoteCard(result, isLoan, isTts) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const unitLabel = quoteUnitLabel(result);
   const scenario = scenarioLabel(result.scenario, result.policy);
   const depositRow = result.schedule[0] || ["Cọc", 0];
   const paymentRow = result.schedule[1] || ["Đợt tiếp theo", 0];
@@ -1592,18 +1599,18 @@ function renderQuoteCard(result, isLoan, isTts) {
     stats.push(quoteCardStat(depositRow[0], money(depositRow[1]), "Cọc", "warm"));
     stats.push(quoteCardStat(paymentRow[0], money(paymentRow[1]), "TTS", "blue"));
   } else {
-    stats.push(quoteCardStat("Giá Niêm Yết", money(result.listedGross), "VAT", "warm"));
+    stats.push(quoteCardStat("Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross), "VAT", "warm"));
     stats.push(quoteCardStat("Giá thô sau CK", "", "CK", "blue"));
   }
 
   const rawGrossAfterDiscountText = result.scenario === "standard" ? "" : money(result.rawGrossAfterDiscount);
   const details = [
-    quoteCardDetail("Mã căn", unitCode),
+    quoteCardDetail("Mã căn - loại căn", unitLabel),
     quoteCardDetail("Nhóm tòa", result.policy.name),
     ...(result.policy.customerHandover
       ? [quoteCardDetail("Ngày dự kiến nhận bàn giao nhà", formatDateText(result.policy.customerHandover))]
       : []),
-    quoteCardDetail("Giá Niêm Yết", money(result.listedGross)),
+    quoteCardDetail("Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross)),
     quoteCardDetail("Giá thô sau CK", rawGrossAfterDiscountText),
     quoteCardDetail("Giá nội thất/hoàn thiện", money(result.completion)),
   ];
@@ -1618,7 +1625,7 @@ function renderQuoteCard(result, isLoan, isTts) {
       <div class="quote-card-hero">
         <div>
           <p class="quote-eyebrow">Phiếu báo giá nhanh</p>
-          <h3>${safeText(unitCode)} - ${safeText(result.policy.name)}</h3>
+          <h3>${safeText(unitLabel)} - ${safeText(result.policy.name)}</h3>
           <p class="quote-subtitle">Phương án: <strong>${safeText(scenario)}</strong></p>
         </div>
         <span class="quote-badge">${safeText(scenario)}</span>
@@ -1644,7 +1651,8 @@ function multiQuoteSecondary(result) {
     return {
       label: depositRow[0],
       value: money(depositRow[1]),
-      meta: `${paymentRow[0]}: ${money(paymentRow[1])}`,
+      metaLabel: paymentRow[0],
+      metaValue: money(paymentRow[1]),
     };
   }
   const firstPayment = result.schedule[0] || ["Đợt 1", 0];
@@ -1657,6 +1665,7 @@ function multiQuoteSecondary(result) {
 
 function renderMultiQuoteCard(result) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const unitLabel = quoteUnitLabel(result);
   const scenario = scenarioLabel(result.scenario, result.policy);
   const secondary = multiQuoteSecondary(result);
   const totalDiscount = result.discounts.reduce((sum, item) => sum + round(item.amount), 0);
@@ -1667,7 +1676,7 @@ function renderMultiQuoteCard(result) {
     <article class="multi-quote-card multi-quote-card-${tone}" aria-label="Báo giá ${safeText(scenario)}">
       <div class="multi-quote-head">
         <div>
-          <span>${safeText(unitCode)} - ${safeText(result.policy.name)}</span>
+          <span>${safeText(unitLabel)} - ${safeText(result.policy.name)}</span>
           <h3>${safeText(scenario)}</h3>
         </div>
         <em>${safeText(scenario)}</em>
@@ -1680,11 +1689,13 @@ function renderMultiQuoteCard(result) {
         <div>
           <span>${safeText(secondary.label)}</span>
           <strong>${safeText(secondary.value)}</strong>
-          <small>${safeText(secondary.meta)}</small>
+          ${secondary.metaValue
+            ? `<small class="multi-quote-payment-extra"><span>${safeText(secondary.metaLabel)}:</span><b>${safeText(secondary.metaValue)}</b></small>`
+            : `<small>${safeText(secondary.meta)}</small>`}
         </div>
       </div>
       <div class="multi-quote-details">
-        <div><span>Giá niêm yết</span><strong>${safeText(money(result.listedGross))}</strong></div>
+        <div><span>Giá niêm yết đã gồm VAT/KPBT</span><strong>${safeText(money(result.listedGross))}</strong></div>
         <div><span>Giá thô sau CK</span><strong>${safeText(rawGrossAfterDiscountText || "Theo tiến độ")}</strong></div>
         <div><span>Nội thất/hoàn thiện</span><strong>${safeText(money(result.completion))}</strong></div>
         <div><span>Tổng chiết khấu</span><strong>${safeText(money(totalDiscount))}</strong></div>
@@ -1816,10 +1827,19 @@ function multiQuoteExportTone(scenario) {
 }
 
 function drawExportStat(ctx, x, y, width, label, value, meta = "") {
-  fillRoundedRect(ctx, x, y, width, 92, 12, "#ffffff", "#d8e4e1", 2);
+  fillRoundedRect(ctx, x, y, width, 104, 12, "#ffffff", "#d8e4e1", 2);
   drawFittedText(ctx, label, x + 16, y + 28, width - 32, 21, 850, "#64736f", 15);
-  drawFittedText(ctx, value, x + 16, y + 62, width - 32, 30, 950, "#0f766e", 21);
-  if (meta) drawFittedText(ctx, meta, x + 16, y + 84, width - 32, 18, 850, "#7a4b0b", 13);
+  if (!meta) {
+    drawFittedText(ctx, value, x + 16, y + 64, width - 32, 30, 950, "#0f766e", 21);
+    return;
+  }
+
+  const splitIndex = meta.lastIndexOf(": ");
+  const metaLabel = splitIndex > -1 ? meta.slice(0, splitIndex + 1) : "";
+  const metaValue = splitIndex > -1 ? meta.slice(splitIndex + 2) : meta;
+  drawFittedText(ctx, value, x + 16, y + 56, width - 32, 24, 950, "#0f766e", 18);
+  if (metaLabel) drawFittedText(ctx, metaLabel, x + 16, y + 78, width - 32, 15, 850, "#7a4b0b", 12);
+  drawFittedText(ctx, metaValue, x + 16, y + 100, width - 32, 24, 950, "#7a4b0b", 18);
 }
 
 function drawExportDetail(ctx, x, y, width, label, value) {
@@ -1829,9 +1849,12 @@ function drawExportDetail(ctx, x, y, width, label, value) {
 }
 
 function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
-  const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const unitLabel = quoteUnitLabel(result);
   const scenario = scenarioLabel(result.scenario, result.policy);
   const secondary = multiQuoteSecondary(result);
+  const secondaryMeta = secondary.metaValue
+    ? `${secondary.metaLabel}: ${secondary.metaValue}`
+    : secondary.meta;
   const totalDiscount = result.discounts.reduce((sum, item) => sum + round(item.amount), 0);
   const rawGrossAfterDiscountText = result.scenario === "standard" ? "Theo tiến độ" : money(result.rawGrossAfterDiscount);
   const tone = multiQuoteExportTone(result.scenario);
@@ -1849,7 +1872,7 @@ function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
   ctx.font = '950 18px "Segoe UI", Arial, sans-serif';
   const badgeW = Math.min(170, Math.max(118, ctx.measureText(scenario).width + 54));
 
-  drawWrappedText(ctx, `${unitCode} - ${result.policy.name}`, contentX, y + 36, contentW - badgeW - 14, 22, {
+  drawWrappedText(ctx, `${unitLabel} - ${result.policy.name}`, contentX, y + 36, contentW - badgeW - 14, 22, {
     size: 20,
     weight: 850,
     color: "#64736f",
@@ -1862,11 +1885,11 @@ function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
   const statGap = 16;
   const statW = (contentW - statGap) / 2;
   drawExportStat(ctx, contentX, y + 92, statW, "Giá cuối phải trả", money(result.total));
-  drawExportStat(ctx, contentX + statW + statGap, y + 92, statW, secondary.label, secondary.value, secondary.meta);
+  drawExportStat(ctx, contentX + statW + statGap, y + 92, statW, secondary.label, secondary.value, secondaryMeta);
 
   const detailW = (contentW - statGap) / 2;
-  const detailY = y + 204;
-  drawExportDetail(ctx, contentX, detailY, detailW, "Giá niêm yết", money(result.listedGross));
+  const detailY = y + 216;
+  drawExportDetail(ctx, contentX, detailY, detailW, "Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross));
   drawExportDetail(ctx, contentX + detailW + statGap, detailY, detailW, "Giá thô sau CK", rawGrossAfterDiscountText);
   drawExportDetail(ctx, contentX, detailY + 76, detailW, "Nội thất/hoàn thiện", money(result.completion));
   drawExportDetail(ctx, contentX + detailW + statGap, detailY + 76, detailW, "Tổng chiết khấu", money(totalDiscount));
@@ -1876,6 +1899,7 @@ function buildMultiQuoteExportCanvas(scenarios) {
   const selected = scenarios.filter(Boolean);
   const results = selected.map((scenario) => calculate({ scenario }));
   const unitCode = normalizeUnitCode(els.unitCode.value) || "CAN-HO";
+  const unitLabel = results[0] ? quoteUnitLabel(results[0]) : unitCode;
   const width = 1400;
   const margin = 48;
   const gap = 26;
@@ -1900,7 +1924,7 @@ function buildMultiQuoteExportCanvas(scenarios) {
   ctx.fillText("Báo giá nhiều phương án", margin, margin + 34);
   ctx.fillStyle = "#64736f";
   ctx.font = '850 24px "Segoe UI", Arial, sans-serif';
-  ctx.fillText(`${unitCode} · ${results[0]?.policy?.name || ""}`, margin, margin + 70);
+  ctx.fillText(`${unitLabel} · ${results[0]?.policy?.name || ""}`, margin, margin + 70);
   ctx.fillText(`Ngày báo giá: ${formatDateText(els.quoteDate.value)}`, margin, margin + 104);
 
   results.forEach((result, index) => {
@@ -1977,6 +2001,7 @@ function scheduleRowsHtml(result) {
 
 function buildPdfSheet(result, isLoan, isTts) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
+  const unitLabel = quoteUnitLabel(result);
   const quoteDate = formatDateText(els.quoteDate.value);
   return `
     <article class="print-sheet">
@@ -1985,7 +2010,7 @@ function buildPdfSheet(result, isLoan, isTts) {
         <div>
           <p>Sun Urban City Hà Nam</p>
           <h1>Bảng tính giá Vhomes - Đối tác top 1 Sun Group</h1>
-          <span>${safeText(unitCode)} - ${safeText(result.policy.name)} | Ngày báo giá: ${safeText(quoteDate)}</span>
+          <span>${safeText(unitLabel)} - ${safeText(result.policy.name)} | Ngày báo giá: ${safeText(quoteDate)}</span>
         </div>
       </header>
 
@@ -2168,9 +2193,9 @@ function drawMapArrow(ctx, start, end, scale = 1) {
 function mapLabelLines(results = []) {
   const list = Array.isArray(results) ? results : [results];
   const firstResult = list[0] || {};
-  const unitCode = normalizeUnitCode(els.unitCode.value) || "Căn hộ";
+  const unitLabel = quoteUnitLabel(firstResult);
   const lines = [
-    { text: unitCode, size: 86, weight: 900, color: "#ffffff" },
+    { text: unitLabel, size: unitLabel.length > 13 ? 72 : 86, weight: 900, color: "#ffffff" },
   ];
 
   list.forEach((result) => {
@@ -2208,9 +2233,17 @@ function drawMapLabel(ctx, label, results = [], scale = 1) {
 
   let cursorY = label.y + 72 * scale;
   lines.forEach((line) => {
-    ctx.fillStyle = line.color;
-    ctx.font = `${line.weight} ${line.size * scale}px "Segoe UI", Arial, sans-serif`;
-    ctx.fillText(line.text, label.x + 72 * scale, cursorY);
+    drawFittedText(
+      ctx,
+      line.text,
+      label.x + 72 * scale,
+      cursorY,
+      label.width - 110 * scale,
+      line.size * scale,
+      line.weight,
+      line.color,
+      Math.max(16, line.size * scale * 0.62)
+    );
     cursorY += (line.size + 24) * scale;
   });
   ctx.restore();
@@ -2566,12 +2599,13 @@ function render() {
 }
 
 function makeQuoteText(result) {
+  const unitLabel = quoteUnitLabel(result);
   const parts = [
-    `${els.unitCode.value.trim() || "Căn hộ"} - ${result.policy.name}`,
+    `${unitLabel} - ${result.policy.name}`,
     `Phương án: ${scenarioLabel(result.scenario, result.policy)}`,
-    `Mã căn: ${els.unitCode.value.trim() || "Căn hộ"}`,
+    `Mã căn - loại căn: ${unitLabel}`,
     ...(result.policy.customerHandover ? [`Ngày dự kiến nhận bàn giao nhà: ${formatDateText(result.policy.customerHandover)}`] : []),
-    `Giá Niêm Yết: ${money(result.listedGross)}`,
+    `Giá niêm yết đã gồm VAT/KPBT: ${money(result.listedGross)}`,
     `Giá Cuối Phải TT: ${money(result.total)}`,
   ];
   if (result.scenario === "loan") {
@@ -2818,7 +2852,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=73", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=74", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
