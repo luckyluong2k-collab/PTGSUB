@@ -231,6 +231,7 @@ const els = {
   unitMapCreate: document.querySelector("#unitMapCreate"),
   unitMapPreview: document.querySelector("#unitMapPreview"),
   unitMapPreviewImage: document.querySelector("#unitMapPreviewImage"),
+  unitMapDescription: document.querySelector("#unitMapDescription"),
   unitMapOutputActions: document.querySelector("#unitMapOutputActions"),
   unitMapDownload: document.querySelector("#unitMapDownload"),
   unitMapCopy: document.querySelector("#unitMapCopy"),
@@ -276,6 +277,72 @@ let skipPolicyDefaultOnce = false;
 let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 
 const unitMapImage = "phankhupark-map.png";
+const lowRiseMapImage = "Bản sao của 230125_TMB 4PK.jpg";
+const LOW_RISE_STREETS = Array.from(
+  { length: 22 },
+  (_, index) => `C${index + 1}`
+).sort((a, b) => b.length - a.length);
+
+function parseLowRiseCodeParts(value) {
+  const code = normalizeUnitCode(value);
+
+  if (!/^C\d+$/.test(code)) {
+    return {
+      street: "",
+      house: "",
+    };
+  }
+
+  const street = LOW_RISE_STREETS.find((item) => {
+    return code.startsWith(item) && code.length > item.length;
+  }) || "";
+
+  if (!street) {
+    return {
+      street: "",
+      house: "",
+    };
+  }
+
+  return {
+    street,
+    house: code.slice(street.length),
+  };
+}
+
+const lowRiseUnitMapLocations = {
+  C1717: {
+    image: lowRiseMapImage,
+    scale: 0.22,
+    crop: {
+      x: 410,
+      y: 980,
+      width: 650,
+      height: 340,
+    },
+    unitRect: {
+      x: 486,
+      y: 1039,
+      width: 7,
+      height: 19,
+    },
+    label: {
+      x: 660,
+      y: 995,
+      width: 370,
+      height: 115,
+    },
+    arrowStart: {
+      x: 660,
+      y: 1130,
+    },
+    arrowEnd: {
+      x: 489.5,
+      y: 1048.5,
+    },
+  },
+};
+
 const unitMapExactLocations = {
   P90316: {
     image: unitMapImage,
@@ -704,15 +771,27 @@ function rectCenter(rect) {
 
 function resolveUnitMapLocation(code) {
   const unitCode = normalizeUnitCode(code);
-  if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];
+
+  if (isLowRiseCode(unitCode)) {
+    // Chỉ cho phép các căn đang có trong giỏ hàng/dữ liệu giá.
+    if (!unitCatalog[unitCode]) return null;
+
+    return lowRiseUnitMapLocations[unitCode] || null;
+  }
+
+  if (unitMapExactLocations[unitCode]) {
+    return unitMapExactLocations[unitCode];
+  }
 
   const parsed = parseUnitCodeParts(unitCode);
   const layout = unitMapTowerLayouts[parsed.tower];
   const apartment = normalizeMapApartmentNo(parsed.apartment);
   const unitRect = layout?.units?.[apartment];
+
   if (!layout || !unitRect) return null;
 
   const arrowEnd = rectCenter(unitRect);
+
   return {
     image: layout.image,
     scale: layout.scale,
@@ -729,8 +808,14 @@ function resolveUnitMapLocation(code) {
 }
 
 function unitTower(unit, code = "") {
+  const lowRise = parseLowRiseCodeParts(code);
+  if (lowRise.street) return lowRise.street;
+
   const parsed = parseUnitCodeParts(code);
-  return parsed.tower || unit.tower || policies[unit.policyGroup]?.name || "Chưa cập nhật";
+  return parsed.tower
+    || unit.tower
+    || policies[unit.policyGroup]?.name
+    || "Chưa cập nhật";
 }
 
 function unitFloor(unit, code = "") {
@@ -741,8 +826,18 @@ function unitFloor(unit, code = "") {
 }
 
 function unitApartmentNumber(code, unit = {}) {
+  const lowRise = parseLowRiseCodeParts(code);
+  if (lowRise.house) return lowRise.house;
+
   const parsed = parseUnitCodeParts(code);
   return parsed.apartment || unit.apartmentNo || "";
+}
+
+function unitAddressLabels(code) {
+  const lowRise = parseLowRiseCodeParts(code);
+  return lowRise.street
+    ? { tower: "Đường", apartment: "Số nhà" }
+    : { tower: "Tòa", apartment: "Căn" };
 }
 
 function unitAreaText(unit) {
@@ -864,7 +959,7 @@ function isPodiumType(value) {
 }
 
 function isLowRiseCode(code) {
-  return /^[CF]\d{3,}[A-Z0-9]*$/.test(normalizeUnitCode(code));
+  return Boolean(parseLowRiseCodeParts(code).street);
 }
 
 function isSupportedSheetCode(code) {
@@ -1068,6 +1163,7 @@ function unitCard({ code, unit }) {
   const tower = unitTower(unit, code);
   const floor = unitFloor(unit, code);
   const apartmentNo = unitApartmentNumber(code, unit);
+  const addressLabels = unitAddressLabels(code);
   const view = unit.view || "Chưa cập nhật";
   const direction = unit.direction || "Chưa cập nhật";
   const isSelected = code === selectedUnitCode;
@@ -1076,7 +1172,7 @@ function unitCard({ code, unit }) {
       data-unit-code="${escapeHtml(code)}" aria-pressed="${isSelected}">
       <span class="unit-card-heading">
         <strong>${escapeHtml(code)}</strong>
-        <span>${escapeHtml(tower)}</span>
+        <span>${escapeHtml(addressLabels.tower)}: ${escapeHtml(tower)}</span>
       </span>
       <span class="unit-card-price">
         <small>Giá niêm yết đã gồm VAT/KPBT</small>
@@ -1085,7 +1181,7 @@ function unitCard({ code, unit }) {
       <span class="unit-card-details">
         <span><b>Loại</b><em>${escapeHtml(unit.unitType || "Chưa cập nhật")}</em></span>
         <span><b>Tầng</b><em>${escapeHtml(floor || "Chưa cập nhật")}</em></span>
-        <span><b>Căn</b><em>${escapeHtml(apartmentNo || "Chưa cập nhật")}</em></span>
+        <span><b>${escapeHtml(addressLabels.apartment)}</b><em>${escapeHtml(apartmentNo || "Chưa cập nhật")}</em></span>
         <span><b>Hướng</b><em>${escapeHtml(direction)}</em></span>
         <span><b>View</b><em>${escapeHtml(view)}</em></span>
         <span class="unit-card-wide"><b>Diện tích</b><em>${escapeHtml(unitAreaText(unit))}</em></span>
@@ -1132,9 +1228,11 @@ function ensureUnitTypeOption(value) {
   }
 }
 
-function applyUnitCatalog() {
-  const code = normalizeUnitCode(els.unitCode.value);
-  if (!code || code === lastAutoFilledCode) return false;
+function applyUnitCatalog(options = {}) {
+  const force = Boolean(options.force);
+  const silent = Boolean(options.silent);
+  const code = normalizeUnitCode(options.code || els.unitCode.value);
+  if (!code || (!force && code === lastAutoFilledCode)) return false;
   lastAutoFilledCode = code;
 
   const unit = unitCatalog[code];
@@ -1167,7 +1265,7 @@ function applyUnitCatalog() {
 
   selectedUnitCode = code;
   renderFinder();
-  showToast(`Đã tự điền mã căn ${code}`);
+  if (!silent) showToast(`Đã tự điền mã căn ${code}`);
   return true;
 }
 
@@ -2113,6 +2211,61 @@ function exportPdf(scenarios = [activeScenario]) {
   }, 80);
 }
 
+function unitMapCatalogUnit(code) {
+  const unitCode = normalizeUnitCode(code);
+  return window.unitCatalog?.[unitCode] || unitCatalog[unitCode] || null;
+}
+
+function resolveUnitMapAvailability(code) {
+  const unitCode = normalizeUnitCode(code);
+  const unit = unitMapCatalogUnit(unitCode);
+
+  if (!unit) {
+    return {
+      unitCode,
+      unit: null,
+      location: null,
+      error: "Mã căn không thuộc giỏ hàng hiện tại.",
+    };
+  }
+
+  const location = resolveUnitMapLocation(unitCode);
+
+  if (!location) {
+    return {
+      unitCode,
+      unit,
+      location: null,
+      error: isLowRiseCode(unitCode)
+        ? `Căn ${unitCode} đã có dữ liệu giá nhưng chưa được gán tọa độ mặt bằng.`
+        : `Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`,
+    };
+  }
+
+  return {
+    unitCode,
+    unit,
+    location,
+    error: "",
+  };
+}
+
+function prepareLowRiseUnitMapData(availability) {
+  if (!isLowRiseCode(availability.unitCode)) return;
+
+  const policyGroup = availability.unit?.policyGroup;
+  if (policyGroup !== "LOWRISE_LK" && policyGroup !== "LOWRISE_BT") {
+    throw new Error(`Căn ${availability.unitCode} chưa có chính sách thấp tầng hợp lệ trong giỏ hàng.`);
+  }
+
+  els.unitCode.value = availability.unitCode;
+  applyUnitCatalog({
+    code: availability.unitCode,
+    force: true,
+    silent: true,
+  });
+}
+
 function selectedMapScenarios() {
   return Array.from(els.mapScenarioInputs || [])
     .filter((input) => input.checked)
@@ -2128,10 +2281,24 @@ function syncMapScenarioLabels() {
 }
 
 function openUnitMapOptions() {
-  const unitCode = normalizeUnitCode(els.unitCode.value);
-  if (!resolveUnitMapLocation(unitCode)) {
-    showToast(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
+  const availability = resolveUnitMapAvailability(els.unitCode.value);
+  if (availability.error) {
+    showToast(availability.error);
     return;
+  }
+
+  try {
+    prepareLowRiseUnitMapData(availability);
+  } catch (error) {
+    showToast(error.message || "Không tạo được ảnh chỉ căn");
+    return;
+  }
+
+  const lowRise = parseLowRiseCodeParts(availability.unitCode);
+  if (els.unitMapDescription) {
+    els.unitMapDescription.textContent = lowRise.street
+      ? "Chọn phương án để app khoanh đường, khoanh số nhà và ghi giá cuối lên mặt bằng."
+      : "Chọn phương án để app khoanh tòa, khoanh căn và ghi giá cuối lên mặt bằng.";
   }
 
   syncMapScenarioLabels();
@@ -2259,10 +2426,13 @@ function canvasToBlob(canvas) {
 
 async function buildUnitMapImage(scenarios = [activeScenario]) {
   const selected = (Array.isArray(scenarios) ? scenarios : [scenarios]).filter(Boolean);
-  const unitCode = normalizeUnitCode(els.unitCode.value);
-  const location = resolveUnitMapLocation(unitCode);
-  if (!location) throw new Error(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
+  const availability = resolveUnitMapAvailability(els.unitCode.value);
+  if (availability.error) throw new Error(availability.error);
 
+  prepareLowRiseUnitMapData(availability);
+
+  const unitCode = availability.unitCode;
+  const location = availability.location;
   const results = selected.map((scenario) => calculate({ scenario }));
   const image = await loadMapImage(location.image);
   const crop = location.crop;
@@ -2284,7 +2454,9 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
   ctx.save();
   ctx.translate(-crop.x, -crop.y);
   const scale = location.scale || 1;
-  drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
+  if (location.towerRect) {
+    drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
+  }
   drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
   drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
   drawMapLabel(ctx, location.label, results, scale);
@@ -2856,7 +3028,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=75", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=76", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });

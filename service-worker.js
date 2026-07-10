@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v75-direction-filter-admin-collapse";
+const CACHE_NAME = "park-pricing-v76-low-rise-unit-map";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=75",
-  "./unit-data.js?v=63",
-  "./app.js?v=75",
+  "./styles.css?v=76",
+  "./unit-data.js?v=64",
+  "./app.js?v=76",
   "./firebase-auth.js?v=74",
   "./manifest.webmanifest",
   "./icon.svg",
@@ -12,6 +12,8 @@ const ASSETS = [
   "./apple-touch-icon.png",
   "./sun-group-icon.png",
   "./sun-group-logo.png",
+  "./phankhupark-map.png",
+  "./Bản sao của 230125_TMB 4PK.jpg",
 ];
 
 self.addEventListener("install", (event) => {
