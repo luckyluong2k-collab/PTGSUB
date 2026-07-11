@@ -4294,6 +4294,164 @@ body.theme-dark .switch input:checked + span { color: var(--luxury-gold-soft); }
   body:not(.auth-locked).menu-expanded .logout-menu-button { background: #f2f6f5 !important; color: #087c72 !important; }
 }
 
+/* Compact high-density layout: maximize useful information per viewport */
+:root {
+  --compact-gap: 10px;
+  --compact-radius: 11px;
+}
+
+@media (min-width: 768px) {
+  html { font-size: 14px !important; }
+  body { line-height: 1.36 !important; }
+
+  .app-shell {
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
+    gap: var(--compact-gap) !important;
+    padding-block: 10px 24px !important;
+  }
+  .dashboard-grid,
+  .dashboard-rail,
+  .results-panel {
+    gap: var(--compact-gap) !important;
+  }
+  .dashboard-grid {
+    grid-template-columns: minmax(260px,3fr) minmax(440px,6fr) minmax(240px,3fr) !important;
+  }
+
+  .panel,
+  .results-card,
+  .tts-chart-panel,
+  .finder-content:not([hidden]) {
+    padding: 12px !important;
+    border-radius: var(--compact-radius) !important;
+  }
+  .panel h2,
+  .results-card h2,
+  .tts-chart-head h3 {
+    margin-bottom: 9px !important;
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+  .form-section-title {
+    margin-bottom: 9px !important;
+    padding-bottom: 7px !important;
+    font-size: 1rem !important;
+  }
+
+  .grid,
+  .quote-card,
+  .quote-stats,
+  .quote-detail-grid,
+  .result-list,
+  .finder-filter-grid {
+    gap: 7px !important;
+  }
+  label, input, select, button, summary { font-size: .86rem !important; }
+  input, select {
+    min-height: 38px !important;
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+  }
+  .pricing-panel label { gap: 4px !important; }
+  .pricing-panel .grid.two,
+  .pricing-panel .grid.three { gap: 7px !important; }
+
+  .segmented { gap: 5px !important; }
+  .segmented button,
+  .tts-chart-tabs button {
+    min-height: 34px !important;
+    padding: 6px 7px !important;
+    font-size: .76rem !important;
+  }
+  .switch-row { margin: 8px 0 !important; gap: 6px !important; }
+  .switch { min-height: 36px !important; padding: 6px 8px !important; }
+
+  .quote-card-hero { padding: 10px !important; }
+  .quote-card h3 { font-size: 1.25rem !important; }
+  .quote-eyebrow, .quote-subtitle { font-size: .76rem !important; }
+  .quote-stat {
+    min-height: 70px !important;
+    padding: 9px !important;
+  }
+  .quote-stat-top { font-size: .74rem !important; }
+  .quote-stat strong { margin-top: 6px !important; font-size: 1.15rem !important; }
+  .quote-detail { padding: 8px !important; }
+  .quote-detail span { font-size: .74rem !important; }
+  .quote-detail strong { margin-top: 3px !important; font-size: .88rem !important; }
+  .quote-discount-list { gap: 5px !important; margin-top: 6px !important; padding-top: 6px !important; }
+  .quote-discount-list span, .quote-discount-list strong { font-size: .76rem !important; }
+
+  .result-list > *, .row {
+    min-height: 38px !important;
+    padding: 7px 8px !important;
+  }
+  .result-list span, .tts-chart-meta span { font-size: .76rem !important; }
+  .result-list strong, .tts-chart-meta strong { font-size: .86rem !important; }
+  .result-actions,
+  .multi-quote-actions { gap: 7px !important; }
+  .result-actions button,
+  .multi-quote-toggle,
+  .unit-map-button,
+  .loan-schedule-button {
+    min-height: 38px !important;
+    padding: 7px 10px !important;
+    font-size: .82rem !important;
+  }
+
+  .finder-section { border-radius: var(--compact-radius) !important; }
+  .finder-toggle { min-height: 42px !important; padding: 8px 12px !important; }
+  .finder-content:not([hidden]) { margin: 7px 2px 2px !important; gap: 9px !important; }
+  .finder-content:not([hidden]) .finder-toolbar { padding: 10px !important; }
+  .comparison-grid {
+    grid-template-columns: repeat(auto-fit,minmax(190px,1fr)) !important;
+    gap: 8px !important;
+  }
+  .comparison-card { padding: 9px !important; border-radius: 9px !important; }
+
+  .summary-band { min-height: 58px !important; }
+  .summary-band > div { min-height: 58px !important; padding: 7px 14px !important; }
+  .summary-band .label { font-size: .72rem !important; }
+  .summary-band strong { font-size: clamp(1.2rem,1.5vw,1.6rem) !important; }
+  .topbar.brand-hero { min-height: 60px !important; max-height: 60px !important; padding: 5px 11px !important; }
+  .topbar .brand-logo { width: 46px !important; height: 46px !important; }
+  .topbar .brand-copy { gap: 10px !important; }
+  .topbar .brand-copy h1 strong { font-size: clamp(1.05rem,1.35vw,1.35rem) !important; }
+  .topbar .social-chip { min-height: 27px !important; padding: 3px 7px !important; font-size: .68rem !important; }
+  .topbar .theme-toggle, .topbar .icon-button { width: 34px !important; height: 34px !important; flex-basis: 34px !important; }
+  .summary-band { top: 60px !important; }
+
+  .tts-chart-panel { gap: 8px !important; }
+  .tts-chart-head { margin-bottom: 0 !important; }
+  .tts-chart-meta { gap: 7px !important; }
+  .tts-chart-meta > * { padding: 8px !important; }
+}
+
+@media (min-width: 1051px) and (max-width: 1280px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0,3fr) minmax(0,6fr) minmax(0,3fr) !important;
+  }
+}
+
+@media (min-width: 1051px) and (max-width: 1400px) {
+  body.menu-expanded .dashboard-grid {
+    grid-template-columns: minmax(0,1fr) minmax(0,1.55fr) !important;
+  }
+  body.menu-expanded .dashboard-rail-left { grid-column: 1 !important; }
+  body.menu-expanded .results-panel { grid-column: 2 !important; }
+  body.menu-expanded .dashboard-rail-right {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  html { font-size: 14px !important; }
+  .app-shell { width: calc(100% - 12px) !important; gap: 8px !important; }
+  .dashboard-grid, .dashboard-rail, .results-panel { gap: 8px !important; }
+  .panel, .results-card, .tts-chart-panel { padding: 11px !important; border-radius: 10px !important; }
+}
+
 /* Distinct expanded unit finder container */
 .finder-content:not([hidden]) {
   display: grid !important;
