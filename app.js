@@ -2546,7 +2546,8 @@ function buildMultiQuoteExportCanvas(scenarios) {
   const results = selected.map((scenario) => calculate({ scenario }));
   const unitCode = normalizeUnitCode(els.unitCode.value) || "CAN-HO";
   const unitLabel = results[0] ? quoteUnitLabel(results[0]) : unitCode;
-  const dark = document.body.classList.contains("theme-dark");
+  // Quote exports use the site's signature navy-gold presentation consistently.
+  const dark = true;
   const margin = 42;
   const gap = 16;
   const cardWidth = selected.length === 1 ? 760 : 330;

@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v96-expanded-unit-map";
+const CACHE_NAME = "park-pricing-v100-external-links";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=87",
+  "./styles.css?v=89",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
-  "./app.js?v=91",
+  "./app.js?v=92",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
