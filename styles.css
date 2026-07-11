@@ -3845,3 +3845,205 @@ body.theme-dark .tts-chart-tabs button.active {
   .topbar .brand-logo { width: 58px !important; }
   .topbar .brand-copy h1 strong { font-size: 1.25rem !important; }
 }
+
+/* High-contrast raised quote cards in dark mode */
+body.theme-dark .quote-card-hero {
+  background: linear-gradient(135deg, #174652, #0c303a) !important;
+  border-color: rgba(228,194,115,.48) !important;
+  border-left-color: var(--luxury-gold) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.06);
+}
+body.theme-dark .quote-card h3,
+body.theme-dark .quote-card-hero h3 { color: #fff !important; }
+body.theme-dark .quote-eyebrow { color: var(--luxury-gold) !important; }
+body.theme-dark .quote-subtitle { color: #c9d9d7 !important; }
+body.theme-dark .quote-subtitle strong { color: #fff !important; }
+
+body.theme-dark .quote-stat,
+body.theme-dark .quote-detail {
+  background: linear-gradient(145deg, #16444e, #0b2c35) !important;
+  color: #fff !important;
+  border-color: rgba(228,194,115,.32) !important;
+  box-shadow: 0 9px 22px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.05);
+}
+body.theme-dark .quote-stat { border-left-color: #2bb8ac !important; }
+body.theme-dark .quote-stat-warm { border-left-color: var(--luxury-gold) !important; }
+body.theme-dark .quote-stat-blue { border-left-color: #55aee8 !important; }
+body.theme-dark .quote-stat-green { border-left-color: #43cf79 !important; }
+body.theme-dark .quote-stat-top,
+body.theme-dark .quote-detail span { color: var(--luxury-gold-soft) !important; }
+body.theme-dark .quote-stat strong,
+body.theme-dark .quote-detail strong { color: #fff !important; text-shadow: 0 1px 2px rgba(0,0,0,.32); }
+body.theme-dark .quote-stat-top em {
+  background: rgba(228,194,115,.16) !important;
+  color: #ffe5a5 !important;
+  border: 1px solid rgba(228,194,115,.26);
+}
+body.theme-dark .quote-stat-green .quote-stat-top,
+body.theme-dark .quote-stat-green strong { color: #8ff0b2 !important; }
+body.theme-dark .quote-detail.wide,
+body.theme-dark .quote-discount-summary {
+  background: linear-gradient(135deg, #1a4b54, #10333c) !important;
+  border-color: rgba(228,194,115,.5) !important;
+}
+body.theme-dark .quote-discount-summary > strong { color: #fff !important; }
+body.theme-dark .quote-discount-list { border-top-color: rgba(228,194,115,.42) !important; }
+body.theme-dark .quote-discount-list span { color: var(--luxury-gold-soft) !important; }
+body.theme-dark .quote-discount-list strong { color: #fff !important; }
+
+body.theme-dark .quote-card-hero:hover,
+body.theme-dark .quote-stat:hover,
+body.theme-dark .quote-detail:hover {
+  background: linear-gradient(145deg, #1c5360, #103944) !important;
+  border-color: var(--luxury-gold) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0,0,0,.3), 0 0 0 1px rgba(228,194,115,.12);
+}
+
+/* Desktop stack: title banner first, evenly distributed menu below */
+@media (min-width: 1051px) {
+  body:not(.auth-locked) { padding-top: 0 !important; }
+
+  .topbar.brand-hero {
+    top: 0 !important;
+    z-index: 120 !important;
+    margin-bottom: 68px !important;
+    border-radius: 0 0 14px 14px !important;
+  }
+
+  body:not(.auth-locked) .auth-drawer,
+  body:not(.auth-locked) .auth-drawer[hidden] {
+    top: 82px !important;
+    bottom: auto !important;
+    z-index: 115 !important;
+    height: 68px;
+    padding: 8px 16px;
+    border-top: 1px solid rgba(228,194,115,.2);
+  }
+
+  body:not(.auth-locked) .auth-card {
+    width: min(1400px, calc(100% - 32px));
+    max-width: 1400px;
+    gap: 12px;
+  }
+
+  body:not(.auth-locked) #authStatus {
+    flex: 0 1 250px;
+    max-width: 250px;
+  }
+
+  body:not(.auth-locked) .auth-actions {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: stretch;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  body:not(.auth-locked) .auth-actions > :not([hidden]) {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    max-width: none;
+  }
+
+  body:not(.auth-locked) .auth-actions > details:not([hidden]) {
+    display: block;
+  }
+
+  body:not(.auth-locked) .auth-actions > details:not([hidden]) > summary {
+    display: flex;
+    width: 100%;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body:not(.auth-locked) .logout-menu-button:not([hidden]) {
+    flex: 0 1 120px;
+  }
+}
+
+/* Smooth calculation feedback without touching pricing logic */
+@keyframes uiResultEnter {
+  from { opacity: 0; transform: translateY(10px) scale(.992); filter: saturate(.82); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: saturate(1); }
+}
+@keyframes uiValueRefresh {
+  0% { opacity: .45; transform: translateY(4px); }
+  55% { color: var(--luxury-gold-soft); text-shadow: 0 0 16px rgba(228,194,115,.42); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes uiRowReveal {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes uiChartReveal {
+  from { opacity: .25; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#resultRows > .quote-card {
+  transform-origin: 50% 0;
+  animation: uiResultEnter 320ms cubic-bezier(.2,.8,.2,1) both;
+}
+#resultRows .quote-card-hero { animation: uiResultEnter 280ms cubic-bezier(.2,.8,.2,1) both; }
+#resultRows .quote-stat,
+#resultRows .quote-detail { animation: uiResultEnter 340ms cubic-bezier(.2,.8,.2,1) both; }
+#resultRows .quote-stat:nth-child(2),
+#resultRows .quote-detail:nth-child(2) { animation-delay: 35ms; }
+#resultRows .quote-stat:nth-child(3),
+#resultRows .quote-detail:nth-child(3) { animation-delay: 70ms; }
+#resultRows .quote-detail:nth-child(4) { animation-delay: 105ms; }
+#resultRows .quote-detail:nth-child(5) { animation-delay: 140ms; }
+#resultRows .quote-detail:nth-child(6) { animation-delay: 175ms; }
+#resultRows strong { animation: uiValueRefresh 360ms cubic-bezier(.2,.8,.2,1) both; }
+
+#discountRows > .row,
+#scheduleRows > .row {
+  animation: uiRowReveal 300ms cubic-bezier(.2,.8,.2,1) both;
+}
+#discountRows > .row:nth-child(2), #scheduleRows > .row:nth-child(2) { animation-delay: 35ms; }
+#discountRows > .row:nth-child(3), #scheduleRows > .row:nth-child(3) { animation-delay: 70ms; }
+#discountRows > .row:nth-child(4), #scheduleRows > .row:nth-child(4) { animation-delay: 105ms; }
+#discountRows > .row:nth-child(5), #scheduleRows > .row:nth-child(5) { animation-delay: 140ms; }
+#discountRows > .row:nth-child(6), #scheduleRows > .row:nth-child(6) { animation-delay: 175ms; }
+
+#ttsPriceChart > * { animation: uiChartReveal 420ms cubic-bezier(.2,.8,.2,1) both; }
+#ttsPriceChart .tts-area { transform-origin: center bottom; }
+#ttsPriceChart .tts-line {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 520ms cubic-bezier(.2,.8,.2,1), d 420ms cubic-bezier(.2,.8,.2,1);
+}
+
+.segmented button.active,
+.tts-chart-tabs button.active {
+  transform: translateY(-1px) scale(1.025);
+  box-shadow: 0 7px 18px rgba(15,118,110,.2);
+}
+.switch input:checked + span { color: var(--brand); }
+body.theme-dark .switch input:checked + span { color: var(--luxury-gold-soft); }
+
+.app-shell:has(#pricingForm input:focus) .summary-band strong,
+.app-shell:has(#pricingForm select:focus) .summary-band strong,
+.app-shell:has(.scenario-panel button:focus) .summary-band strong {
+  animation: uiValueRefresh 380ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #resultRows > .quote-card,
+  #resultRows .quote-card-hero,
+  #resultRows .quote-stat,
+  #resultRows .quote-detail,
+  #resultRows strong,
+  #discountRows > .row,
+  #scheduleRows > .row,
+  #ttsPriceChart > *,
+  .summary-band strong {
+    animation: none !important;
+    transform: none !important;
+  }
+}
