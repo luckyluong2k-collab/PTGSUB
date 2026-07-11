@@ -1,11 +1,12 @@
-const CACHE_NAME = "park-pricing-v85-lienke-auto-map";
+const CACHE_NAME = "park-pricing-v86-loan-schedule";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=79",
+  "./styles.css?v=80",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
-  "./app.js?v=85",
+  "./app.js?v=86",
+  "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
   "./icon.svg",

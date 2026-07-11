@@ -198,6 +198,7 @@ const els = {
   upfrontLabel: document.querySelector("#upfrontLabel"),
   summaryBand: document.querySelector(".summary-band"),
   upfrontBox: document.querySelector("#upfrontPrice").parentElement,
+  loanScheduleBtn: document.querySelector("#loanScheduleBtn"),
   resultRows: document.querySelector("#resultRows"),
   discountRows: document.querySelector("#discountRows"),
   scheduleRows: document.querySelector("#scheduleRows"),
@@ -3202,6 +3203,30 @@ function renderTtsChart() {
   showTtsChartPoint(currentIndex, false);
 }
 
+function loanSupportMonths(policy) {
+  const match = String(policy?.loanSupport || "").match(/(\d+)\s*tháng/i);
+  return match ? Number(match[1]) : 30;
+}
+
+function loanScheduleUrl(result) {
+  const params = new URLSearchParams();
+  const unitCode = normalizeUnitCode(els.unitCode.value) || els.unitCode.value.trim();
+  if (unitCode) params.set("unit", unitCode);
+  params.set("loan", String(round(result.bankDisbursement)));
+  params.set("loanPct", "100");
+  params.set("support", String(loanSupportMonths(result.policy)));
+  params.set("purchaseDate", els.quoteDate.value || "2026-07-08");
+  params.set("source", "pricing-app");
+  return `tra-goc-lai-35-nam-tu-ngay-mua.html?${params.toString()}`;
+}
+
+function openLoanScheduleCalculator() {
+  const result = calculate({ scenario: "loan" });
+  const url = loanScheduleUrl(result);
+  const opened = window.open(url, "_blank", "noopener");
+  if (!opened) window.location.href = url;
+}
+
 function render() {
   const policy = policies[els.policyGroup.value] || policies.P3P9;
   syncPolicyControls(policy);
@@ -3210,6 +3235,7 @@ function render() {
   const isLoan = activeScenario === "loan";
   const isTts = ["tts50", "tts70", "tts95"].includes(activeScenario);
   els.upfrontBox.style.display = isLoan || isTts ? "" : "none";
+  if (els.loanScheduleBtn) els.loanScheduleBtn.hidden = !isLoan;
   els.summaryBand.style.gridTemplateColumns = isLoan || isTts ? "1fr 1fr" : "1fr";
   els.upfrontPrice.classList.toggle("summary-mini", isTts);
   if (isLoan) {
@@ -3393,6 +3419,8 @@ els.scenarioButtons.forEach((button) => {
 });
 
 els.resetBtn.addEventListener("click", resetDefaults);
+
+els.loanScheduleBtn?.addEventListener("click", openLoanScheduleCalculator);
 
 els.copyBtn.addEventListener("click", async () => {
   try {
