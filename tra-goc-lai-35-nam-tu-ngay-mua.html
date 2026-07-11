@@ -9,6 +9,14 @@
     * { box-sizing:border-box; }
     body { margin:0; color:var(--ink); background:linear-gradient(145deg,#edf3ff,#f9fbff 44%,#eef1f8); font:15px/1.45 Arial,Helvetica,sans-serif; }
     .page { width:min(1120px,100%); margin:0 auto; padding:28px 16px 44px; }
+    .loan-brandbar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin:0 0 14px; padding:12px 14px; border:1px solid #cfe0f6; border-radius:16px; background:rgba(255,255,255,.9); box-shadow:0 10px 28px #14336c12; }
+    .loan-brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .loan-brand img { width:68px; height:48px; object-fit:cover; border-radius:12px; border:1px solid #f0d37b; box-shadow:0 7px 16px #1725541c; }
+    .loan-brand span { display:block; color:#5b6b85; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .loan-brand strong { display:block; color:#07194a; font-size:18px; line-height:1.12; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .home-link { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:0 16px; border:1px solid #7dd3fc; border-radius:999px; background:linear-gradient(180deg,#e0f7ff,#8bdcff); color:#075985; font-weight:900; text-decoration:none; box-shadow:0 7px 0 #38a3dc,0 14px 22px #0ea5e936; }
+    .home-link:hover, .home-link:focus-visible { transform:translateY(-1px); filter:brightness(1.03); outline:none; }
+    .home-link:active { transform:translateY(5px); box-shadow:0 2px 0 #38a3dc,0 8px 14px #0ea5e92b; }
     .hero { color:#fff; background:radial-gradient(circle at 90% 0,#315fc6 0,transparent 32%),linear-gradient(122deg,#06133c,#102e72); border-radius:22px 22px 8px 8px; padding:26px 28px; box-shadow:0 14px 34px #0b24603b; }
     .eyebrow { margin:0 0 7px; color:var(--gold); font-weight:700; letter-spacing:.08em; font-size:12px; text-transform:uppercase; }
     h1 { margin:0; font-size:clamp(25px,4vw,38px); line-height:1.15; }
@@ -57,6 +65,8 @@
     .footnote { margin:14px 0 0; color:#6a7892; font-size:12px; }
     @media (max-width:760px) {
       .page { padding:16px 10px 30px; }
+      .loan-brandbar { align-items:stretch; flex-direction:column; }
+      .home-link { width:100%; }
       .hero { border-radius:14px 14px 6px 6px; padding:22px 18px; }
       .layout { grid-template-columns:1fr; }
       .stats { grid-template-columns:1fr 1fr; }
@@ -66,6 +76,17 @@
 </head>
 <body>
   <main class="page">
+    <div class="loan-brandbar">
+      <div class="loan-brand">
+        <img src="sun-group-logo.png" alt="Sun Group" onerror="this.hidden=true">
+        <div>
+          <span>Sun Urban City</span>
+          <strong>Lịch trả gốc lãi sau HTLS</strong>
+        </div>
+      </div>
+      <a class="home-link" id="homeLink" href="index.html">Trang chủ</a>
+    </div>
+
     <section class="hero">
       <p class="eyebrow">Sun Urban City · Công cụ tư vấn tài chính</p>
       <h1>Lịch trả gốc và lãi trong 35 năm từ ngày mua</h1>
@@ -197,6 +218,7 @@
     }
 
     function render() {
+      updateHomeLink();
       const purchaseDate = parseLocalDate($('purchaseDate').value);
       const price = parseNumber($('price').value);
       const loanPct = Math.max(0, Math.min(100, parseNumber($('loanPct').value)));
@@ -302,6 +324,16 @@
       }
       if (rate) $('rate').value = rate;
       if (purchaseDate) $('purchaseDate').value = purchaseDate;
+    }
+
+    function updateHomeLink() {
+      const home = $('homeLink');
+      if (!home) return;
+      const params = new URLSearchParams();
+      const unit = $('unitCode').value.trim();
+      if (unit) params.set('unit', unit);
+      params.set('scenario', 'loan');
+      home.href = `index.html?${params.toString()}`;
     }
 
     if (!$('purchaseDate').value) $('purchaseDate').value = toInputDate(new Date());

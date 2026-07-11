@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v86-loan-schedule";
+const CACHE_NAME = "park-pricing-v88-loan-same-tab";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=80",
+  "./styles.css?v=81",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
-  "./app.js?v=86",
+  "./app.js?v=88",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",

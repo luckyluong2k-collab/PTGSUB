@@ -3222,9 +3222,7 @@ function loanScheduleUrl(result) {
 
 function openLoanScheduleCalculator() {
   const result = calculate({ scenario: "loan" });
-  const url = loanScheduleUrl(result);
-  const opened = window.open(url, "_blank", "noopener");
-  if (!opened) window.location.href = url;
+  window.location.href = loanScheduleUrl(result);
 }
 
 function render() {
@@ -3330,6 +3328,23 @@ function resetDefaults() {
   selectedUnitCode = normalizeUnitCode(els.unitCode.value);
   renderFinder();
   render();
+}
+
+function applyAppUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const unit = params.get("unit") || params.get("unitCode") || params.get("maCan");
+  const scenario = params.get("scenario");
+  if (unit) {
+    els.unitCode.value = normalizeUnitCode(unit);
+    selectedUnitCode = normalizeUnitCode(unit);
+    lastAutoFilledCode = "";
+  }
+  if (quoteScenarios.includes(scenario)) {
+    activeScenario = scenario;
+    els.scenarioButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.scenario === activeScenario);
+    });
+  }
 }
 
 document.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-filter])").forEach((input) => {
@@ -3543,6 +3558,7 @@ function installServiceWorkerUpdates() {
 }
 
 installServiceWorkerUpdates();
+applyAppUrlParams();
 syncBaseFromGross();
 document.querySelectorAll("[data-money-input]").forEach(formatMoneyInput);
 renderFinder();

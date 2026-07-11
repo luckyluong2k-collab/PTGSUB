@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=80">
+  <link rel="stylesheet" href="styles.css?v=81">
 </head>
 <body class="auth-locked">
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -196,7 +196,7 @@
       </div>
     </section>
 
-    <section class="panel" id="pricingForm">
+    <section class="panel pricing-panel" id="pricingForm">
       <div class="grid two">
         <label>
           M&#227; c&#259;n
@@ -260,7 +260,7 @@
       </label>
     </section>
 
-    <section class="panel">
+    <section class="panel scenario-panel">
       <h2>Ph&#432;&#417;ng &#225;n</h2>
       <div class="segmented" role="radiogroup" aria-label="Ph&#432;&#417;ng &#225;n thanh to&#225;n">
         <button type="button" data-scenario="loan" class="active">C&#243; vay</button>
@@ -288,7 +288,7 @@
       </div>
     </section>
 
-    <section class="panel results">
+    <section class="panel results results-panel">
       <h2>K&#7871;t qu&#7843;</h2>
       <div id="resultRows" class="result-list"></div>
       <div class="result-actions">
@@ -331,12 +331,12 @@
       </div>
     </section>
 
-    <section class="panel compact">
+    <section class="panel compact discount-panel">
       <h2>Chi ti&#7871;t CK</h2>
       <div id="discountRows" class="result-list"></div>
     </section>
 
-    <section class="panel compact">
+    <section class="panel compact schedule-panel">
       <h2>Ti&#7871;n &#273;&#7897; t&#7841;m t&#237;nh</h2>
       <div id="scheduleRows" class="result-list"></div>
     </section>
@@ -408,7 +408,7 @@
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=64"></script>
   <script src="lienke-learned-locations.js?v=2"></script>
-  <script src="app.js?v=86"></script>
+  <script src="app.js?v=88"></script>
   <script type="module" src="firebase-auth.js?v=76"></script>
 </body>
 </html>
