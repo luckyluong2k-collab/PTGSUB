@@ -851,6 +851,90 @@ function lowRiseHouseNumber(code) {
   return Number.isFinite(house) ? house : null;
 }
 
+function lienKeHouseSequence(start, end, exclude = []) {
+  const excluded = new Set(exclude);
+  const values = [];
+  for (let house = start; house <= end; house += 2) {
+    if (!excluded.has(house)) values.push(house);
+  }
+  return values;
+}
+
+function lienKeInterpolatedSegmentLocation(house, segment) {
+  const houses = segment.houses || lienKeHouseSequence(segment.start, segment.end, segment.exclude);
+  const index = houses.indexOf(house);
+  if (index < 0) return null;
+  const width = segment.width || 34;
+  const height = segment.height || 107;
+  const ratio = houses.length > 1 ? index / (houses.length - 1) : 0;
+  const centerX = interpolateValue(segment.xStart, segment.xEnd, ratio);
+  return makeLienKeMapLocation(Math.round(centerX - width / 2), segment.y, {
+    width,
+    height,
+    cropWidth: segment.cropWidth,
+    cropHeight: segment.cropHeight,
+    labelOnLeft: centerX > LIEN_KE_BASE_WIDTH * 0.62,
+  });
+}
+
+const LIEN_KE_FULL_LEFT_EVEN = { start: 2, end: 96, exclude: [4], xStart: 1246, xEnd: 3062 };
+const LIEN_KE_FULL_LEFT_ODD = { start: 1, end: 97, exclude: [13], xStart: 1246, xEnd: 3062 };
+const LIEN_KE_FULL_RIGHT_EVEN = { start: 98, end: 212, xStart: 3268, xEnd: 5530 };
+const LIEN_KE_FULL_RIGHT_ODD = { start: 99, end: 219, xStart: 3268, xEnd: 5530 };
+
+const lienKeStreetLayouts = {
+  C15: [
+    { start: 2, end: 52, exclude: [4, 14], xStart: 1246, xEnd: 5508, y: 1463, width: 70, height: 162 },
+    { ...LIEN_KE_FULL_LEFT_ODD, y: 1648 },
+    { start: 51, end: 97, xStart: 3300, xEnd: 5508, y: 1648 },
+  ],
+  C16: [
+    { ...LIEN_KE_FULL_LEFT_ODD, y: 1648 },
+    { start: 51, end: 97, xStart: 3300, xEnd: 5508, y: 1648 },
+    { ...LIEN_KE_FULL_LEFT_EVEN, y: 1915 },
+  ],
+  C17: [
+    { ...LIEN_KE_FULL_LEFT_ODD, y: 2062 },
+    { start: 51, end: 97, xStart: 3268, xEnd: 5530, y: 2062 },
+    { start: 2, end: 50, exclude: [4], xStart: 1246, xEnd: 2246, y: 2293 },
+    { start: 52, end: 72, xStart: 2672, xEnd: 3062, y: 2293 },
+    { start: 74, end: 120, xStart: 3268, xEnd: 4138, y: 2293 },
+    { start: 122, end: 164, xStart: 4690, xEnd: 5530, y: 2293 },
+  ],
+  C18: [
+    { start: 1, end: 47, exclude: [13], xStart: 1246, xEnd: 2246, y: 2440 },
+    { start: 51, end: 73, xStart: 2672, xEnd: 3062, y: 2440 },
+    { start: 75, end: 121, xStart: 3268, xEnd: 4138, y: 2440 },
+    { start: 123, end: 169, xStart: 4690, xEnd: 5530, y: 2440 },
+    { ...LIEN_KE_FULL_LEFT_EVEN, y: 2670 },
+    { ...LIEN_KE_FULL_RIGHT_EVEN, y: 2670 },
+  ],
+  C19: [
+    { ...LIEN_KE_FULL_LEFT_ODD, y: 2818 },
+    { ...LIEN_KE_FULL_RIGHT_ODD, y: 2818 },
+    { ...LIEN_KE_FULL_LEFT_EVEN, y: 3048 },
+    { ...LIEN_KE_FULL_RIGHT_EVEN, y: 3048 },
+  ],
+  C20: [
+    { start: 1, end: 51, exclude: [13], xStart: 1246, xEnd: 3062, y: 3194, width: 66, height: 112 },
+    { start: 55, end: 111, xStart: 3268, xEnd: 5512, y: 3194, width: 66, height: 112 },
+  ],
+};
+
+function resolveLienKeLayoutLocation(unitCode) {
+  const parsed = parseLowRiseCodeParts(unitCode);
+  const house = Number.parseInt(parsed.house, 10);
+  const segments = lienKeStreetLayouts[parsed.street];
+  if (!segments || !Number.isFinite(house)) return null;
+
+  for (const segment of segments) {
+    const location = lienKeInterpolatedSegmentLocation(house, segment);
+    if (location) return location;
+  }
+
+  return null;
+}
+
 function interpolationPair(samples, targetHouse) {
   if (samples.length < 2) return null;
   const sorted = samples
@@ -918,7 +1002,11 @@ function inferLowRiseMapLocation(unitCode) {
 
 function resolveUnitMapLocation(code) {
   const unitCode = normalizeUnitCode(code);
-  if (lowRiseUnitMapLocations[unitCode]) return lowRiseUnitMapLocations[unitCode];
+  const exactLowRiseLocation = lowRiseUnitMapLocations[unitCode];
+  if (exactLowRiseLocation?.image === lienKeMapImage) return exactLowRiseLocation;
+  const generatedLienKeLocation = resolveLienKeLayoutLocation(unitCode);
+  if (generatedLienKeLocation) return generatedLienKeLocation;
+  if (exactLowRiseLocation) return exactLowRiseLocation;
   const inferredLowRiseLocation = inferLowRiseMapLocation(unitCode);
   if (inferredLowRiseLocation) return inferredLowRiseLocation;
   if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];

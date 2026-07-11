@@ -1,10 +1,11 @@
-const CACHE_NAME = "park-pricing-v84-lowrise-tts100-schedule";
+const CACHE_NAME = "park-pricing-v85-lienke-auto-map";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=79",
   "./unit-data.js?v=64",
-  "./app.js?v=84",
+  "./lienke-learned-locations.js?v=2",
+  "./app.js?v=85",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
   "./icon.svg",
@@ -13,6 +14,7 @@ const ASSETS = [
   "./sun-group-icon.png",
   "./sun-group-logo.png",
   "./lowrise-map-sharp.jpg",
+  "./lienke.png",
 ];
 
 self.addEventListener("install", (event) => {
