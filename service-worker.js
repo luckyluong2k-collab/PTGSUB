@@ -1,8 +1,8 @@
-const CACHE_NAME = "park-pricing-v88-loan-same-tab";
+const CACHE_NAME = "park-pricing-v89-sun-luxury-dashboard";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=81",
+  "./styles.css?v=82",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=88",

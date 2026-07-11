@@ -1,15 +1,19 @@
 :root {
   color-scheme: light;
-  --bg: #f4f7f6;
-  --panel: #ffffff;
-  --ink: #17211f;
-  --muted: #64736f;
-  --line: #d8e1de;
+  --bg: #071c22;
+  --panel: rgba(255, 255, 255, 0.94);
+  --ink: #142421;
+  --muted: #6b7d78;
+  --line: rgba(215, 180, 106, 0.24);
+  --navy: #071c22;
+  --navy-deep: #041216;
   --brand: #0f766e;
-  --brand-strong: #0b5f59;
-  --accent: #f4b35e;
+  --brand-strong: #2aa398;
+  --accent: #d7b46a;
+  --accent-soft: #f0d69c;
   --danger: #b42318;
-  --shadow: 0 14px 35px rgba(18, 38, 34, 0.12);
+  --glass: rgba(255, 255, 255, 0.82);
+  --shadow: 0 18px 44px rgba(4, 18, 22, 0.22);
 }
 
 * {
@@ -1992,6 +1996,354 @@ input[readonly] {
 
   .comparison-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Sun Luxury Financial Dashboard theme */
+body {
+  background:
+    radial-gradient(circle at 12% -6%, rgba(42, 163, 152, 0.28), transparent 34vw),
+    radial-gradient(circle at 88% 6%, rgba(215, 180, 106, 0.22), transparent 30vw),
+    linear-gradient(135deg, #041216 0%, #071c22 46%, #0b2a2e 100%);
+}
+
+.app-shell {
+  color: var(--ink);
+}
+
+.brand-hero {
+  border-color: rgba(215, 180, 106, 0.42);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at 86% 8%, rgba(215, 180, 106, 0.20), transparent 36%),
+    linear-gradient(135deg, rgba(4, 18, 22, 0.96), rgba(7, 28, 34, 0.94));
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.26);
+  color: #fff;
+}
+
+.brand-hero::before {
+  width: 6px;
+  background: linear-gradient(180deg, #f0d69c, #d7b46a);
+}
+
+.brand-copy h1 span,
+.eyebrow {
+  color: #f0d69c;
+}
+
+.brand-copy h1 strong {
+  color: #ffffff;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
+.brand-logo {
+  border-color: rgba(240, 214, 156, 0.78);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
+}
+
+.social-chip {
+  border-color: rgba(240, 214, 156, 0.34);
+  background: rgba(255, 255, 255, 0.92);
+  color: #071c22;
+  box-shadow: 0 10px 26px rgba(4, 18, 22, 0.18);
+}
+
+.social-chip.zalo {
+  border-color: rgba(42, 163, 152, 0.35);
+  background: rgba(235, 250, 248, 0.94);
+}
+
+.social-chip.drive {
+  border-color: rgba(215, 180, 106, 0.38);
+  background: rgba(255, 250, 240, 0.94);
+}
+
+.icon-button,
+.panel,
+.finder-toggle,
+.finder-toolbar,
+.unit-card,
+.multi-quote-card,
+.quote-stat,
+.quote-detail,
+.row,
+.pdf-options-card,
+.unit-map-options-card {
+  border-color: rgba(215, 180, 106, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 246, 245, 0.90));
+  box-shadow: 0 16px 38px rgba(4, 18, 22, 0.18);
+}
+
+.panel {
+  border-radius: 16px;
+}
+
+.panel h2,
+.finder-toggle span:first-child {
+  color: #071c22;
+}
+
+.summary-band {
+  gap: 0;
+  border-color: rgba(240, 214, 156, 0.46);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #d7b46a, #2aa398);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+}
+
+.summary-band > div {
+  background:
+    radial-gradient(circle at 90% 0, rgba(240, 214, 156, 0.18), transparent 38%),
+    linear-gradient(135deg, #071c22 0%, #0b3134 100%);
+}
+
+.summary-band > div + div {
+  border-left: 1px solid rgba(240, 214, 156, 0.35);
+}
+
+.summary-band .label {
+  color: rgba(240, 214, 156, 0.96);
+  opacity: 1;
+  letter-spacing: 0.01em;
+}
+
+.summary-band strong,
+.summary-band strong.summary-mini b {
+  color: #ffffff;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.30);
+}
+
+.loan-schedule-button {
+  border-color: rgba(240, 214, 156, 0.48);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 44%),
+    linear-gradient(135deg, #2aa398 0%, #0f766e 48%, #071c22 100%);
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -3px 0 rgba(4, 18, 22, 0.32),
+    0 9px 0 #041216,
+    0 18px 30px rgba(4, 18, 22, 0.34);
+}
+
+.loan-schedule-button:hover,
+.loan-schedule-button:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -3px 0 rgba(4, 18, 22, 0.32),
+    0 11px 0 #041216,
+    0 22px 34px rgba(4, 18, 22, 0.38);
+}
+
+.loan-schedule-button:active {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    inset 0 -2px 0 rgba(4, 18, 22, 0.28),
+    0 4px 0 #041216,
+    0 10px 18px rgba(4, 18, 22, 0.28);
+}
+
+.finder-toggle {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(235, 246, 244, 0.92));
+}
+
+.finder-toggle strong,
+.finder-toggle-icon,
+.unit-card-price strong,
+.quote-subtitle strong,
+.quote-signature-reward > strong {
+  color: #0f766e;
+}
+
+.finder-toggle-icon {
+  background: rgba(42, 163, 152, 0.12);
+}
+
+input,
+select,
+.switch {
+  border-color: rgba(7, 28, 34, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  color: #142421;
+}
+
+input:focus,
+select:focus {
+  border-color: #2aa398;
+  box-shadow: 0 0 0 3px rgba(42, 163, 152, 0.18);
+}
+
+.segmented button,
+.primary,
+.secondary,
+.multi-quote-toggle,
+.unit-map-button,
+.filter-reset {
+  border-radius: 12px;
+}
+
+.segmented button {
+  border-color: rgba(7, 28, 34, 0.14);
+  background: rgba(255, 255, 255, 0.88);
+  color: #142421;
+}
+
+.segmented button.active,
+.primary,
+.multi-quote-toggle,
+.unit-map-button {
+  border-color: rgba(240, 214, 156, 0.34);
+  background: linear-gradient(135deg, #0f766e, #071c22);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(7, 28, 34, 0.24);
+}
+
+.secondary {
+  border-color: rgba(42, 163, 152, 0.28);
+  background: rgba(235, 250, 248, 0.95);
+  color: #0f766e;
+}
+
+.pdf-button,
+.result-actions .pdf-button {
+  border-color: rgba(215, 180, 106, 0.62);
+  background: linear-gradient(135deg, #fff8e8, #f0d69c);
+  color: #6b4a12;
+}
+
+.result-list {
+  border-color: rgba(215, 180, 106, 0.23);
+  background: rgba(215, 180, 106, 0.18);
+}
+
+.row.highlight {
+  background: rgba(42, 163, 152, 0.11);
+}
+
+.row.strong-value strong,
+.quote-card h3,
+.quote-detail strong,
+.quote-discount-list strong,
+.quote-signature-list strong {
+  color: #071c22;
+}
+
+.quote-card-hero {
+  border-color: rgba(215, 180, 106, 0.36);
+  border-left-color: #d7b46a;
+  background:
+    radial-gradient(circle at 100% 0, rgba(215, 180, 106, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(235, 250, 248, 0.92));
+}
+
+.quote-eyebrow,
+.quote-badge {
+  color: #ffffff;
+}
+
+.quote-eyebrow {
+  color: #0f766e;
+}
+
+.quote-badge {
+  background: linear-gradient(135deg, #0f766e, #071c22);
+  box-shadow: 0 10px 22px rgba(7, 28, 34, 0.23);
+}
+
+.quote-stat {
+  border-left-color: #0f766e;
+}
+
+.quote-stat strong {
+  color: #071c22;
+  font-weight: 950;
+}
+
+.quote-stat-warm {
+  border-left-color: #d7b46a;
+}
+
+.quote-stat-warm .quote-stat-top em {
+  background: rgba(240, 214, 156, 0.38);
+  color: #6b4a12;
+}
+
+.quote-stat-blue {
+  border-left-color: #2aa398;
+}
+
+.quote-stat-blue .quote-stat-top em {
+  background: rgba(42, 163, 152, 0.14);
+  color: #0f766e;
+}
+
+.quote-stat-green strong {
+  color: #0f766e;
+}
+
+.quote-detail.wide,
+.quote-signature-reward {
+  background: rgba(243, 246, 245, 0.88);
+}
+
+.quote-discount-summary {
+  border-color: rgba(215, 180, 106, 0.45);
+  background: linear-gradient(135deg, rgba(255, 250, 240, 0.96), rgba(255, 255, 255, 0.92));
+}
+
+.tts-chart-panel {
+  border-color: rgba(215, 180, 106, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 246, 245, 0.92));
+  box-shadow: 0 16px 38px rgba(4, 18, 22, 0.16);
+}
+
+.tts-chart-head h3,
+.tts-chart-meta strong {
+  color: #071c22;
+}
+
+.tts-chart-tabs button.active {
+  background: linear-gradient(135deg, #0f766e, #071c22);
+  color: #fff;
+}
+
+.toast {
+  border: 1px solid rgba(240, 214, 156, 0.32);
+  background: rgba(4, 18, 22, 0.94);
+  color: #ffffff;
+}
+
+@media (max-width: 579px) {
+  .app-shell {
+    padding: 10px;
+  }
+
+  .brand-hero,
+  .panel,
+  .summary-band {
+    border-radius: 14px;
+  }
+
+  .brand-copy h1 strong {
+    font-size: clamp(24px, 7.6vw, 34px);
+  }
+
+  .summary-band > div {
+    padding: 12px 11px;
+  }
+
+  .summary-band strong {
+    font-size: clamp(20px, 6.6vw, 28px);
+  }
+
+  .quote-stat strong,
+  .quote-card h3 {
+    font-size: clamp(20px, 6vw, 24px);
   }
 }
 
