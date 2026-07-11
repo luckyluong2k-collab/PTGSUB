@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v82-sun-signature-reward";
+const CACHE_NAME = "park-pricing-v83-signature-sheet-gate";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=79",
   "./unit-data.js?v=64",
-  "./app.js?v=82",
+  "./app.js?v=83",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
   "./icon.svg",

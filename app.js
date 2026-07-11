@@ -1230,6 +1230,10 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
     { includes: ["chua vat"], excludes: ["tts"] },
     { includes: ["gia tho chua"], excludes: ["tts"] },
   ], 150);
+  const salesPolicyIdx = preferredColumnIndex(labels, [
+    { includes: ["csbh"], maxLength: 40 },
+    { includes: ["chinh sach ban hang"], maxLength: 80 },
+  ], 80);
   const grossIdx = preferredColumnIndex(labels, [
     { includes: ["tong gia ban can ho bao gom vat"], excludes: ["chua", "tts"] },
     { includes: ["tong gia gom vat"], excludes: ["chua", "tts"] },
@@ -1294,6 +1298,7 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
     }
 
     const unitType = normalizeSheetUnitType(rawType, policyGroup);
+    const salesPolicy = gvizValue(row, salesPolicyIdx);
     const unit = {
       policyGroup,
       source: "google-sheet",
@@ -1316,6 +1321,10 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
       const direction = gvizValue(row, directionIdx);
       if (view) unit.view = view;
       if (direction) unit.direction = direction;
+    }
+    if (salesPolicy) {
+      unit.salesPolicy = salesPolicy;
+      unit.sunSignatureEligible = normalizeHeaderText(salesPolicy).includes("sun signature");
     }
     const parsedCode = parseUnitCodeParts(code);
     const floor = lowRiseDetails?.floor || parsedCode.floor || gvizValue(row, floorIdx) || inferFloorFromCode(code, tower);
@@ -1958,7 +1967,13 @@ function sunSignatureReward(result) {
   return { transactionValue, tier, points };
 }
 
+function isCurrentUnitSunSignatureEligible() {
+  const unitCode = normalizeUnitCode(els.unitCode.value);
+  return Boolean(unitCatalog[unitCode]?.sunSignatureEligible);
+}
+
 function quoteCardSunSignatureReward(result) {
+  if (!isCurrentUnitSunSignatureEligible()) return "";
   const reward = sunSignatureReward(result);
   const rewardRows = [
     ["Hạng dự kiến", reward.tier.name],
@@ -2015,7 +2030,8 @@ function renderQuoteCard(result, isLoan, isTts) {
   ];
 
   details.push(quoteCardDiscountSummary(result.discounts));
-  details.push(quoteCardSunSignatureReward(result));
+  const signatureReward = quoteCardSunSignatureReward(result);
+  if (signatureReward) details.push(signatureReward);
   if (isLoan) {
     details.push(quoteCardDetail("HTLS", result.policy.loanSupport, "wide"));
   }
@@ -3252,7 +3268,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=82", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=83", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
