@@ -104,6 +104,8 @@
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
     ttsJuly: { tts95: 0.21, tts70: 0.145, tts50: 0.12 },
+    scenarioLabels: { tts95: "TTS 100%" },
+    lowRiseTts100Schedule: true,
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -121,6 +123,8 @@
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
     ttsJuly: { tts95: 0.16, tts70: 0.095, tts50: 0.07 },
+    scenarioLabels: { tts95: "TTS 100%" },
+    lowRiseTts100Schedule: true,
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -1669,14 +1673,24 @@ function buildTtsSchedule(result) {
   const deadline = ttsDeadlineFromQuote(quoteDateText);
   const handoverDate = dateFromText(result.policy.handover);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
-  const paymentBasisRawWithVat = result.paymentBasisRawWithVat || result.rawWithVat;
+  const paymentBasisRawWithVat = result.rawWithVat;
+  const isLowRiseTts100 = Boolean(result.policy.lowRiseTts100Schedule && result.scenario === "tts95");
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
-    [
+  ];
+
+  if (isLowRiseTts100) {
+    rows.push(
+      [`Thanh toán lần 2 15% (${formatDateText(deadline)})`, Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit))],
+      [`Thanh toán lần 3 10% (${formatDateText(deadline)})`, round(paymentBasisRawWithVat * 0.10)],
+      [`Thanh toán lần 4 70% (${formatDateText(deadline)})`, round(paymentBasisRawWithVat * 0.70)]
+    );
+  } else {
+    rows.push([
       `Thanh toán lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
       Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit)),
-    ],
-  ];
+    ]);
+  }
 
   if (completion.total) {
     rows.push([`Ký HĐMB - 70% hoàn thiện`, round(completion.grossWithVat * 0.70)]);
@@ -3268,7 +3282,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=83", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=84", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
