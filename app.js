@@ -266,9 +266,12 @@ let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 
 const unitMapImage = "phankhupark-map.png";
 const lowRiseMapImage = "lowrise-map-sharp.jpg";
+const lienKeMapImage = "lienke.png";
 const LOW_RISE_BASE_WIDTH = 2048;
 const LOW_RISE_BASE_HEIGHT = 1448;
 const LOW_RISE_SOURCE_SCALE = 2;
+const LIEN_KE_BASE_WIDTH = 5854;
+const LIEN_KE_BASE_HEIGHT = 3667;
 const LOW_RISE_STREETS = Array.from(
   { length: 22 },
   (_, index) => `C${index + 1}`
@@ -352,6 +355,37 @@ function makeLowRiseMapLocation(x, y, options = {}) {
   };
 }
 
+function makeLienKeMapLocation(x, y, options = {}) {
+  const width = options.width || 42;
+  const height = options.height || 62;
+  const cropWidth = options.cropWidth || 1500;
+  const cropHeight = options.cropHeight || 900;
+  const maxCropX = Math.max(0, LIEN_KE_BASE_WIDTH - cropWidth);
+  const maxCropY = Math.max(0, LIEN_KE_BASE_HEIGHT - cropHeight);
+  const cropX = Math.min(maxCropX, Math.max(0, options.cropX ?? x - 560));
+  const cropY = Math.min(maxCropY, Math.max(0, options.cropY ?? y - 330));
+  const labelOnLeft = options.labelOnLeft ?? x > LIEN_KE_BASE_WIDTH * 0.62;
+  const label = {
+    x: labelOnLeft ? cropX + 34 : cropX + cropWidth - 760,
+    y: cropY + 34,
+    width: 700,
+    height: 145,
+  };
+
+  return {
+    image: lienKeMapImage,
+    scale: 1,
+    crop: { x: cropX, y: cropY, width: cropWidth, height: cropHeight },
+    unitRect: { x, y, width, height },
+    label,
+    arrowStart: {
+      x: labelOnLeft ? label.x + label.width : label.x,
+      y: label.y + 150,
+    },
+    arrowEnd: { x: x + width / 2, y: y + height / 2 },
+  };
+}
+
 // Danh sách căn LK được duyệt để tạo ảnh chỉ căn (theo bảng hàng thấp tầng).
 const lowRiseUnitMapLocations = {
   C6104: makeLowRiseMapLocation(1238, 366),
@@ -367,6 +401,23 @@ const lowRiseUnitMapLocations = {
   C1981: makeLowRiseMapLocation(1037, 1158),
   C19177: makeLowRiseMapLocation(1394, 1100, { labelOnLeft: true }),
 };
+
+Object.entries(window.lienKeLearnedMapSamples || {}).forEach(([code, sample]) => {
+  const unitCode = String(code || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (!unitCode || !sample || typeof sample !== "object") return;
+  const x = Number(sample.x);
+  const y = Number(sample.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+  lowRiseUnitMapLocations[unitCode] = makeLienKeMapLocation(x, y, {
+    width: Number(sample.width) || undefined,
+    height: Number(sample.height) || undefined,
+    cropWidth: Number(sample.cropWidth) || undefined,
+    cropHeight: Number(sample.cropHeight) || undefined,
+    cropX: Number.isFinite(Number(sample.cropX)) ? Number(sample.cropX) : undefined,
+    cropY: Number.isFinite(Number(sample.cropY)) ? Number(sample.cropY) : undefined,
+    labelOnLeft: typeof sample.labelOnLeft === "boolean" ? sample.labelOnLeft : undefined,
+  });
+});
 
 const unitMapExactLocations = {
   P90316: {
@@ -794,9 +845,82 @@ function rectCenter(rect) {
   };
 }
 
+function lowRiseHouseNumber(code) {
+  const parsed = parseLowRiseCodeParts(code);
+  const house = Number.parseInt(parsed.house, 10);
+  return Number.isFinite(house) ? house : null;
+}
+
+function interpolationPair(samples, targetHouse) {
+  if (samples.length < 2) return null;
+  const sorted = samples
+    .slice()
+    .sort((a, b) => a.house - b.house);
+  const lower = sorted.filter((sample) => sample.house <= targetHouse).pop();
+  const upper = sorted.find((sample) => sample.house >= targetHouse);
+  if (lower && upper && lower !== upper) return [lower, upper];
+
+  return sorted
+    .slice()
+    .sort((a, b) => Math.abs(a.house - targetHouse) - Math.abs(b.house - targetHouse))
+    .slice(0, 2)
+    .sort((a, b) => a.house - b.house);
+}
+
+function interpolateValue(a, b, ratio) {
+  return a + (b - a) * ratio;
+}
+
+function inferLowRiseMapLocation(unitCode) {
+  const parsed = parseLowRiseCodeParts(unitCode);
+  const targetHouse = Number.parseInt(parsed.house, 10);
+  if (!parsed.street || !Number.isFinite(targetHouse)) return null;
+
+  const samples = Object.entries(lowRiseUnitMapLocations)
+    .map(([code, location]) => {
+      const sampleParsed = parseLowRiseCodeParts(code);
+      const house = Number.parseInt(sampleParsed.house, 10);
+      return {
+        code,
+        street: sampleParsed.street,
+        house,
+        location,
+      };
+    })
+    .filter((sample) => {
+      return sample.street === parsed.street
+        && Number.isFinite(sample.house)
+        && sample.location?.image === lienKeMapImage
+        && sample.location?.unitRect;
+    });
+
+  if (samples.length < 2) return null;
+
+  const sameParity = samples.filter((sample) => sample.house % 2 === targetHouse % 2);
+  const pair = interpolationPair(sameParity.length >= 2 ? sameParity : samples, targetHouse);
+  if (!pair || pair.length < 2 || pair[0].house === pair[1].house) return null;
+
+  const [start, end] = pair;
+  const ratio = (targetHouse - start.house) / (end.house - start.house);
+  const startRect = start.location.unitRect;
+  const endRect = end.location.unitRect;
+  const x = Math.round(interpolateValue(startRect.x, endRect.x, ratio));
+  const y = Math.round(interpolateValue(startRect.y, endRect.y, ratio));
+  const width = Math.round(interpolateValue(startRect.width, endRect.width, ratio));
+  const height = Math.round(interpolateValue(startRect.height, endRect.height, ratio));
+
+  return makeLienKeMapLocation(x, y, {
+    width,
+    height,
+    labelOnLeft: x > LIEN_KE_BASE_WIDTH * 0.62,
+  });
+}
+
 function resolveUnitMapLocation(code) {
   const unitCode = normalizeUnitCode(code);
   if (lowRiseUnitMapLocations[unitCode]) return lowRiseUnitMapLocations[unitCode];
+  const inferredLowRiseLocation = inferLowRiseMapLocation(unitCode);
+  if (inferredLowRiseLocation) return inferredLowRiseLocation;
   if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];
 
   const parsed = parseUnitCodeParts(unitCode);
