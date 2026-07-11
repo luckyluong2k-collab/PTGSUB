@@ -1680,11 +1680,10 @@ function buildTtsSchedule(result) {
   ];
 
   if (isLowRiseTts100) {
-    rows.push(
-      [`Thanh toán lần 2 15% (${formatDateText(deadline)})`, Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit))],
-      [`Thanh toán lần 3 10% (${formatDateText(deadline)})`, round(paymentBasisRawWithVat * 0.10)],
-      [`Thanh toán lần 4 70% (${formatDateText(deadline)})`, round(paymentBasisRawWithVat * 0.70)]
-    );
+    rows.push([
+      `Thanh toán lần 2 95% (${formatDateText(deadline)})`,
+      Math.max(0, round(paymentBasisRawWithVat * 0.95 - deposit)),
+    ]);
   } else {
     rows.push([
       `Thanh toán lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
