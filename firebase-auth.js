@@ -762,6 +762,11 @@ function adminAccessBadgeClass(approved, isAdminUser, data) {
   return isAccessExpired(data) ? "admin-badge expired" : "admin-badge active";
 }
 
+function latestUserSearchMs(data) {
+  const searches = Array.isArray(data?.recentSearches) ? data.recentSearches : [];
+  return searches.reduce((latest, item) => Math.max(latest, timestampMs(item?.at)), 0);
+}
+
 function userCard(id, data) {
   const email = data.email || "Không có email";
   const approved = Boolean(data.approved);
@@ -906,7 +911,10 @@ async function renderAdminUsers({ open = false } = {}) {
     const docs = [];
     snaps.forEach((snap) => docs.push({ id: snap.id, data: snap.data() || {} }));
 
-    docs.sort((a, b) => String(a.data.email || "").localeCompare(String(b.data.email || "")));
+    docs.sort((a, b) =>
+      latestUserSearchMs(b.data) - latestUserSearchMs(a.data)
+      || String(a.data.email || "").localeCompare(String(b.data.email || ""))
+    );
 
     adminUsers.textContent = "";
     if (!docs.length) {

@@ -112,6 +112,10 @@
           <h2 id="adminPanelTitle">Quản lý tài khoản</h2>
         </div>
         <button class="admin-overlay-close" id="adminCloseBtn" type="button" aria-label="Đóng quản lý tài khoản">×</button>
+        <label class="admin-user-search">
+          <span>T&#236;m th&#224;nh vi&#234;n</span>
+          <input id="adminUserSearch" type="search" autocomplete="off" placeholder="Nh&#7853;p Gmail c&#7847;n t&#236;m...">
+        </label>
       </header>
       <div id="adminUsers" class="admin-users admin-users-board"></div>
     </div>
@@ -204,10 +208,12 @@
     <div class="dashboard-grid">
     <div class="dashboard-rail dashboard-rail-left">
     <section class="panel pricing-panel" id="pricingForm">
+      <h2 class="form-section-title">Nh&#7853;p d&#7919; li&#7879;u</h2>
       <div class="grid two">
-        <label>
+        <label class="unit-code-field">
           M&#227; c&#259;n
           <input id="unitCode" autocomplete="off" value="P90316">
+          <button class="unit-lookup-button" id="unitLookupBtn" type="button" hidden>Tra c&#259;n</button>
         </label>
         <label>
           Nh&#243;m t&#242;a
@@ -422,7 +428,10 @@
   <script src="unit-data.js?v=64"></script>
   <script src="lienke-learned-locations.js?v=2"></script>
   <script src="app.js?v=88"></script>
+  <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=76"></script>
+  <script src="ui-admin-search.js?v=1"></script>
+  <script src="ui-menu.js?v=1"></script>
   <script src="ui-theme.js?v=1"></script>
 </body>
 </html>
