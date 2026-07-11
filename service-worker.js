@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v80-centered-login";
+const CACHE_NAME = "park-pricing-v82-sun-signature-reward";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=78",
+  "./styles.css?v=79",
   "./unit-data.js?v=64",
-  "./app.js?v=80",
+  "./app.js?v=82",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
   "./icon.svg",
@@ -12,6 +12,7 @@ const ASSETS = [
   "./apple-touch-icon.png",
   "./sun-group-icon.png",
   "./sun-group-logo.png",
+  "./lowrise-map-sharp.jpg",
 ];
 
 self.addEventListener("install", (event) => {

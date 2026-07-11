@@ -261,7 +261,10 @@ let skipPolicyDefaultOnce = false;
 let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 
 const unitMapImage = "phankhupark-map.png";
-const lowRiseMapImage = "Bản sao của 230125_TMB 4PK.jpg";
+const lowRiseMapImage = "lowrise-map-sharp.jpg";
+const LOW_RISE_BASE_WIDTH = 2048;
+const LOW_RISE_BASE_HEIGHT = 1448;
+const LOW_RISE_SOURCE_SCALE = 2;
 const LOW_RISE_STREETS = Array.from(
   { length: 22 },
   (_, index) => `C${index + 1}`
@@ -294,11 +297,35 @@ function parseLowRiseCodeParts(value) {
   };
 }
 
+function scaleLowRiseValue(value) {
+  return Math.round(value * LOW_RISE_SOURCE_SCALE);
+}
+
+function scaleLowRiseRect(rect) {
+  return {
+    x: scaleLowRiseValue(rect.x),
+    y: scaleLowRiseValue(rect.y),
+    width: scaleLowRiseValue(rect.width),
+    height: scaleLowRiseValue(rect.height),
+  };
+}
+
+function scaleLowRisePoint(point) {
+  return {
+    x: scaleLowRiseValue(point.x),
+    y: scaleLowRiseValue(point.y),
+  };
+}
+
 function makeLowRiseMapLocation(x, y, options = {}) {
-  const width = options.width || 9;
-  const height = options.height || 20;
-  const cropX = Math.max(0, options.cropX ?? x - 300);
-  const cropY = Math.max(0, options.cropY ?? y - 145);
+  const width = options.width || 22;
+  const height = options.height || 46;
+  const cropWidth = options.cropWidth || 850;
+  const cropHeight = options.cropHeight || 430;
+  const maxCropX = Math.max(0, LOW_RISE_BASE_WIDTH - cropWidth);
+  const maxCropY = Math.max(0, LOW_RISE_BASE_HEIGHT - cropHeight);
+  const cropX = Math.min(maxCropX, Math.max(0, options.cropX ?? x - 300));
+  const cropY = Math.min(maxCropY, Math.max(0, options.cropY ?? y - 145));
   const labelOnLeft = options.labelOnLeft ?? x > 1300;
   const label = {
     x: labelOnLeft ? cropX + 24 : cropX + 430,
@@ -309,15 +336,15 @@ function makeLowRiseMapLocation(x, y, options = {}) {
 
   return {
     image: lowRiseMapImage,
-    scale: 0.32,
-    crop: { x: cropX, y: cropY, width: 850, height: 430 },
-    unitRect: { x, y, width, height },
-    label,
-    arrowStart: {
+    scale: 0.32 * LOW_RISE_SOURCE_SCALE,
+    crop: scaleLowRiseRect({ x: cropX, y: cropY, width: cropWidth, height: cropHeight }),
+    unitRect: scaleLowRiseRect({ x, y, width, height }),
+    label: scaleLowRiseRect(label),
+    arrowStart: scaleLowRisePoint({
       x: labelOnLeft ? label.x + label.width : label.x,
       y: label.y + 125,
-    },
-    arrowEnd: { x: x + width / 2, y: y + height / 2 },
+    }),
+    arrowEnd: scaleLowRisePoint({ x: x + width / 2, y: y + height / 2 }),
   };
 }
 
@@ -325,15 +352,15 @@ function makeLowRiseMapLocation(x, y, options = {}) {
 const lowRiseUnitMapLocations = {
   C6104: makeLowRiseMapLocation(1238, 366),
   C7177: makeLowRiseMapLocation(1394, 454, { labelOnLeft: true }),
-  C1634: makeLowRiseMapLocation(785, 968),
-  C1707: makeLowRiseMapLocation(691, 987),
-  C1741: makeLowRiseMapLocation(825, 987),
-  C1807: makeLowRiseMapLocation(691, 1044),
-  C1837: makeLowRiseMapLocation(809, 1044),
-  C1841: makeLowRiseMapLocation(825, 1044),
-  C1863: makeLowRiseMapLocation(1002, 1044),
-  C1955: makeLowRiseMapLocation(870, 1100),
-  C1981: makeLowRiseMapLocation(978, 1100),
+  C1634: makeLowRiseMapLocation(702, 1000),
+  C1707: makeLowRiseMapLocation(543, 1044),
+  C1741: makeLowRiseMapLocation(766, 1044),
+  C1807: makeLowRiseMapLocation(541, 1100),
+  C1837: makeLowRiseMapLocation(742, 1100),
+  C1841: makeLowRiseMapLocation(766, 1100),
+  C1863: makeLowRiseMapLocation(1071, 1100),
+  C1955: makeLowRiseMapLocation(846, 1158),
+  C1981: makeLowRiseMapLocation(1037, 1158),
   C19177: makeLowRiseMapLocation(1394, 1100, { labelOnLeft: true }),
 };
 
@@ -1908,6 +1935,52 @@ function quoteCardDiscountSummary(discounts) {
     </div>`;
 }
 
+const SUN_SIGNATURE_POINT_VALUE = 330;
+const SUN_SIGNATURE_TIERS = [
+  { name: "Infinity", min: 40000000000, rate: 0.02 },
+  { name: "Platinum", min: 30000000000, rate: 0.015 },
+  { name: "Gold", min: 15000000000, rate: 0.01 },
+  { name: "Silver", min: 1, rate: 0.007 },
+];
+
+function formatPoints(value) {
+  return `${round(value).toLocaleString("vi-VN")} điểm`;
+}
+
+function sunSignatureReward(result) {
+  const completion = completionBreakdown(result.policy, result.unitType, result.area);
+  const transactionValue = round(result.rawWithVat + completion.grossWithVat);
+  const tier = SUN_SIGNATURE_TIERS.find((item) => transactionValue >= item.min) || {
+    name: "Member",
+    rate: 0,
+  };
+  const points = tier.rate ? round((transactionValue * tier.rate) / SUN_SIGNATURE_POINT_VALUE) : 0;
+  return { transactionValue, tier, points };
+}
+
+function quoteCardSunSignatureReward(result) {
+  const reward = sunSignatureReward(result);
+  const rewardRows = [
+    ["Hạng dự kiến", reward.tier.name],
+    ["Hệ số điểm thưởng", percent(reward.tier.rate)],
+    ["Giá trị tính điểm", money(reward.transactionValue)],
+  ];
+
+  return `
+    <div class="quote-detail quote-signature-reward wide">
+      <span>Điểm thưởng Sun Signature dự kiến</span>
+      <strong>${safeText(formatPoints(reward.points))}</strong>
+      <ul class="quote-signature-list">
+        ${rewardRows.map(([label, value]) => `
+          <li>
+            <span>${safeText(label)}</span>
+            <strong>${safeText(value)}</strong>
+          </li>`).join("")}
+      </ul>
+      <p>Điểm thưởng dùng cho dịch vụ/quyền lợi trong hệ sinh thái Sun Signature, không trừ trực tiếp vào giá căn và sẽ đổ theo tiến độ thanh toán.</p>
+    </div>`;
+}
+
 function renderQuoteCard(result, isLoan, isTts) {
   const unitCode = els.unitCode.value.trim() || "Căn hộ";
   const unitLabel = quoteUnitLabel(result);
@@ -1942,6 +2015,7 @@ function renderQuoteCard(result, isLoan, isTts) {
   ];
 
   details.push(quoteCardDiscountSummary(result.discounts));
+  details.push(quoteCardSunSignatureReward(result));
   if (isLoan) {
     details.push(quoteCardDetail("HTLS", result.policy.loanSupport, "wide"));
   }
@@ -3178,7 +3252,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=80", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=82", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
