@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=93">
+  <link rel="stylesheet" href="styles.css?v=94">
 </head>
 <body class="auth-locked">
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -440,6 +440,22 @@
   </dialog>
 
   <div class="toast" id="toast" role="status"></div>
+  <button class="sales-chat-toggle" id="salesChatToggle" type="button" aria-controls="salesChatPanel" aria-expanded="false">
+    <span aria-hidden="true">?</span><b>Trợ lý CSBH</b>
+  </button>
+  <section class="sales-chat-panel" id="salesChatPanel" aria-label="Trợ lý chính sách bán hàng" hidden>
+    <header class="sales-chat-head">
+      <div><span>Trợ lý tư vấn</span><strong>Sun Urban City</strong></div>
+      <button id="salesChatClose" type="button" aria-label="Đóng trợ lý">×</button>
+    </header>
+    <div class="sales-chat-messages" id="salesChatMessages" aria-live="polite"></div>
+    <div class="sales-chat-suggestions" id="salesChatSuggestions"></div>
+    <form class="sales-chat-form" id="salesChatForm">
+      <input id="salesChatInput" autocomplete="off" placeholder="Mô tả tình huống và lời khách nói..." aria-label="Nội dung câu hỏi">
+      <button type="submit">Gửi</button>
+    </form>
+    <small>Thông tin demo dựa trên dữ liệu app và tài liệu CSBH; vui lòng kiểm tra bản chính sách mới nhất trước khi chốt.</small>
+  </section>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=64"></script>
   <script src="lienke-learned-locations.js?v=2"></script>
@@ -450,5 +466,6 @@
   <script src="ui-menu.js?v=1"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=1"></script>
+  <script src="ui-chatbot.js?v=2"></script>
 </body>
 </html>

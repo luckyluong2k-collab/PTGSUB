@@ -1,11 +1,12 @@
-const CACHE_NAME = "park-pricing-v104-smooth-panels";
+const CACHE_NAME = "park-pricing-v106-sales-coach";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=93",
+  "./styles.css?v=94",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=92",
+  "./ui-chatbot.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
