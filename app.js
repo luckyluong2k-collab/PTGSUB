@@ -294,37 +294,47 @@ function parseLowRiseCodeParts(value) {
   };
 }
 
-const lowRiseUnitMapLocations = {
-  C1717: {
+function makeLowRiseMapLocation(x, y, options = {}) {
+  const width = options.width || 9;
+  const height = options.height || 20;
+  const cropX = Math.max(0, options.cropX ?? x - 300);
+  const cropY = Math.max(0, options.cropY ?? y - 145);
+  const labelOnLeft = options.labelOnLeft ?? x > 1300;
+  const label = {
+    x: labelOnLeft ? cropX + 24 : cropX + 430,
+    y: cropY + 24,
+    width: 390,
+    height: 120,
+  };
+
+  return {
     image: lowRiseMapImage,
-    scale: 0.22,
-    crop: {
-      x: 410,
-      y: 980,
-      width: 650,
-      height: 340,
-    },
-    unitRect: {
-      x: 486,
-      y: 1039,
-      width: 7,
-      height: 19,
-    },
-    label: {
-      x: 660,
-      y: 995,
-      width: 370,
-      height: 115,
-    },
+    scale: 0.32,
+    crop: { x: cropX, y: cropY, width: 850, height: 430 },
+    unitRect: { x, y, width, height },
+    label,
     arrowStart: {
-      x: 660,
-      y: 1130,
+      x: labelOnLeft ? label.x + label.width : label.x,
+      y: label.y + 125,
     },
-    arrowEnd: {
-      x: 489.5,
-      y: 1048.5,
-    },
-  },
+    arrowEnd: { x: x + width / 2, y: y + height / 2 },
+  };
+}
+
+// Danh sách căn LK được duyệt để tạo ảnh chỉ căn (theo bảng hàng thấp tầng).
+const lowRiseUnitMapLocations = {
+  C6104: makeLowRiseMapLocation(1238, 366),
+  C7177: makeLowRiseMapLocation(1394, 454, { labelOnLeft: true }),
+  C1634: makeLowRiseMapLocation(785, 968),
+  C1707: makeLowRiseMapLocation(691, 987),
+  C1741: makeLowRiseMapLocation(825, 987),
+  C1807: makeLowRiseMapLocation(691, 1044),
+  C1837: makeLowRiseMapLocation(809, 1044),
+  C1841: makeLowRiseMapLocation(825, 1044),
+  C1863: makeLowRiseMapLocation(1002, 1044),
+  C1955: makeLowRiseMapLocation(870, 1100),
+  C1981: makeLowRiseMapLocation(978, 1100),
+  C19177: makeLowRiseMapLocation(1394, 1100, { labelOnLeft: true }),
 };
 
 const unitMapExactLocations = {
@@ -755,6 +765,7 @@ function rectCenter(rect) {
 
 function resolveUnitMapLocation(code) {
   const unitCode = normalizeUnitCode(code);
+  if (lowRiseUnitMapLocations[unitCode]) return lowRiseUnitMapLocations[unitCode];
   if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];
 
   const parsed = parseUnitCodeParts(unitCode);
@@ -2595,7 +2606,7 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
   ctx.save();
   ctx.translate(-crop.x, -crop.y);
   const scale = location.scale || 1;
-  drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
+  if (location.towerRect) drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
   drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
   drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
   drawMapLabel(ctx, location.label, results, scale);
@@ -3167,7 +3178,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=77", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=78", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
