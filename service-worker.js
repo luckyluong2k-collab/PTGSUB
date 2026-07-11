@@ -1,8 +1,8 @@
-const CACHE_NAME = "park-pricing-v100-external-links";
+const CACHE_NAME = "park-pricing-v101-click-only-menu";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=89",
+  "./styles.css?v=90",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=92",

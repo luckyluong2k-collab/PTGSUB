@@ -6090,3 +6090,77 @@ body.theme-dark .unit-card-price strong {
   font-weight:950 !important;
   text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
+
+/* Click-only sidebar: no icon rail and no hover flashing */
+body:not(.auth-locked):not(.menu-expanded) .auth-drawer {
+  display:none !important;
+  width:0 !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+body:not(.auth-locked) .auth-actions > *,
+body:not(.auth-locked) .auth-actions > *::before,
+body:not(.auth-locked) .auth-actions > *::after,
+body:not(.auth-locked) .menu-3d-icon,
+body:not(.auth-locked) .camera-360-icon,
+body:not(.auth-locked) .menu-3d-button svg {
+  animation:none !important;
+  transition:none !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-actions > :not([hidden]):hover,
+body:not(.auth-locked).menu-expanded .menu-3d-panel > summary:hover,
+body:not(.auth-locked).menu-expanded .menu-3d-icon:hover,
+body:not(.auth-locked).menu-expanded .camera-360-icon:hover {
+  transform:none !important;
+  filter:none !important;
+}
+
+/* Camera 360 uses the same understandable icon tile as every menu tool */
+body:not(.auth-locked).menu-expanded .auth-actions .camera-360-link {
+  border-color:rgba(228,194,115,.48) !important;
+  background:linear-gradient(145deg,#123745,#092431) !important;
+  color:#ffffff !important;
+}
+
+body:not(.auth-locked).menu-expanded .camera-360-icon {
+  box-sizing:border-box !important;
+  display:inline-grid !important;
+  place-items:center !important;
+  flex:0 0 46px !important;
+  width:46px !important;
+  height:46px !important;
+  margin-right:12px !important;
+  padding:6px !important;
+  border:1px solid #e4c273 !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,#173e50,#071d2b) !important;
+  color:#f5d36f !important;
+  -webkit-text-fill-color:#f5d36f !important;
+  box-shadow:inset 0 0 0 2px rgba(228,194,115,.1),0 7px 14px rgba(0,0,0,.3) !important;
+  font-size:.68rem !important;
+  font-weight:950 !important;
+}
+
+body:not(.auth-locked).menu-expanded .camera-360-link > span:not(.camera-360-icon) {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-actions .camera-360-link {
+  border-color:rgba(15,118,110,.34) !important;
+  background:linear-gradient(145deg,#ffffff,#e9f3f1) !important;
+}
+
+body:not(.theme-dark):not(.auth-locked).menu-expanded .camera-360-icon {
+  border-color:#c9a753 !important;
+  background:linear-gradient(145deg,#0f766e,#09554f) !important;
+  color:#ffe39a !important;
+  -webkit-text-fill-color:#ffe39a !important;
+}
+
+body:not(.theme-dark):not(.auth-locked).menu-expanded .camera-360-link > span:not(.camera-360-icon) {
+  color:#123e39 !important;
+  -webkit-text-fill-color:#123e39 !important;
+}
