@@ -3282,9 +3282,15 @@ function makeQuoteText(result) {
 }
 
 function showToast(message) {
+  const isUnitAutofill = String(message || "").startsWith("Đã tự điền mã căn");
+  window.clearTimeout(els.toast._hideTimer);
   els.toast.textContent = message;
+  els.toast.classList.toggle("unit-autofill-toast", isUnitAutofill);
   els.toast.classList.add("show");
-  window.setTimeout(() => els.toast.classList.remove("show"), 1800);
+  els.toast._hideTimer = window.setTimeout(() => {
+    els.toast.classList.remove("show");
+    window.setTimeout(() => els.toast.classList.remove("unit-autofill-toast"), 240);
+  }, isUnitAutofill ? 2600 : 1800);
 }
 
 async function copyTextToClipboard(text) {
