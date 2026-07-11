@@ -1824,6 +1824,41 @@ input[readonly] {
   display: none !important;
 }
 
+body.auth-locked {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(244, 179, 94, 0.22), transparent 34vw),
+    radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.18), transparent 38vw),
+    var(--bg);
+}
+
+body.auth-locked .account-tab {
+  display: none;
+}
+
+body.auth-locked .auth-drawer {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 18px;
+  border-right: 0;
+  background: rgba(244, 247, 246, 0.96);
+  box-shadow: none;
+}
+
+body.auth-locked .auth-card {
+  width: min(430px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  box-shadow: 0 28px 70px rgba(18, 38, 34, 0.2);
+}
+
+body.auth-locked .auth-close {
+  display: none;
+}
+
 .auth-card {
   position: relative;
   padding: 16px;
@@ -1900,13 +1935,19 @@ input[readonly] {
 }
 
 .login-intro {
+  position: relative;
   display: grid;
   gap: 10px;
   margin-top: 14px;
   padding: 12px;
   border: 1px solid #cfe0dc;
   border-radius: 8px;
-  background: #f8fcfb;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(237, 250, 247, 0.92)),
+    #f8fcfb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 10px 28px rgba(15, 118, 110, 0.1);
+  overflow: hidden;
+  perspective: 900px;
 }
 
 .login-intro strong {
@@ -1933,6 +1974,103 @@ input[readonly] {
 
 .login-intro b {
   color: var(--brand-strong);
+}
+
+.login-price-spotlight {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 2px 10px;
+  margin-top: 2px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, #0f766e 0%, #13a08f 50%, #ffd45a 100%);
+  color: #ffffff;
+  box-shadow:
+    0 8px 0 #0a5d56,
+    0 18px 30px rgba(15, 118, 110, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  transform: rotateX(0deg) translateY(0);
+  transform-style: preserve-3d;
+  animation: loginPriceFloat 3.2s ease-in-out infinite;
+}
+
+.login-price-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: -45% auto -45% -70%;
+  z-index: -1;
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+  transform: rotate(18deg);
+  animation: loginPriceShine 3.2s ease-in-out infinite;
+}
+
+.login-price-spotlight span {
+  font-size: 15px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.login-price-spotlight b {
+  color: #fff8d9;
+  font-size: 36px;
+  font-weight: 1000;
+  line-height: 0.9;
+  text-shadow:
+    0 2px 0 #0a5d56,
+    0 5px 10px rgba(0, 0, 0, 0.22);
+}
+
+.login-price-spotlight small {
+  grid-column: 1 / -1;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+@keyframes loginPriceFloat {
+  0%,
+  100% {
+    box-shadow:
+      0 8px 0 #0a5d56,
+      0 18px 30px rgba(15, 118, 110, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.38);
+    transform: rotateX(0deg) translateY(0);
+  }
+
+  50% {
+    box-shadow:
+      0 11px 0 #0a5d56,
+      0 24px 36px rgba(15, 118, 110, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    transform: rotateX(5deg) translateY(-3px);
+  }
+}
+
+@keyframes loginPriceShine {
+  0%,
+  35% {
+    transform: translateX(0) rotate(18deg);
+  }
+
+  80%,
+  100% {
+    transform: translateX(340%) rotate(18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-price-spotlight,
+  .login-price-spotlight::before {
+    animation: none;
+  }
 }
 
 .browser-warning {

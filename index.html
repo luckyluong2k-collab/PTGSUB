@@ -12,9 +12,9 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=76">
+  <link rel="stylesheet" href="styles.css?v=78">
 </head>
-<body>
+<body class="auth-locked">
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
     <span>Menu</span>
   </button>
@@ -26,14 +26,21 @@
       <h1>Quản lý đăng nhập</h1>
       <p id="authStatus">Vui lòng đăng nhập bằng Gmail. Nếu là tài khoản mới, bạn cần chờ quản trị viên duyệt.</p>
       <div class="login-intro" id="loginIntro" aria-label="Giới thiệu ứng dụng">
-        <strong>App hỗ trợ tư vấn và tính giá Sun Group nhanh hơn</strong>
+        <strong>App hỗ trợ tư vấn và tính giá Sun Urban City nhanh hơn</strong>
         <ul>
-          <li>Tự động tính giá cuối, trả trước và tiến độ thanh toán.</li>
+          <li>Tự động tính giá cuối, trả trước và tiến độ thanh toán, update theo bảng hàng và CSBH.</li>
           <li>Lọc, so sánh căn theo tòa, loại căn, tầng, view và giá.</li>
           <li>Lưu lịch sử 10 căn đã tra gần nhất để mở lại nhanh.</li>
-          <li>Quản lý tài khoản Gmail đã duyệt và đang chờ duyệt.</li>
+          <li>Xuất file ảnh/PDF báo giá nhanh.</li>
+          <li>Tạo biểu đồ biến động giá theo từng tháng khi chiết khấu thay đổi.</li>
+          <li>Tạo ảnh chỉ căn và ghi giá tiền Chung Cư (LK đang update).</li>
+          <li>Sao chép nhanh link vị trí dự án, Camera 360, CSBH, Bảng Hàng...</li>
         </ul>
-        <p><b>Chỉ 99k/vĩnh viễn</b>, được hỗ trợ cập nhật liên tục và còn nhiều chức năng khác nữa.</p>
+        <div class="login-price-spotlight" aria-label="Giá hỗ trợ cập nhật">
+          <span>Chỉ</span>
+          <b>xxxk</b>
+          <small>được hỗ trợ cập nhật liên tục và còn nhiều chức năng khác nữa.</small>
+        </div>
       </div>
 
       <div class="browser-warning" id="browserWarning" hidden>
@@ -396,7 +403,7 @@
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="unit-data.js?v=64"></script>
-  <script src="app.js?v=78"></script>
-  <script type="module" src="firebase-auth.js?v=75"></script>
+  <script src="app.js?v=80"></script>
+  <script type="module" src="firebase-auth.js?v=76"></script>
 </body>
 </html>

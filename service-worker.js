@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v78-lowrise-unit-maps";
+const CACHE_NAME = "park-pricing-v80-centered-login";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=76",
+  "./styles.css?v=78",
   "./unit-data.js?v=64",
-  "./app.js?v=78",
-  "./firebase-auth.js?v=75",
+  "./app.js?v=80",
+  "./firebase-auth.js?v=76",
   "./manifest.webmanifest",
   "./icon.svg",
   "./favicon.png",

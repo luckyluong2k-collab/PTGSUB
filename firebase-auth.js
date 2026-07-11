@@ -267,6 +267,13 @@ function setMenuAuthState(isInsideApp) {
   if (!isInsideApp) setAdminMenuVisible(false);
 }
 
+function setAuthLocked(isLocked) {
+  document.body.classList.toggle("auth-locked", isLocked);
+  document.body.classList.toggle("app-unlocked", !isLocked);
+  if (accountTab) accountTab.hidden = isLocked;
+  if (authCloseBtn) authCloseBtn.hidden = isLocked;
+}
+
 function setAdminMenuVisible(isVisible) {
   if (adminOpenBtn) adminOpenBtn.hidden = !isVisible;
 }
@@ -293,6 +300,7 @@ function closeDrawer() {
 }
 
 function showApp(userEmail, data = {}) {
+  setAuthLocked(false);
   if (appContent) appContent.hidden = false;
   if (loginBtn) loginBtn.hidden = true;
   if (logoutBtn) logoutBtn.hidden = false;
@@ -301,6 +309,7 @@ function showApp(userEmail, data = {}) {
 }
 
 function hideApp(message) {
+  setAuthLocked(true);
   if (appContent) appContent.hidden = true;
   if (loginBtn) loginBtn.hidden = false;
   if (logoutBtn) logoutBtn.hidden = true;
@@ -672,6 +681,7 @@ async function enterApprovedApp(user, data) {
 }
 
 function showPendingApproval(user) {
+  setAuthLocked(true);
   if (appContent) appContent.hidden = true;
   closeAdminPanel();
   if (myHistoryPanel) myHistoryPanel.hidden = true;
@@ -682,6 +692,7 @@ function showPendingApproval(user) {
 
 function showExpiredAccess(userOrEmail) {
   stopAccessExpiryTimer();
+  setAuthLocked(true);
   if (appContent) appContent.hidden = true;
   closeAdminPanel();
   if (myHistoryPanel) myHistoryPanel.hidden = true;
