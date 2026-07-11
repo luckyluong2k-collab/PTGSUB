@@ -665,6 +665,21 @@ function stopApprovalPolling() {
   approvalPollTimer = 0;
 }
 
+function redirectToApprovedChildPage() {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (!next) return false;
+  try {
+    const target = new URL(next, window.location.href);
+    const allowed = target.origin === window.location.origin
+      && target.pathname.endsWith("/tra-goc-lai-35-nam-tu-ngay-mua.html");
+    if (!allowed) return false;
+    window.location.replace(target.href);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function enterApprovedApp(user, data) {
   stopApprovalPolling();
   currentUserData = data;
@@ -677,6 +692,7 @@ async function enterApprovedApp(user, data) {
   if (!currentIsAdmin) closeAdminPanel();
 
   closeDrawer();
+  if (redirectToApprovedChildPage()) return;
   window.setTimeout(() => scheduleSaveCurrentSearch(true), 1000);
 }
 

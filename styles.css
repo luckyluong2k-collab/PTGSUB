@@ -5161,3 +5161,198 @@ body.theme-dark .admin-overlay .admin-user-card {
     height: 30px !important;
   }
 }
+
+/* Final click-only menu guard and refined luxury branding */
+@media (min-width: 1051px) {
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover,
+  body:not(.auth-locked):not(.menu-expanded) .account-tab:hover + .auth-drawer {
+    width: 72px !important;
+    box-shadow: 14px 0 34px rgba(2,14,18,.24) !important;
+  }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .auth-card {
+    width: 52px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .auth-card > .eyebrow,
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .auth-card > h1,
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover #authStatus { display: none !important; }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .auth-actions > :not([hidden]) {
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 7px !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .menu-3d-button > span:not(.menu-3d-icon),
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .zalo-login-link > span { display: none !important; }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .menu-3d-panel > summary {
+    font-size: 0 !important;
+    justify-content: center !important;
+  }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .menu-3d-panel > summary::after { display: none !important; }
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer:hover .logout-menu-button { font-size: 0 !important; }
+
+  .topbar.brand-hero {
+    border: 1px solid rgba(228,194,115,.42) !important;
+    background: linear-gradient(120deg,#061f28 0%,#0b3038 60%,#132f31 100%) !important;
+  }
+  .topbar .brand-logo {
+    width: 46px !important;
+    height: 46px !important;
+    padding: 2px;
+    border: 1px solid #e4c273 !important;
+    border-radius: 11px !important;
+    background: linear-gradient(145deg,#fff0bb,#b78935);
+    box-shadow: 0 8px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.65);
+  }
+  .topbar .brand-copy h1 { gap: 9px !important; }
+  .topbar .brand-copy h1 span {
+    color: #e4c273 !important;
+    font-family: Georgia,"Times New Roman",serif;
+    font-size: .68rem !important;
+    font-weight: 800 !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase;
+  }
+  .topbar .brand-copy h1 strong {
+    color: #fff !important;
+    font-family: "Segoe UI",Tahoma,Arial,sans-serif;
+    font-size: clamp(1.06rem,1.35vw,1.34rem) !important;
+    font-weight: 950 !important;
+    letter-spacing: -.025em !important;
+    text-shadow: 0 2px 14px rgba(255,255,255,.1);
+  }
+  .topbar .social-chip {
+    border-color: rgba(228,194,115,.35) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,.14);
+  }
+}
+
+/* Login gate aligned with the main navy-gold experience */
+@keyframes loginPriceLuxuryFloat {
+  0%, 100% {
+    transform: perspective(900px) rotateX(0deg) rotateY(-2deg) translateY(0) scale(1);
+    box-shadow: 0 9px 0 #052d35, 0 22px 42px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.3);
+  }
+  50% {
+    transform: perspective(900px) rotateX(5deg) rotateY(2deg) translateY(-7px) scale(1.018);
+    box-shadow: 0 14px 0 #052d35, 0 32px 54px rgba(0,0,0,.42), 0 0 28px rgba(228,194,115,.15), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+}
+
+body.auth-locked {
+  background:
+    radial-gradient(circle at 12% 15%,rgba(15,118,110,.28),transparent 34vw),
+    radial-gradient(circle at 88% 82%,rgba(228,194,115,.16),transparent 32vw),
+    linear-gradient(145deg,#03171d,#082a32 58%,#061f27) !important;
+  color: #fff !important;
+}
+body.auth-locked .auth-drawer {
+  background: rgba(3,23,29,.72) !important;
+  backdrop-filter: blur(12px);
+}
+body.auth-locked .auth-card {
+  width: min(570px,100%) !important;
+  padding: clamp(20px,3vw,30px) !important;
+  border: 1px solid rgba(228,194,115,.48) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg,#10343d,#071f28) !important;
+  color: #fff !important;
+  box-shadow: 0 34px 90px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+body.auth-locked .auth-card > .eyebrow {
+  color: #e4c273 !important;
+  font-size: .78rem !important;
+  font-weight: 950 !important;
+  letter-spacing: .06em;
+}
+body.auth-locked .auth-card > h1 {
+  color: #fff !important;
+  font-size: clamp(1.6rem,3vw,2rem) !important;
+  font-weight: 1000 !important;
+  letter-spacing: -.03em;
+}
+body.auth-locked .auth-card > p { color: #c9d9d6 !important; }
+
+body.auth-locked .login-intro {
+  padding: 16px !important;
+  border: 1px solid rgba(228,194,115,.3) !important;
+  border-radius: 14px !important;
+  background: linear-gradient(145deg,#16434d,#0b2b34) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 14px 32px rgba(0,0,0,.2) !important;
+}
+body.auth-locked .login-intro > strong {
+  color: #f4dea6 !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+}
+body.auth-locked .login-intro ul,
+body.auth-locked .login-intro p {
+  color: #d7e3e1 !important;
+}
+body.auth-locked .login-intro li::marker { color: #e4c273; }
+
+body.auth-locked .login-price-spotlight {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) !important;
+  justify-items: center;
+  gap: 2px !important;
+  margin: 18px auto 10px !important;
+  padding: 20px 18px !important;
+  border: 1px solid rgba(255,232,170,.72) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg,#0b625d 0%,#159b8f 48%,#d7b46a 100%) !important;
+  text-align: center;
+  transform-style: preserve-3d;
+  animation: loginPriceLuxuryFloat 3.2s ease-in-out infinite !important;
+}
+body.auth-locked .login-price-spotlight > span {
+  color: #fff !important;
+  font-size: .86rem !important;
+  letter-spacing: .12em;
+}
+body.auth-locked .login-price-spotlight b {
+  color: #fff8d9 !important;
+  font-size: clamp(2.7rem,7vw,4.2rem) !important;
+  line-height: .98 !important;
+  text-shadow: 0 3px 0 #76531f,0 8px 20px rgba(0,0,0,.3) !important;
+}
+body.auth-locked .login-price-spotlight b::after {
+  content: "/năm";
+  margin-left: 8px;
+  color: #fff !important;
+  font-size: .34em;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: 0 2px 5px rgba(0,0,0,.25);
+}
+body.auth-locked .login-price-spotlight small {
+  grid-column: 1 !important;
+  max-width: 430px;
+  color: rgba(255,255,255,.94) !important;
+  font-size: .78rem !important;
+}
+
+body.auth-locked #loginBtn {
+  min-height: 52px;
+  border: 1px solid #e4c273 !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg,#e4c273,#bd9140) !important;
+  color: #16250f !important;
+  font-weight: 950 !important;
+  box-shadow: 0 9px 0 #76531f,0 18px 30px rgba(0,0,0,.25) !important;
+}
+body.auth-locked #loginBtn:hover { transform: translateY(-2px); box-shadow: 0 11px 0 #76531f,0 22px 34px rgba(0,0,0,.3) !important; }
+body.auth-locked .zalo-login-link {
+  border-color: #55aee8 !important;
+  background: #eef7ff !important;
+  color: #075f9f !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.auth-locked .login-price-spotlight { animation: none !important; transform: none !important; }
+}
