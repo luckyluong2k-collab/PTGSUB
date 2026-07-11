@@ -4027,7 +4027,7 @@ body.theme-dark .quote-detail:hover {
 .switch input:checked + span { color: var(--brand); }
 body.theme-dark .switch input:checked + span { color: var(--luxury-gold-soft); }
 
-.app-shell:has(#pricingForm input:focus) .summary-band strong,
+.app-shell:has(#pricingForm input:not(#unitCode):focus) .summary-band strong,
 .app-shell:has(#pricingForm select:focus) .summary-band strong,
 .app-shell:has(.scenario-panel button:focus) .summary-band strong {
   animation: uiValueRefresh 380ms cubic-bezier(.2,.8,.2,1) both;
@@ -4175,6 +4175,123 @@ body.theme-dark .switch input:checked + span { color: var(--luxury-gold-soft); }
     border-radius: 0 0 14px 14px !important;
     box-shadow: 0 14px 30px rgba(2,15,19,.24) !important;
   }
+}
+
+/* Click-only desktop menu and balanced navigation buttons */
+@media (min-width: 1051px) {
+  body:not(.auth-locked) .auth-drawer:hover,
+  body:not(.auth-locked) .account-tab:hover + .auth-drawer {
+    width: 72px !important;
+    box-shadow: 14px 0 34px rgba(2,14,18,.24) !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-drawer,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover {
+    width: 292px !important;
+    box-shadow: 18px 0 42px rgba(2,14,18,.34) !important;
+  }
+
+  body:not(.auth-locked) .auth-drawer:hover .auth-card {
+    width: 52px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-card,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card {
+    width: 260px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(228,194,115,.34) !important;
+    background: linear-gradient(145deg,#10343d,#09252d) !important;
+  }
+
+  body:not(.auth-locked) .auth-drawer:hover .auth-card > .eyebrow,
+  body:not(.auth-locked) .auth-drawer:hover .auth-card > h1,
+  body:not(.auth-locked) .auth-drawer:hover #authStatus { display: none !important; }
+  body:not(.auth-locked).menu-expanded .auth-card > .eyebrow,
+  body:not(.auth-locked).menu-expanded .auth-card > h1,
+  body:not(.auth-locked).menu-expanded #authStatus,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > .eyebrow,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > h1,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover #authStatus { display: block !important; }
+
+  body:not(.auth-locked) .auth-drawer:hover .auth-actions > :not([hidden]) {
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 7px !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-actions {
+    gap: 10px !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-actions > :not([hidden]),
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-actions > :not([hidden]) {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 54px !important;
+    padding: 9px 12px !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+    border-radius: 13px !important;
+    color: #12332f !important;
+    font-size: .86rem !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-actions > details:not([hidden]),
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-actions > details:not([hidden]) {
+    height: auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-actions > details > summary,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-actions > details > summary {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 54px !important;
+    padding: 9px 12px !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    color: #12332f !important;
+    font-size: .86rem !important;
+    font-weight: 900 !important;
+  }
+  body:not(.auth-locked).menu-expanded .auth-actions > details > summary::after { margin-left: auto; }
+
+  body:not(.auth-locked) .auth-drawer:hover .menu-3d-button > span:not(.menu-3d-icon),
+  body:not(.auth-locked) .auth-drawer:hover .zalo-login-link > span { display: none !important; }
+  body:not(.auth-locked).menu-expanded .menu-3d-button > span:not(.menu-3d-icon),
+  body:not(.auth-locked).menu-expanded .zalo-login-link > span,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .menu-3d-button > span:not(.menu-3d-icon),
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .zalo-login-link > span { display: inline !important; }
+
+  body:not(.auth-locked) .auth-drawer:hover .menu-3d-panel > summary { font-size: 0 !important; justify-content: center !important; }
+  body:not(.auth-locked) .auth-drawer:hover .menu-3d-panel > summary::after { display: none !important; }
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .menu-3d-panel > summary { font-size: .86rem !important; justify-content: flex-start !important; }
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary::after,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .menu-3d-panel > summary::after { display: inline-flex !important; }
+
+  body:not(.auth-locked) .auth-drawer:hover .logout-menu-button { font-size: 0 !important; }
+  body:not(.auth-locked).menu-expanded .logout-menu-button,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .logout-menu-button { font-size: .86rem !important; }
+
+  body:not(.auth-locked).menu-expanded .auth-actions > :not([hidden]):hover {
+    border-color: var(--luxury-gold) !important;
+    color: #082721 !important;
+    box-shadow: 0 9px 20px rgba(0,0,0,.18) !important;
+  }
+  body:not(.auth-locked).menu-expanded .admin-menu-button { background: #edf9f7 !important; color: #087c72 !important; }
+  body:not(.auth-locked).menu-expanded .zalo-login-link { background: #eef7ff !important; color: #075f9f !important; }
+  body:not(.auth-locked).menu-expanded .history-panel { background: #f4f7f8 !important; }
+  body:not(.auth-locked).menu-expanded .camera-360-link { background: #fff7e8 !important; color: #8a3a08 !important; }
+  body:not(.auth-locked).menu-expanded .address-copy-section { background: #effaf8 !important; color: #087c72 !important; }
+  body:not(.auth-locked).menu-expanded .policy-sales-link { background: #f2fbf3 !important; color: #17652b !important; }
+  body:not(.auth-locked).menu-expanded .logout-menu-button { background: #f2f6f5 !important; color: #087c72 !important; }
 }
 
 /* Distinct expanded unit finder container */

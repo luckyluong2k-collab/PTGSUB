@@ -3350,7 +3350,8 @@ function applyAppUrlParams() {
 document.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-filter])").forEach((input) => {
   input.addEventListener("input", () => {
     if (input === els.unitCode) {
-      applyUnitCatalog();
+      const matchedUnit = applyUnitCatalog();
+      if (!matchedUnit) return;
     }
     if (input === els.listedGross) {
       const cursorAtEnd = input.selectionStart === input.value.length;
@@ -3366,7 +3367,8 @@ document.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-
   });
   input.addEventListener("change", () => {
     if (input === els.unitCode) {
-      applyUnitCatalog();
+      const matchedUnit = applyUnitCatalog();
+      if (!matchedUnit) return;
     }
     if (input.matches?.("[data-money-input]")) {
       formatMoneyInput(input);
