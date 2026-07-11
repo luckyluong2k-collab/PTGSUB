@@ -1828,15 +1828,13 @@ function calculate(options = {}) {
     upfront = deposit + payment2 + payment4;
 
     schedule = [
-      ["Cọc", deposit],
-      ["Lần 2", payment2],
+      ["Trả trước 25%", upfront],
       [`NH giải ngân ${percent(loanRatio)}`, bankDisbursement],
-      ["Lần 4", payment4],
       ["Bàn giao", round(maintenance + vat * 0.05 + completion * 0.30)],
       ["5% GCN", round(netAfterDiscount * 0.05)],
     ];
     if (completion) {
-      schedule.splice(2, 0, ["HĐMB - 70% nội thất", round(completion * 0.70)]);
+      schedule.splice(1, 0, ["HĐMB - 70% nội thất", round(completion * 0.70)]);
     }
   } else if (scenario === "standard") {
     schedule = buildStandardSchedule({
