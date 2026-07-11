@@ -104,6 +104,19 @@
     </div>
   </aside>
 
+  <dialog class="payment-dialog" id="paymentDialog" aria-labelledby="paymentDialogTitle">
+    <div class="payment-dialog-card">
+      <button class="payment-dialog-close" id="paymentCloseBtn" type="button" aria-label="&#272;&#243;ng th&#244;ng tin chuy&#7875;n kho&#7843;n">&#215;</button>
+      <p class="payment-eyebrow">K&#237;ch ho&#7841;t th&#224;nh vi&#234;n</p>
+      <h2 id="paymentDialogTitle">Chuy&#7875;n kho&#7843;n 129k</h2>
+      <p class="payment-description">Qu&#233;t m&#227; QR b&#234;n d&#432;&#7899;i, sau &#273;&#243; ch&#7909;p bill v&#224; g&#7917;i cho m&#236;nh qua Zalo &#273;&#7875; &#273;&#432;&#7907;c h&#7895; tr&#7907; k&#237;ch ho&#7841;t.</p>
+      <div class="payment-qr-frame"><img src="payment-qr.png" alt="M&#227; QR chuy&#7875;n kho&#7843;n 129 ngh&#236;n &#273;&#7891;ng"></div>
+      <div class="payment-amount"><span>N&#7897;i dung</span><strong>Chuy&#7875;n kho&#7843;n 129k</strong></div>
+      <p class="payment-bill-note">Sau khi chuy&#7875;n kho&#7843;n, vui l&#242;ng ch&#7909;p bill v&#224; g&#7917;i qua Zalo:</p>
+      <a class="payment-zalo-link" href="http://zalo.me/0387335227" target="_blank" rel="noopener"><span aria-hidden="true">Zalo</span><strong>0387.335.227</strong></a>
+    </div>
+  </dialog>
+
   <section class="admin-panel admin-overlay" id="adminPanel" role="dialog" aria-modal="true" aria-labelledby="adminPanelTitle" hidden>
     <div class="admin-overlay-shell">
       <header class="admin-overlay-head">
@@ -155,7 +168,8 @@
       </div>
       <div class="topbar-actions">
         <button class="theme-toggle" id="uiThemeToggle" type="button" aria-label="B&#7853;t giao di&#7879;n t&#7889;i" title="Giao di&#7879;n s&#225;ng / Dark mode">
-          <span aria-hidden="true">&#9790;</span>
+          <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-knob"></span></span>
+          <span class="theme-toggle-text">S&#225;ng</span>
         </button>
         <button class="icon-button" id="resetBtn" type="button" title="Nh&#7853;p l&#7841;i">
           <span aria-hidden="true">&#8635;</span>
@@ -432,6 +446,7 @@
   <script type="module" src="firebase-auth.js?v=76"></script>
   <script src="ui-admin-search.js?v=1"></script>
   <script src="ui-menu.js?v=1"></script>
+  <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=1"></script>
 </body>
 </html>

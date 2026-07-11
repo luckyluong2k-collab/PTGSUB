@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#061f28">
+  <script>document.documentElement.classList.toggle("theme-dark",localStorage.getItem("ptgsub-ui-theme")==="dark");</script>
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="loan-theme.css?v=1">
   <title>Tính gốc lãi 35 năm từ ngày mua | Sun Urban City</title>
   <style>
     :root { --navy:#07194a; --blue:#12347c; --gold:#ffd833; --ink:#12213d; --muted:#62708c; --line:#dce3ef; --soft:#f3f6fc; --red:#c82d2d; --green:#14724e; }
@@ -467,6 +469,7 @@
     });
     render();
   </script>
+  <script src="loan-theme.js?v=1"></script>
   <script type="module" src="loan-auth-guard.js?v=1"></script>
 </body>
 </html>
