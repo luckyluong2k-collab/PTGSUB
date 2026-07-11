@@ -1,8 +1,8 @@
-const CACHE_NAME = "park-pricing-v101-click-only-menu";
+const CACHE_NAME = "park-pricing-v104-smooth-panels";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=90",
+  "./styles.css?v=93",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=92",
