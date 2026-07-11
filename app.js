@@ -203,6 +203,7 @@ const els = {
   discountRows: document.querySelector("#discountRows"),
   scheduleRows: document.querySelector("#scheduleRows"),
   copyBtn: document.querySelector("#copyBtn"),
+  quoteImageBtn: document.querySelector("#quoteImageBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
   multiQuoteBtn: document.querySelector("#multiQuoteBtn"),
   multiQuotePanel: document.querySelector("#multiQuotePanel"),
@@ -2460,35 +2461,36 @@ function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, options = {}) {
   return y + Math.min(lines.length, maxLines) * lineHeight;
 }
 
-function multiQuoteExportTone(scenario) {
+function multiQuoteExportTone(scenario, dark = false) {
+  if (dark) return { bg: "#0d343d", border: "#8d8051", badge: "#e7f4f1", badgeText: "#0a8f82" };
   if (scenario === "loan") return { bg: "#f7fffd", border: "#8ccdc4", badge: "#e2f2ef", badgeText: "#0b5f59" };
   if (isTtsScenario(scenario)) return { bg: "#f8fbff", border: "#b9d2f0", badge: "#e9f1ff", badgeText: "#1d4f91" };
   return { bg: "#fffdf6", border: "#d7c087", badge: "#fff3df", badgeText: "#7a4b0b" };
 }
 
-function drawExportStat(ctx, x, y, width, label, value, meta = "") {
-  fillRoundedRect(ctx, x, y, width, 104, 12, "#ffffff", "#d8e4e1", 2);
-  drawFittedText(ctx, label, x + 16, y + 28, width - 32, 21, 850, "#64736f", 15);
+function drawExportStat(ctx, x, y, width, label, value, meta = "", dark = false) {
+  fillRoundedRect(ctx, x, y, width, 92, 12, dark ? "#17414a" : "#ffffff", dark ? "#4f7778" : "#d8e4e1", 2);
+  drawFittedText(ctx, label, x + 14, y + 25, width - 28, 20, 850, dark ? "#c6d9d5" : "#64736f", 14);
   if (!meta) {
-    drawFittedText(ctx, value, x + 16, y + 64, width - 32, 30, 950, "#0f766e", 21);
+    drawFittedText(ctx, value, x + 14, y + 61, width - 28, 28, 950, dark ? "#f5d994" : "#0f766e", 20);
     return;
   }
 
   const splitIndex = meta.lastIndexOf(": ");
   const metaLabel = splitIndex > -1 ? meta.slice(0, splitIndex + 1) : "";
   const metaValue = splitIndex > -1 ? meta.slice(splitIndex + 2) : meta;
-  drawFittedText(ctx, value, x + 16, y + 56, width - 32, 24, 950, "#0f766e", 18);
-  if (metaLabel) drawFittedText(ctx, metaLabel, x + 16, y + 78, width - 32, 15, 850, "#7a4b0b", 12);
-  drawFittedText(ctx, metaValue, x + 16, y + 100, width - 32, 24, 950, "#7a4b0b", 18);
+  drawFittedText(ctx, value, x + 14, y + 48, width - 28, 21, 950, dark ? "#f5d994" : "#0f766e", 17);
+  if (metaLabel) drawFittedText(ctx, metaLabel, x + 14, y + 67, width - 28, 14, 850, dark ? "#ffd985" : "#7a4b0b", 11);
+  drawFittedText(ctx, metaValue, x + 14, y + 86, width - 28, 20, 950, dark ? "#ffd985" : "#7a4b0b", 16);
 }
 
-function drawExportDetail(ctx, x, y, width, label, value) {
-  fillRoundedRect(ctx, x, y, width, 62, 10, "rgba(255,255,255,0.82)", "#dbe5e2", 1.5);
-  drawFittedText(ctx, label, x + 12, y + 23, width - 24, 17, 800, "#64736f", 12);
-  drawFittedText(ctx, value, x + 12, y + 48, width - 24, 20, 900, "#111c1a", 14);
+function drawExportDetail(ctx, x, y, width, label, value, dark = false) {
+  fillRoundedRect(ctx, x, y, width, 62, 10, dark ? "#17414a" : "rgba(255,255,255,0.82)", dark ? "#4f7778" : "#dbe5e2", 1.5);
+  drawFittedText(ctx, label, x + 10, y + 22, width - 20, 16, 850, dark ? "#c6d9d5" : "#64736f", 11);
+  drawFittedText(ctx, value, x + 10, y + 48, width - 20, 20, 950, dark ? "#ffffff" : "#111c1a", 14);
 }
 
-function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
+function drawMultiQuoteExportCard(ctx, result, x, y, width, height, dark = false) {
   const unitLabel = quoteUnitLabel(result);
   const scenario = scenarioLabel(result.scenario, result.policy);
   const secondary = multiQuoteSecondary(result);
@@ -2497,7 +2499,7 @@ function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
     : secondary.meta;
   const totalDiscount = result.discounts.reduce((sum, item) => sum + round(item.amount), 0);
   const rawGrossAfterDiscountText = result.scenario === "standard" ? "Theo tiến độ" : money(result.rawGrossAfterDiscount);
-  const tone = multiQuoteExportTone(result.scenario);
+  const tone = multiQuoteExportTone(result.scenario, dark);
 
   ctx.save();
   ctx.shadowColor = "rgba(18, 38, 34, 0.10)";
@@ -2512,27 +2514,31 @@ function drawMultiQuoteExportCard(ctx, result, x, y, width, height) {
   ctx.font = '950 18px "Segoe UI", Arial, sans-serif';
   const badgeW = Math.min(170, Math.max(118, ctx.measureText(scenario).width + 54));
 
-  drawWrappedText(ctx, `${unitLabel} - ${result.policy.name}`, contentX, y + 36, contentW - badgeW - 14, 22, {
-    size: 20,
+  drawWrappedText(ctx, `${unitLabel} - ${result.policy.name}`, contentX, y + 32, contentW - badgeW - 10, 20, {
+    size: 16,
     weight: 850,
-    color: "#64736f",
+    color: dark ? "#c6d9d5" : "#64736f",
     maxLines: 1,
   });
-  drawFittedText(ctx, scenario, contentX, y + 72, contentW - badgeW - 14, 34, 950, "#0b5f59", 24);
-  fillRoundedRect(ctx, x + width - pad - badgeW, y + 24, badgeW, 38, 999, tone.badge);
-  drawFittedText(ctx, scenario, x + width - pad - badgeW + 18, y + 49, badgeW - 36, 18, 950, tone.badgeText, 13);
+  drawFittedText(ctx, scenario, contentX, y + 62, contentW - badgeW - 10, 28, 950, dark ? "#ffffff" : "#0b5f59", 21);
+  fillRoundedRect(ctx, x + width - pad - badgeW, y + 20, badgeW, 32, 999, tone.badge);
+  drawFittedText(ctx, scenario, x + width - pad - badgeW + 14, y + 42, badgeW - 28, 16, 950, tone.badgeText, 12);
 
-  const statGap = 16;
-  const statW = (contentW - statGap) / 2;
-  drawExportStat(ctx, contentX, y + 92, statW, "Giá cuối phải trả", money(result.total));
-  drawExportStat(ctx, contentX + statW + statGap, y + 92, statW, secondary.label, secondary.value, secondaryMeta);
+  const statGap = 10;
+  drawExportStat(ctx, contentX, y + 78, contentW, "Giá cuối phải trả", money(result.total), "", dark);
+  drawExportStat(ctx, contentX, y + 180, contentW, secondary.label, secondary.value, secondaryMeta, dark);
 
   const detailW = (contentW - statGap) / 2;
-  const detailY = y + 216;
-  drawExportDetail(ctx, contentX, detailY, detailW, "Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross));
-  drawExportDetail(ctx, contentX + detailW + statGap, detailY, detailW, "Giá thô sau CK", rawGrossAfterDiscountText);
-  drawExportDetail(ctx, contentX, detailY + 76, detailW, "Nội thất/hoàn thiện", money(result.completion));
-  drawExportDetail(ctx, contentX + detailW + statGap, detailY + 76, detailW, "Tổng chiết khấu", money(totalDiscount));
+  const detailY = y + 282;
+  drawExportDetail(ctx, contentX, detailY, detailW, "Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross), dark);
+  drawExportDetail(ctx, contentX + detailW + statGap, detailY, detailW, "Giá thô sau CK", rawGrossAfterDiscountText, dark);
+  drawExportDetail(ctx, contentX, detailY + 72, detailW, "Nội thất/hoàn thiện", money(result.completion), dark);
+  drawExportDetail(ctx, contentX + detailW + statGap, detailY + 72, detailW, "Tổng chiết khấu", money(totalDiscount), dark);
+
+  if (result.scenario === "loan") {
+    fillRoundedRect(ctx, contentX, y + height - 48, contentW, 32, 8, dark ? "#fff3d2" : "#fff8e7", "#d7b46a", 1.5);
+    drawFittedText(ctx, result.policy.loanSupport, contentX + 10, y + height - 27, contentW - 20, 16, 950, "#6b3d00", 12);
+  }
 }
 
 function buildMultiQuoteExportCanvas(scenarios) {
@@ -2540,39 +2546,37 @@ function buildMultiQuoteExportCanvas(scenarios) {
   const results = selected.map((scenario) => calculate({ scenario }));
   const unitCode = normalizeUnitCode(els.unitCode.value) || "CAN-HO";
   const unitLabel = results[0] ? quoteUnitLabel(results[0]) : unitCode;
-  const width = 1400;
-  const margin = 48;
-  const gap = 26;
-  const columns = selected.length === 1 ? 1 : 2;
-  const rows = Math.ceil(selected.length / columns);
-  const headerHeight = 130;
-  const cardHeight = 360;
-  const cardWidth = columns === 1 ? width - margin * 2 : (width - margin * 2 - gap) / 2;
-  const height = margin + headerHeight + rows * cardHeight + Math.max(0, rows - 1) * gap + margin;
+  const dark = document.body.classList.contains("theme-dark");
+  const margin = 42;
+  const gap = 16;
+  const cardWidth = selected.length === 1 ? 760 : 330;
+  const columns = Math.max(1, selected.length);
+  const headerHeight = 108;
+  const cardHeight = 440;
+  const width = margin * 2 + columns * cardWidth + Math.max(0, columns - 1) * gap;
+  const height = margin + headerHeight + cardHeight + margin;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#f4f7f6";
+  ctx.fillStyle = dark ? "#061f28" : "#f4f7f6";
   ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = "#0f766e";
+  ctx.fillStyle = dark ? "#e4c273" : "#0f766e";
   ctx.fillRect(0, 0, width, 14);
 
-  ctx.fillStyle = "#0b5f59";
+  ctx.fillStyle = dark ? "#ffffff" : "#0b5f59";
   ctx.font = '950 44px "Segoe UI", Arial, sans-serif';
-  ctx.fillText("Báo giá nhiều phương án", margin, margin + 34);
-  ctx.fillStyle = "#64736f";
+  ctx.fillText(selected.length === 1 ? "Ảnh báo giá" : "Báo giá nhiều phương án", margin, margin + 34);
+  ctx.fillStyle = dark ? "#c6d9d5" : "#64736f";
   ctx.font = '850 24px "Segoe UI", Arial, sans-serif';
   ctx.fillText(`${unitLabel} · ${results[0]?.policy?.name || ""}`, margin, margin + 70);
   ctx.fillText(`Ngày báo giá: ${formatDateText(els.quoteDate.value)}`, margin, margin + 104);
 
   results.forEach((result, index) => {
-    const col = index % columns;
-    const rowIndex = Math.floor(index / columns);
-    const x = margin + col * (cardWidth + gap);
-    const y = margin + headerHeight + rowIndex * (cardHeight + gap);
-    drawMultiQuoteExportCard(ctx, result, x, y, cardWidth, cardHeight);
+    const x = margin + index * (cardWidth + gap);
+    const y = margin + headerHeight;
+    drawMultiQuoteExportCard(ctx, result, x, y, cardWidth, cardHeight, dark);
   });
 
   return canvas;
@@ -3290,7 +3294,7 @@ function showToast(message) {
   els.toast._hideTimer = window.setTimeout(() => {
     els.toast.classList.remove("show");
     window.setTimeout(() => els.toast.classList.remove("unit-autofill-toast"), 240);
-  }, isUnitAutofill ? 2600 : 1800);
+  }, isUnitAutofill ? 500 : 1800);
 }
 
 async function copyTextToClipboard(text) {
@@ -3452,6 +3456,10 @@ els.copyBtn.addEventListener("click", async () => {
   } catch {
     showToast("Không sao chép được trên trình duyệt này");
   }
+});
+
+els.quoteImageBtn?.addEventListener("click", () => {
+  runMultiQuoteExport([activeScenario], "image");
 });
 
 els.pdfBtn.addEventListener("click", openPdfOptions);
