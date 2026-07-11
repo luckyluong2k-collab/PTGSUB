@@ -149,9 +149,14 @@
           </a>
         </div>
       </div>
-      <button class="icon-button" id="resetBtn" type="button" title="Nh&#7853;p l&#7841;i">
-        <span aria-hidden="true">&#8635;</span>
-      </button>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="uiThemeToggle" type="button" aria-label="B&#7853;t giao di&#7879;n t&#7889;i" title="Giao di&#7879;n s&#225;ng / Dark mode">
+          <span aria-hidden="true">&#9790;</span>
+        </button>
+        <button class="icon-button" id="resetBtn" type="button" title="Nh&#7853;p l&#7841;i">
+          <span aria-hidden="true">&#8635;</span>
+        </button>
+      </div>
     </header>
 
     <section class="summary-band" aria-live="polite">
@@ -196,6 +201,7 @@
       </div>
     </section>
 
+    <div class="dashboard-grid">
     <section class="panel pricing-panel" id="pricingForm">
       <div class="grid two">
         <label>
@@ -289,6 +295,7 @@
     </section>
 
     <section class="panel results results-panel">
+      <div class="results-card">
       <h2>K&#7871;t qu&#7843;</h2>
       <div id="resultRows" class="result-list"></div>
       <div class="result-actions">
@@ -306,6 +313,7 @@
         </div>
       </div>
       <button class="unit-map-button" id="unitMapBtn" type="button">T&#7841;o &#7843;nh ch&#7881; c&#259;n</button>
+      </div>
       <div class="tts-chart-panel" id="ttsChartPanel">
         <div class="tts-chart-head">
           <div>
@@ -340,6 +348,7 @@
       <h2>Ti&#7871;n &#273;&#7897; t&#7841;m t&#237;nh</h2>
       <div id="scheduleRows" class="result-list"></div>
     </section>
+    </div>
   </main>
 
   <dialog class="pdf-options-dialog" id="pdfOptionsDialog" aria-labelledby="pdfOptionsTitle">
@@ -410,5 +419,6 @@
   <script src="lienke-learned-locations.js?v=2"></script>
   <script src="app.js?v=88"></script>
   <script type="module" src="firebase-auth.js?v=76"></script>
+  <script src="ui-theme.js?v=1"></script>
 </body>
 </html>

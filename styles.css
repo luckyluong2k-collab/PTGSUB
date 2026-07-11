@@ -3461,3 +3461,29 @@ body.auth-locked .auth-close {
     grid-template-columns: 1fr;
   }
 }
+
+/* Final cascade: responsive dashboard and light/dark theme */
+:root { color-scheme: light; --bg: #f3f6f5; --panel: #fff; --ink: #142421; --muted: #60736f; --brand: #0f766e; --gold: #d7b46a; --ui-border: rgba(20,36,33,.14); --ui-soft: #e8efed; --ui-shadow: 0 12px 32px rgba(15,56,51,.09); }
+body.theme-dark { color-scheme: dark; --bg: #061b20; --panel: #10282c; --ink: #f4f7f6; --muted: #b6c6c3; --brand: #25a79a; --gold: #e4c273; --ui-border: rgba(244,247,246,.15); --ui-soft: #18353a; --ui-shadow: 0 14px 36px rgba(0,0,0,.24); }
+body, body.auth-locked { background: var(--bg); color: var(--ink); }
+.app-shell { width: calc(100% - 32px) !important; max-width: 1400px !important; margin-inline: auto !important; grid-template-columns: minmax(0,1fr) !important; gap: 14px !important; }
+.app-shell > *, .dashboard-grid > *, .results-card, .tts-chart-panel { min-width: 0; }
+.topbar, .summary-band, .finder-section, .loan-schedule-button { grid-column: 1 / -1 !important; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.theme-toggle { display: inline-grid; width: 44px; height: 44px; place-items: center; flex: 0 0 44px; border: 1px solid var(--ui-border); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: var(--ui-shadow); cursor: pointer; font: inherit; font-size: 1.25rem; }
+.loan-schedule-button { width: min(100%,360px) !important; justify-self: end; margin: 0 !important; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(12,minmax(0,1fr)); grid-template-areas: "pricing pricing pricing results results results results results results discount discount discount" "scenario scenario scenario results results results results results results schedule schedule schedule" ". . . chart chart chart chart chart chart chart chart chart"; align-items: start; gap: 14px; }
+.pricing-panel { grid-area: pricing; }.scenario-panel { grid-area: scenario; }.results-panel { display: contents !important; }.results-card { grid-area: results; }.discount-panel { grid-area: discount; }.schedule-panel { grid-area: schedule; }.tts-chart-panel { grid-area: chart; }
+.results-card, .pricing-panel, .scenario-panel, .discount-panel, .schedule-panel, .tts-chart-panel { background: var(--panel) !important; color: var(--ink); border-color: var(--ui-border) !important; box-shadow: var(--ui-shadow); }
+.results-card { padding: 22px; border: 1px solid var(--ui-border); border-radius: 24px; }
+body.theme-dark .topbar, body.theme-dark .summary-band, body.theme-dark .finder-section, body.theme-dark .finder-content, body.theme-dark .auth-card, body.theme-dark dialog, body.theme-dark .pdf-options-card, body.theme-dark .multi-quote-panel { background-color: var(--panel); color: var(--ink); border-color: var(--ui-border); }
+body.theme-dark input, body.theme-dark select, body.theme-dark textarea, body.theme-dark button:not(.primary):not(.loan-schedule-button), body.theme-dark .result-list > *, body.theme-dark .tts-chart-meta > * { background-color: var(--ui-soft); color: var(--ink); border-color: var(--ui-border); }
+body.theme-dark input::placeholder { color: var(--muted); }
+body.theme-dark label, body.theme-dark .label, body.theme-dark small, body.theme-dark .tts-chart-meta span { color: var(--muted); }
+body.theme-dark .summary-band { background: linear-gradient(135deg,#0d3437,#17494a); }
+body.theme-dark .summary-band .label { color: #d8e5e2; }
+body.theme-dark .summary-band strong, body.theme-dark .result-list strong, body.theme-dark .tts-chart-meta strong { color: #fff; }
+body.theme-dark svg text { fill: var(--muted); }
+@media (min-width:768px) and (max-width:1050px) { .dashboard-grid { grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-areas: "pricing results" "scenario results" "discount schedule" "chart chart"; } }
+@media (max-width:767px) { .app-shell { width: calc(100% - 20px) !important; gap: 12px !important; } .topbar { position: static !important; } .dashboard-grid { grid-template-columns: minmax(0,1fr); grid-template-areas: "pricing" "scenario" "results" "discount" "schedule" "chart"; gap: 12px; } .loan-schedule-button { width: 100% !important; } .result-actions, .multi-quote-actions { grid-template-columns: minmax(0,1fr) !important; } .result-actions button, .multi-quote-actions button, .multi-quote-toggle, .unit-map-button { width: 100%; } .summary-band strong, .result-list strong, .tts-chart-meta strong { overflow-wrap: anywhere; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
