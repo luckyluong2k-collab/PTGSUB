@@ -5402,6 +5402,17 @@ body.auth-locked .zalo-login-link {
   color: #075f9f !important;
 }
 
+body.auth-locked .free-version-link {
+  border-color: #78c9a2 !important;
+  background: #effbf4 !important;
+  color: #146b43 !important;
+  text-decoration: none;
+}
+
+body.auth-locked .free-version-link:hover {
+  transform: translateY(-2px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   body.auth-locked .login-price-spotlight { animation: none !important; transform: none !important; }
 }
