@@ -1,12 +1,13 @@
-const CACHE_NAME = "park-pricing-v120-clean-unused-files";
+const CACHE_NAME = "park-pricing-v125-site-theme-manager";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=101",
+  "./styles.css?v=104",
   "./app.js?v=93",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=79",
+  "./firebase-auth.js?v=81",
   "./ui-menu.js?v=2",
+  "./ui-theme.js?v=2",
   "./manifest.webmanifest",
   "./favicon.png",
   "./apple-touch-icon.png",
