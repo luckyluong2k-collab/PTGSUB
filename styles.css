@@ -6454,6 +6454,62 @@ body.announcement-open { overflow:hidden; }
   .member-announcement-media img { max-height:68vh; }
 }
 
+/* Responsive Kuula 360 tour at the end of the member workspace. */
+.kuula-tour-section {
+  grid-column:1 / -1;
+  width:100%;
+  margin-top:8px;
+  padding:clamp(14px,2vw,22px);
+  border:1px solid rgba(15,118,110,.25);
+  border-radius:20px;
+  background:#ffffff;
+  box-shadow:0 16px 38px rgba(15,56,51,.12);
+}
+.kuula-tour-head {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.kuula-tour-head p { margin:0 0 2px; }
+.kuula-tour-head h2 { margin:0; color:#0b5f59; font-size:clamp(1.25rem,2vw,1.7rem); }
+.kuula-tour-head a {
+  flex:0 0 auto;
+  padding:9px 13px;
+  border:1px solid #0f766e;
+  border-radius:10px;
+  color:#0f766e;
+  font-size:.86rem;
+  font-weight:900;
+  text-decoration:none;
+}
+.kuula-tour-frame {
+  position:relative;
+  width:100%;
+  aspect-ratio:16 / 9;
+  min-height:420px;
+  overflow:hidden;
+  border:1px solid rgba(20,36,33,.16);
+  border-radius:14px;
+  background:#061f27;
+}
+.kuula-tour-frame iframe { display:block; width:100%; height:100%; border:0; }
+body.theme-dark .kuula-tour-section {
+  border-color:rgba(228,194,115,.34);
+  background:linear-gradient(145deg,#10343d,#09252d);
+  color:#fff;
+}
+body.theme-dark .kuula-tour-head h2 { color:#fff !important; }
+body.theme-dark .kuula-tour-head a { border-color:#e4c273; color:#f4dea6; }
+
+@media (max-width:767px) {
+  .kuula-tour-section { padding:10px; border-radius:14px; }
+  .kuula-tour-head { align-items:center; }
+  .kuula-tour-head a { padding:8px 10px; font-size:.76rem; }
+  .kuula-tour-frame { aspect-ratio:4 / 5; min-height:520px; border-radius:10px; }
+}
+
 /* High-contrast history cards inside the account menu */
 body:not(.auth-locked).menu-expanded .history-list {
   background:#0a2a33 !important;

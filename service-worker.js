@@ -1,8 +1,8 @@
-const CACHE_NAME = "park-pricing-v107-announcement-menu";
+const CACHE_NAME = "park-pricing-v108-kuula-tour";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=95",
+  "./styles.css?v=96",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=92",
