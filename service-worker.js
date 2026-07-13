@@ -1,14 +1,14 @@
-const CACHE_NAME = "park-pricing-v127-membership-price";
+const CACHE_NAME = "park-pricing-v128-mid-autumn-decor";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=104",
-  "./mid-autumn-theme.css?v=1",
+  "./mid-autumn-theme.css?v=2",
   "./app.js?v=93",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=82",
   "./ui-menu.js?v=2",
-  "./ui-theme.js?v=3",
+  "./ui-theme.js?v=4",
   "./manifest.webmanifest",
   "./favicon.png",
   "./apple-touch-icon.png",

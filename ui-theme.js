@@ -26,6 +26,19 @@
     return systemThemes.find(function (theme) { return theme.id === themeId; }) || systemThemes[0];
   }
 
+  function ensureMidAutumnDecor() {
+    var decorations = document.querySelectorAll("#midAutumnDecor");
+    for (var index = 1; index < decorations.length; index += 1) {
+      decorations[index].remove();
+    }
+    return decorations[0] || null;
+  }
+
+  function setMidAutumnDecorVisible(isVisible) {
+    var decor = ensureMidAutumnDecor();
+    if (decor) decor.hidden = !isVisible;
+  }
+
   function applySystemTheme(themeId) {
     var selectedTheme = findSystemTheme(themeId);
     systemThemes.forEach(function (theme) {
@@ -33,6 +46,7 @@
     });
     body.classList.add(selectedTheme.bodyClass);
     body.dataset.siteTheme = selectedTheme.id;
+    setMidAutumnDecorVisible(selectedTheme.id === "mid-autumn-red-gold");
     localStorage.setItem(systemThemeStorageKey, selectedTheme.id);
     window.dispatchEvent(new CustomEvent("ptgsub-site-theme-change", {
       detail: { themeId: selectedTheme.id },
@@ -49,6 +63,8 @@
   window.ptgsubApplySiteTheme = applySystemTheme;
   window.applySystemTheme = applySystemTheme;
   window.loadSystemTheme = loadSystemTheme;
+  window.ensureMidAutumnDecor = ensureMidAutumnDecor;
+  window.setMidAutumnDecorVisible = setMidAutumnDecorVisible;
 
   loadSystemTheme();
 
