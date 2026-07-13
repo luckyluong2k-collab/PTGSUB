@@ -50,6 +50,11 @@ const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
 auth.languageCode = "vi";
 
+window.ptgsubGetAuthToken = async function ptgsubGetAuthToken() {
+  if (!auth.currentUser) return "";
+  return auth.currentUser.getIdToken();
+};
+
 function authErrorMessage(error) {
   const code = error?.code || "";
   if (code === "auth/unauthorized-domain") {
@@ -803,6 +808,27 @@ function hideMemberAnnouncement() {
   document.body.classList.remove("announcement-open");
 }
 
+function fitMemberAnnouncementToImage() {
+  if (!memberAnnouncementImage?.naturalWidth || !memberAnnouncementImage?.naturalHeight) return;
+  const card = memberAnnouncement?.querySelector(".member-announcement-card");
+  if (!card) return;
+
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+  const outerGap = viewportWidth <= 600 ? 16 : 48;
+  const actionSpace = viewportWidth <= 600 ? 155 : 125;
+  const maxImageWidth = Math.max(240, Math.min(820, viewportWidth - outerGap - 20));
+  const maxImageHeight = Math.max(220, viewportHeight - actionSpace);
+  const scale = Math.min(
+    1,
+    maxImageWidth / memberAnnouncementImage.naturalWidth,
+    maxImageHeight / memberAnnouncementImage.naturalHeight
+  );
+  const imageWidth = Math.max(1, Math.round(memberAnnouncementImage.naturalWidth * scale));
+  const cardWidth = Math.min(viewportWidth - outerGap, imageWidth + 20);
+  card.style.setProperty("--announcement-card-width", `${Math.max(240, cardWidth)}px`);
+}
+
 async function showMemberAnnouncement() {
   if (!memberAnnouncement || !memberAnnouncementImage) return;
   const snap = await getDocFromServer(doc(db, "settings", "memberAnnouncement"));
@@ -815,6 +841,8 @@ async function showMemberAnnouncement() {
 
   currentAnnouncementRevision = revision;
   memberAnnouncementImage.src = imageDataUrl;
+  await memberAnnouncementImage.decode().catch(() => {});
+  fitMemberAnnouncementToImage();
   const linkUrl = safeAnnouncementUrl(data.linkUrl);
   if (memberAnnouncementLink) {
     if (linkUrl) {
@@ -1234,6 +1262,10 @@ announcementDisableBtn?.addEventListener("click", async () => {
 
 memberAnnouncementX?.addEventListener("click", hideMemberAnnouncement);
 memberAnnouncementClose?.addEventListener("click", hideMemberAnnouncement);
+memberAnnouncementImage?.addEventListener("load", fitMemberAnnouncementToImage);
+window.addEventListener("resize", () => {
+  if (memberAnnouncement && !memberAnnouncement.hidden) fitMemberAnnouncementToImage();
+});
 memberAnnouncementSnooze?.addEventListener("click", () => {
   if (currentAnnouncementRevision) {
     localStorage.setItem(
