@@ -6566,6 +6566,72 @@ body:not(.auth-locked).menu-expanded .history-mini-btn:hover {
   transform:none !important;
 }
 
+/* Fuller menu pictograms: reduce empty tile space and improve legibility. */
+body:not(.auth-locked).menu-expanded .menu-3d-icon,
+body:not(.auth-locked).menu-expanded .menu-3d-button svg,
+body:not(.auth-locked).menu-expanded .zalo-login-link svg,
+body:not(.auth-locked).menu-expanded .history-panel-summary::before,
+body:not(.auth-locked).menu-expanded .drawer-tool-summary::before,
+body:not(.auth-locked).menu-expanded .logout-menu-button::before,
+body:not(.auth-locked).menu-expanded .camera-360-icon {
+  flex:0 0 50px !important;
+  width:50px !important;
+  height:50px !important;
+  margin-right:14px !important;
+  padding:2px !important;
+  border-radius:14px !important;
+  line-height:1 !important;
+}
+
+body:not(.auth-locked).menu-expanded .admin-menu-button .menu-3d-icon {
+  font-size:1.8rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .zalo-login-link svg text {
+  font-size:12px !important;
+  font-weight:950 !important;
+}
+
+body:not(.auth-locked).menu-expanded .free-version-link .menu-3d-icon {
+  font-size:1rem !important;
+  letter-spacing:-.04em;
+}
+
+/* The free-version entry is exclusively for signed-out visitors. */
+body.app-unlocked .auth-actions > .free-version-link,
+body:not(.auth-locked) .auth-actions > .free-version-link,
+body:not(.auth-locked).menu-expanded .auth-actions > .free-version-link,
+body:not(.auth-locked).menu-expanded .auth-actions > .free-version-link:not([hidden]) {
+  display:none !important;
+}
+
+body:not(.auth-locked).menu-expanded .history-panel-summary::before {
+  font-size:1.9rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .camera-360-icon {
+  font-size:1.05rem !important;
+  letter-spacing:-.04em;
+}
+
+body:not(.auth-locked).menu-expanded .drawer-tool-summary::before {
+  font-size:1.9rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .policy-sales-link .menu-3d-icon {
+  font-size:1.75rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .logout-menu-button::before {
+  font-size:1.9rem !important;
+}
+
+body.auth-locked .free-version-link .menu-3d-icon {
+  padding:2px !important;
+  font-size:1rem !important;
+  letter-spacing:-.04em;
+}
+
 /* Smooth click-triggered reveals without hover animation */
 @keyframes clickPanelReveal {
   from {

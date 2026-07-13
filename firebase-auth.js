@@ -106,6 +106,7 @@ const myHistoryPanel = document.querySelector("#myHistoryPanel");
 const myHistoryList = document.querySelector("#myHistoryList");
 const loginIntro = document.querySelector("#loginIntro");
 const loginMenuSection = document.querySelector("#loginMenuSection");
+const freeVersionLink = document.querySelector("#freeVersionLink");
 const protectedMenuItems = Array.from(document.querySelectorAll("[data-auth-menu]"));
 const browserWarning = document.querySelector("#browserWarning");
 const copyAppLinkBtn = document.querySelector("#copyAppLinkBtn");
@@ -286,6 +287,7 @@ async function checkRedirectLoginResult() {
 function setMenuAuthState(isInsideApp) {
   if (loginIntro) loginIntro.hidden = isInsideApp;
   if (loginMenuSection) loginMenuSection.open = !isInsideApp;
+  if (freeVersionLink) freeVersionLink.hidden = isInsideApp;
   protectedMenuItems.forEach((item) => {
     item.hidden = !isInsideApp;
   });

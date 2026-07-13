@@ -1,14 +1,14 @@
-const CACHE_NAME = "park-pricing-v108-kuula-tour";
+const CACHE_NAME = "park-pricing-v110-free-entry-auth";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=96",
+  "./styles.css?v=97",
   "./unit-data.js?v=64",
   "./lienke-learned-locations.js?v=2",
   "./app.js?v=92",
   "./ui-chatbot.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=77",
+  "./firebase-auth.js?v=78",
   "./ui-menu.js?v=2",
   "./manifest.webmanifest",
   "./icon.svg",
