@@ -82,6 +82,26 @@ const adminPanel = document.querySelector("#adminPanel");
 const adminOpenBtn = document.querySelector("#adminOpenBtn");
 const adminCloseBtn = document.querySelector("#adminCloseBtn");
 const adminUsers = document.querySelector("#adminUsers");
+const announcementAdminBtn = document.querySelector("#announcementAdminBtn");
+const adminUsersTab = document.querySelector("#adminUsersTab");
+const adminAnnouncementTab = document.querySelector("#adminAnnouncementTab");
+const adminUsersPane = document.querySelector("#adminUsersPane");
+const adminAnnouncementPane = document.querySelector("#adminAnnouncementPane");
+const announcementForm = document.querySelector("#announcementForm");
+const announcementImageInput = document.querySelector("#announcementImageInput");
+const announcementLinkInput = document.querySelector("#announcementLinkInput");
+const announcementEnabledInput = document.querySelector("#announcementEnabledInput");
+const announcementPreview = document.querySelector("#announcementPreview");
+const announcementPreviewImage = document.querySelector("#announcementPreviewImage");
+const announcementAdminStatus = document.querySelector("#announcementAdminStatus");
+const announcementSaveBtn = document.querySelector("#announcementSaveBtn");
+const announcementDisableBtn = document.querySelector("#announcementDisableBtn");
+const memberAnnouncement = document.querySelector("#memberAnnouncement");
+const memberAnnouncementLink = document.querySelector("#memberAnnouncementLink");
+const memberAnnouncementImage = document.querySelector("#memberAnnouncementImage");
+const memberAnnouncementX = document.querySelector("#memberAnnouncementX");
+const memberAnnouncementClose = document.querySelector("#memberAnnouncementClose");
+const memberAnnouncementSnooze = document.querySelector("#memberAnnouncementSnooze");
 const myHistoryPanel = document.querySelector("#myHistoryPanel");
 const myHistoryList = document.querySelector("#myHistoryList");
 const loginIntro = document.querySelector("#loginIntro");
@@ -100,6 +120,11 @@ let historyTimer = 0;
 let redirectResultChecked = false;
 let approvalPollTimer = 0;
 let accessExpiryTimer = 0;
+let announcementImageDataUrl = "";
+let currentAnnouncementRevision = "";
+
+const ANNOUNCEMENT_SNOOZE_MS = 2 * 60 * 60 * 1000;
+const ANNOUNCEMENT_MAX_IMAGE_BYTES = 650 * 1024;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -276,6 +301,7 @@ function setAuthLocked(isLocked) {
 
 function setAdminMenuVisible(isVisible) {
   if (adminOpenBtn) adminOpenBtn.hidden = !isVisible;
+  if (announcementAdminBtn) announcementAdminBtn.hidden = !isVisible;
 }
 
 function closeAdminPanel() {
@@ -286,16 +312,19 @@ async function openAdminPanel() {
   if (!currentIsAdmin) return;
   closeDrawer();
   if (adminPanel) adminPanel.hidden = false;
+  selectAdminTab("users");
   await renderAdminUsers({ open: true });
 }
 
 function openDrawer() {
   if (authGate) authGate.hidden = false;
+  document.body.classList.add("menu-expanded");
   if (accountTab) accountTab.setAttribute("aria-expanded", "true");
 }
 
 function closeDrawer() {
   if (authGate) authGate.hidden = true;
+  document.body.classList.remove("menu-expanded");
   if (accountTab) accountTab.setAttribute("aria-expanded", "false");
 }
 
@@ -660,6 +689,147 @@ function renderMyHistory(searches = []) {
   renderHistoryList(myHistoryList, searches);
 }
 
+function setAnnouncementAdminStatus(message, isError = false) {
+  if (!announcementAdminStatus) return;
+  announcementAdminStatus.textContent = message;
+  announcementAdminStatus.classList.toggle("is-error", isError);
+}
+
+function selectAdminTab(tabName) {
+  const showAnnouncement = tabName === "announcement";
+  if (adminUsersPane) adminUsersPane.hidden = showAnnouncement;
+  if (adminAnnouncementPane) adminAnnouncementPane.hidden = !showAnnouncement;
+  adminUsersTab?.classList.toggle("is-active", !showAnnouncement);
+  adminAnnouncementTab?.classList.toggle("is-active", showAnnouncement);
+  adminUsersTab?.setAttribute("aria-selected", String(!showAnnouncement));
+  adminAnnouncementTab?.setAttribute("aria-selected", String(showAnnouncement));
+  const search = document.querySelector(".admin-user-search");
+  if (search) search.hidden = showAnnouncement;
+}
+
+function safeAnnouncementUrl(value) {
+  const input = String(value || "").trim();
+  if (!input) return "";
+  try {
+    const url = new URL(input);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function dataUrlFromBlob(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error || new Error("Khong doc duoc anh."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function imageFromDataUrl(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Tep da chon khong phai anh hop le."));
+    image.src = dataUrl;
+  });
+}
+
+function canvasBlob(canvas, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Trinh duyet khong nen duoc anh."));
+    }, "image/webp", quality);
+  });
+}
+
+async function prepareAnnouncementImage(file) {
+  if (!file?.type?.startsWith("image/")) throw new Error("Vui long chon mot tep anh.");
+  const originalDataUrl = await dataUrlFromBlob(file);
+  if (file.size <= ANNOUNCEMENT_MAX_IMAGE_BYTES) return originalDataUrl;
+
+  const source = await imageFromDataUrl(originalDataUrl);
+  let scale = Math.min(1, 1600 / Math.max(source.naturalWidth, source.naturalHeight));
+  let quality = 0.86;
+  let result = null;
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(source.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(source.naturalHeight * scale));
+    const context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(source, 0, 0, canvas.width, canvas.height);
+    result = await canvasBlob(canvas, quality);
+    if (result.size <= ANNOUNCEMENT_MAX_IMAGE_BYTES) return dataUrlFromBlob(result);
+    if (quality > 0.52) quality -= 0.1;
+    else scale *= 0.78;
+  }
+
+  throw new Error("Anh qua lon. Vui long chon anh nho hon.");
+}
+
+function renderAnnouncementAdmin(data = {}) {
+  announcementImageDataUrl = String(data.imageDataUrl || "");
+  if (announcementLinkInput) announcementLinkInput.value = String(data.linkUrl || "");
+  if (announcementEnabledInput) announcementEnabledInput.checked = Boolean(data.enabled);
+  if (announcementPreviewImage) announcementPreviewImage.src = announcementImageDataUrl;
+  if (announcementPreview) announcementPreview.hidden = !announcementImageDataUrl;
+}
+
+async function loadAdminAnnouncement() {
+  if (!currentIsAdmin) return;
+  setAnnouncementAdminStatus("Dang tai cai dat popup...");
+  try {
+    const snap = await getDocFromServer(doc(db, "settings", "memberAnnouncement"));
+    renderAnnouncementAdmin(snap.exists() ? snap.data() : {});
+    setAnnouncementAdminStatus(snap.exists() ? "Da tai cai dat hien tai." : "Chua co popup nao. Hay chon anh de tao moi.");
+  } catch (error) {
+    setAnnouncementAdminStatus(`Khong tai duoc popup: ${authErrorMessage(error)}`, true);
+  }
+}
+
+function announcementSnoozeKey(revision) {
+  return `ptgsub-announcement-snooze:${currentUserId}:${revision}`;
+}
+
+function hideMemberAnnouncement() {
+  if (memberAnnouncement) memberAnnouncement.hidden = true;
+  document.body.classList.remove("announcement-open");
+}
+
+async function showMemberAnnouncement() {
+  if (!memberAnnouncement || !memberAnnouncementImage) return;
+  const snap = await getDocFromServer(doc(db, "settings", "memberAnnouncement"));
+  if (!snap.exists()) return;
+  const data = snap.data() || {};
+  const imageDataUrl = String(data.imageDataUrl || "");
+  const revision = String(data.revision || "default");
+  const snoozedUntil = Number(localStorage.getItem(announcementSnoozeKey(revision)) || 0);
+  if (!data.enabled || !imageDataUrl || snoozedUntil > Date.now()) return;
+
+  currentAnnouncementRevision = revision;
+  memberAnnouncementImage.src = imageDataUrl;
+  const linkUrl = safeAnnouncementUrl(data.linkUrl);
+  if (memberAnnouncementLink) {
+    if (linkUrl) {
+      memberAnnouncementLink.href = linkUrl;
+      memberAnnouncementLink.classList.add("has-link");
+      memberAnnouncementLink.setAttribute("aria-label", "Mo lien ket thong bao trong tab moi");
+    } else {
+      memberAnnouncementLink.removeAttribute("href");
+      memberAnnouncementLink.classList.remove("has-link");
+      memberAnnouncementLink.removeAttribute("aria-label");
+    }
+  }
+  memberAnnouncement.hidden = false;
+  document.body.classList.add("announcement-open");
+  memberAnnouncementX?.focus();
+}
+
 function stopApprovalPolling() {
   window.clearInterval(approvalPollTimer);
   approvalPollTimer = 0;
@@ -693,6 +863,7 @@ async function enterApprovedApp(user, data) {
 
   closeDrawer();
   if (redirectToApprovedChildPage()) return;
+  showMemberAnnouncement().catch(() => {});
   window.setTimeout(() => scheduleSaveCurrentSearch(true), 1000);
 }
 
@@ -958,13 +1129,6 @@ async function renderAdminUsers({ open = false } = {}) {
   }
 }
 
-if (accountTab) {
-  accountTab.addEventListener("click", () => {
-    if (authGate?.hidden) openDrawer();
-    else closeDrawer();
-  });
-}
-
 if (authCloseBtn) authCloseBtn.addEventListener("click", closeDrawer);
 
 if (adminOpenBtn) {
@@ -974,6 +1138,109 @@ if (adminOpenBtn) {
     });
   });
 }
+
+if (announcementAdminBtn) {
+  announcementAdminBtn.addEventListener("click", async () => {
+    if (!currentIsAdmin) return;
+    closeDrawer();
+    if (adminPanel) adminPanel.hidden = false;
+    selectAdminTab("announcement");
+    await loadAdminAnnouncement();
+  });
+}
+
+adminUsersTab?.addEventListener("click", () => {
+  selectAdminTab("users");
+  renderAdminUsers().catch(() => {});
+});
+
+adminAnnouncementTab?.addEventListener("click", () => {
+  selectAdminTab("announcement");
+  loadAdminAnnouncement().catch(() => {});
+});
+
+announcementImageInput?.addEventListener("change", async () => {
+  const file = announcementImageInput.files?.[0];
+  if (!file) return;
+  announcementImageInput.disabled = true;
+  setAnnouncementAdminStatus("Dang xu ly anh...");
+  try {
+    announcementImageDataUrl = await prepareAnnouncementImage(file);
+    if (announcementPreviewImage) announcementPreviewImage.src = announcementImageDataUrl;
+    if (announcementPreview) announcementPreview.hidden = false;
+    setAnnouncementAdminStatus("Anh da san sang. Bam Luu thong bao de ap dung.");
+  } catch (error) {
+    announcementImageInput.value = "";
+    setAnnouncementAdminStatus(error?.message || String(error), true);
+  } finally {
+    announcementImageInput.disabled = false;
+  }
+});
+
+announcementForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentIsAdmin) return;
+  const rawLink = String(announcementLinkInput?.value || "").trim();
+  const linkUrl = safeAnnouncementUrl(rawLink);
+  if (!announcementImageDataUrl) {
+    setAnnouncementAdminStatus("Vui long chon anh popup.", true);
+    return;
+  }
+  if (rawLink && !linkUrl) {
+    setAnnouncementAdminStatus("Link phai bat dau bang http:// hoac https://", true);
+    return;
+  }
+
+  if (announcementSaveBtn) announcementSaveBtn.disabled = true;
+  setAnnouncementAdminStatus("Dang luu thong bao...");
+  try {
+    await setDoc(doc(db, "settings", "memberAnnouncement"), {
+      enabled: Boolean(announcementEnabledInput?.checked),
+      imageDataUrl: announcementImageDataUrl,
+      linkUrl,
+      revision: Date.now(),
+      updatedBy: currentUserEmail,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    setAnnouncementAdminStatus("Da luu. Popup moi se hien sau khi thanh vien dang nhap.");
+  } catch (error) {
+    setAnnouncementAdminStatus(`Khong luu duoc: ${authErrorMessage(error)}`, true);
+  } finally {
+    if (announcementSaveBtn) announcementSaveBtn.disabled = false;
+  }
+});
+
+announcementDisableBtn?.addEventListener("click", async () => {
+  if (!currentIsAdmin) return;
+  announcementDisableBtn.disabled = true;
+  setAnnouncementAdminStatus("Dang tat popup...");
+  try {
+    await setDoc(doc(db, "settings", "memberAnnouncement"), {
+      enabled: false,
+      revision: Date.now(),
+      updatedBy: currentUserEmail,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+    if (announcementEnabledInput) announcementEnabledInput.checked = false;
+    setAnnouncementAdminStatus("Da tat popup cho toan bo thanh vien.");
+  } catch (error) {
+    setAnnouncementAdminStatus(`Khong tat duoc: ${authErrorMessage(error)}`, true);
+  } finally {
+    announcementDisableBtn.disabled = false;
+  }
+});
+
+memberAnnouncementX?.addEventListener("click", hideMemberAnnouncement);
+memberAnnouncementClose?.addEventListener("click", hideMemberAnnouncement);
+memberAnnouncementSnooze?.addEventListener("click", () => {
+  if (currentAnnouncementRevision) {
+    localStorage.setItem(
+      announcementSnoozeKey(currentAnnouncementRevision),
+      String(Date.now() + ANNOUNCEMENT_SNOOZE_MS)
+    );
+  }
+  hideMemberAnnouncement();
+});
 
 if (adminCloseBtn) adminCloseBtn.addEventListener("click", closeAdminPanel);
 
@@ -985,6 +1252,7 @@ if (adminPanel) {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && adminPanel && !adminPanel.hidden) closeAdminPanel();
+  if (event.key === "Escape" && memberAnnouncement && !memberAnnouncement.hidden) hideMemberAnnouncement();
 });
 
 if (copyAppLinkBtn) {

@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=94">
+  <link rel="stylesheet" href="styles.css?v=95">
 </head>
 <body class="auth-locked">
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
@@ -58,6 +58,10 @@
         <button class="menu-3d-button admin-menu-button" id="adminOpenBtn" type="button" hidden>
           <span class="menu-3d-icon" aria-hidden="true">&#9881;</span>
           <span>Quản lý tài khoản</span>
+        </button>
+        <button class="menu-3d-button admin-menu-button" id="announcementAdminBtn" type="button" hidden>
+          <span class="menu-3d-icon" aria-hidden="true">&#128226;</span>
+          <span>Popup th&#244;ng b&#225;o</span>
         </button>
         <a class="zalo-login-link menu-3d-button" href="http://zalo.me/0387335227" target="_blank" rel="noopener" aria-label="Liên hệ Zalo 0387.335.227">
           <svg viewBox="0 0 36 36" aria-hidden="true">
@@ -131,7 +135,55 @@
           <input id="adminUserSearch" type="search" autocomplete="off" placeholder="Nh&#7853;p Gmail c&#7847;n t&#236;m...">
         </label>
       </header>
-      <div id="adminUsers" class="admin-users admin-users-board"></div>
+      <nav class="admin-tabs" aria-label="Ch&#7913;c n&#259;ng qu&#7843;n tr&#7883;">
+        <button class="admin-tab is-active" id="adminUsersTab" type="button" aria-controls="adminUsersPane">Th&#224;nh vi&#234;n</button>
+        <button class="admin-tab" id="adminAnnouncementTab" type="button" aria-controls="adminAnnouncementPane">Popup th&#244;ng b&#225;o</button>
+      </nav>
+      <section id="adminUsersPane" class="admin-pane">
+        <div id="adminUsers" class="admin-users admin-users-board"></div>
+      </section>
+      <section id="adminAnnouncementPane" class="admin-pane" hidden>
+        <form class="announcement-admin-card" id="announcementForm">
+          <div>
+            <p class="eyebrow">Th&#244;ng b&#225;o cho to&#224;n b&#7897; th&#224;nh vi&#234;n</p>
+            <h3>C&#224;i &#273;&#7863;t popup sau khi &#273;&#259;ng nh&#7853;p</h3>
+            <p>Ch&#7885;n &#7843;nh v&#224; link t&#249;y ch&#7885;n. &#7842;nh s&#7869; &#273;&#432;&#7907;c t&#7921; &#273;&#7897;ng n&#233;n tr&#432;&#7899;c khi l&#432;u.</p>
+          </div>
+          <label class="announcement-field">
+            <span>&#7842;nh popup</span>
+            <input id="announcementImageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+          </label>
+          <div class="announcement-preview" id="announcementPreview" hidden>
+            <img id="announcementPreviewImage" alt="Xem tr&#432;&#7899;c &#7843;nh popup">
+          </div>
+          <label class="announcement-field">
+            <span>&#272;&#432;&#7901;ng d&#7851;n khi b&#7845;m v&#224;o &#7843;nh (kh&#244;ng b&#7855;t bu&#7897;c)</span>
+            <input id="announcementLinkInput" type="url" inputmode="url" placeholder="https://example.com">
+          </label>
+          <label class="announcement-enabled">
+            <input id="announcementEnabledInput" type="checkbox" checked>
+            <span>Hi&#7875;n th&#7883; popup cho th&#224;nh vi&#234;n</span>
+          </label>
+          <p class="announcement-admin-status" id="announcementAdminStatus" role="status"></p>
+          <div class="announcement-admin-actions">
+            <button class="filter-reset" id="announcementDisableBtn" type="button">T&#7855;t popup</button>
+            <button class="primary" id="announcementSaveBtn" type="submit">L&#432;u th&#244;ng b&#225;o</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <section class="member-announcement" id="memberAnnouncement" role="dialog" aria-modal="true" aria-label="Th&#244;ng b&#225;o" hidden>
+    <div class="member-announcement-card">
+      <button class="member-announcement-x" id="memberAnnouncementX" type="button" aria-label="&#272;&#243;ng th&#244;ng b&#225;o">&times;</button>
+      <a id="memberAnnouncementLink" class="member-announcement-media" target="_blank" rel="noopener noreferrer">
+        <img id="memberAnnouncementImage" alt="Th&#244;ng b&#225;o m&#7899;i">
+      </a>
+      <div class="member-announcement-actions">
+        <button class="filter-reset" id="memberAnnouncementClose" type="button">T&#7855;t</button>
+        <button class="primary" id="memberAnnouncementSnooze" type="button">Kh&#244;ng hi&#7875;n th&#7883; trong 2 gi&#7901;</button>
+      </div>
     </div>
   </section>
 
@@ -461,9 +513,9 @@
   <script src="lienke-learned-locations.js?v=2"></script>
   <script src="app.js?v=92"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
-  <script type="module" src="firebase-auth.js?v=76"></script>
+  <script type="module" src="firebase-auth.js?v=77"></script>
   <script src="ui-admin-search.js?v=1"></script>
-  <script src="ui-menu.js?v=1"></script>
+  <script src="ui-menu.js?v=2"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=1"></script>
   <script src="ui-chatbot.js?v=2"></script>

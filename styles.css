@@ -6247,6 +6247,213 @@ body:not(.theme-dark):not(.auth-locked).menu-expanded .camera-360-link:hover {
   background:linear-gradient(145deg,#ffffff,#e9f3f1) !important;
 }
 
+/* Stable click-only account menu: theme and layout never change on hover. */
+@media (min-width:1051px) {
+  body:not(.auth-locked).menu-expanded .auth-drawer,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover,
+  body:not(.auth-locked).menu-expanded .account-tab:hover + .auth-drawer {
+    display:block !important;
+    width:370px !important;
+    min-width:370px !important;
+    transition:none !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-card,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card {
+    width:338px !important;
+    max-width:338px !important;
+    padding:13px !important;
+    border-radius:15px !important;
+    transition:none !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > .eyebrow,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > h1,
+  body:not(.auth-locked).menu-expanded .auth-drawer:hover #authStatus {
+    display:block !important;
+  }
+
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer:hover {
+    background:#eef5f3 !important;
+  }
+
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-card,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card {
+    border:1px solid rgba(15,118,110,.3) !important;
+    background:linear-gradient(145deg,#ffffff,#edf6f4) !important;
+    color:#123e39 !important;
+  }
+
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-card > h1,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-card > .eyebrow,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded #authStatus,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > h1,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card > .eyebrow,
+  body:not(.theme-dark):not(.auth-locked).menu-expanded .auth-drawer:hover #authStatus {
+    color:#123e39 !important;
+    -webkit-text-fill-color:#123e39 !important;
+  }
+
+  body.theme-dark:not(.auth-locked).menu-expanded .auth-drawer,
+  body.theme-dark:not(.auth-locked).menu-expanded .auth-drawer:hover {
+    background:#06262e !important;
+  }
+
+  body.theme-dark:not(.auth-locked).menu-expanded .auth-card,
+  body.theme-dark:not(.auth-locked).menu-expanded .auth-drawer:hover .auth-card {
+    border:1px solid rgba(228,194,115,.34) !important;
+    background:linear-gradient(145deg,#10343d,#09252d) !important;
+    color:#ffffff !important;
+  }
+}
+
+/* Mobile account drawer is controlled by the Menu button on every touch device. */
+@media (max-width:1050px) {
+  body:not(.auth-locked) .account-tab {
+    z-index:1401 !important;
+    display:grid !important;
+    pointer-events:auto !important;
+    touch-action:manipulation;
+  }
+
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer,
+  body:not(.auth-locked):not(.menu-expanded) .auth-drawer[hidden] {
+    display:none !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-drawer,
+  body:not(.auth-locked).menu-expanded .auth-drawer[hidden] {
+    display:block !important;
+    z-index:1400 !important;
+    width:min(390px,100vw) !important;
+    max-width:100vw !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain;
+    pointer-events:auto !important;
+  }
+}
+
+/* Admin announcement editor. */
+.admin-overlay-shell {
+  grid-template-rows:auto auto minmax(0,1fr) !important;
+}
+.admin-tabs { display:flex; gap:8px; min-width:0; }
+.admin-user-search[hidden] { display:none !important; }
+.admin-tab {
+  min-height:42px;
+  padding:9px 15px;
+  border:1px solid #a9cbc5;
+  border-radius:11px;
+  background:#e8f3f1;
+  color:#185f58;
+  cursor:pointer;
+  font-weight:900;
+}
+.admin-tab.is-active { background:#0f766e; color:#fff; border-color:#0f766e; }
+.admin-pane { min-height:0; overflow:auto; }
+.admin-pane[hidden] { display:none !important; }
+.announcement-admin-card {
+  display:grid;
+  gap:16px;
+  width:min(760px,100%);
+  margin:0 auto;
+  padding:clamp(16px,3vw,28px);
+  border:1px solid #b9d8d3;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 16px 38px rgba(18,38,34,.12);
+}
+.announcement-admin-card h3 { margin:2px 0 4px; color:#0b5f59; font-size:1.25rem; }
+.announcement-admin-card p { margin:0; color:#55716c; }
+.announcement-field { display:grid; gap:7px; color:#244944; font-weight:850; }
+.announcement-field input { width:100%; }
+.announcement-preview {
+  max-height:380px;
+  overflow:auto;
+  border:1px dashed #8dbdb6;
+  border-radius:14px;
+  background:#edf6f4;
+  text-align:center;
+}
+.announcement-preview[hidden] { display:none !important; }
+.announcement-preview img { display:block; max-width:100%; max-height:360px; margin:auto; object-fit:contain; }
+.announcement-enabled { display:flex; align-items:center; gap:10px; color:#164c46; font-weight:900; }
+.announcement-enabled input { width:20px; height:20px; }
+.announcement-admin-status { min-height:24px; font-weight:850; }
+.announcement-admin-status.is-error { color:#b42318 !important; }
+.announcement-admin-actions { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+.announcement-admin-actions button { min-height:44px; }
+
+body.theme-dark .announcement-admin-card {
+  border-color:rgba(228,194,115,.34);
+  background:linear-gradient(145deg,#10343d,#09252d);
+  color:#fff;
+}
+body.theme-dark .announcement-admin-card h3,
+body.theme-dark .announcement-field,
+body.theme-dark .announcement-enabled { color:#fff !important; }
+body.theme-dark .announcement-preview { background:#061f27; border-color:rgba(228,194,115,.45); }
+
+/* Member announcement shown immediately after approved login. */
+.member-announcement {
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  display:grid;
+  place-items:center;
+  padding:clamp(12px,3vw,28px);
+  background:rgba(1,15,19,.78);
+  backdrop-filter:blur(9px);
+}
+.member-announcement[hidden] { display:none !important; }
+.member-announcement-card {
+  position:relative;
+  width:min(820px,100%);
+  max-height:calc(100vh - 24px);
+  overflow:auto;
+  padding:10px;
+  border:1px solid rgba(228,194,115,.58);
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 35px 90px rgba(0,0,0,.48);
+}
+.member-announcement-x {
+  position:absolute;
+  top:16px;
+  right:16px;
+  z-index:2;
+  display:grid;
+  width:44px;
+  height:44px;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:50%;
+  background:rgba(4,31,37,.86);
+  color:#fff;
+  cursor:pointer;
+  font-size:28px;
+  line-height:1;
+  box-shadow:0 7px 20px rgba(0,0,0,.25);
+}
+.member-announcement-media { display:block; border-radius:13px; overflow:hidden; }
+.member-announcement-media.has-link { cursor:pointer; }
+.member-announcement-media:not(.has-link) { cursor:default; }
+.member-announcement-media img { display:block; width:100%; max-height:72vh; object-fit:contain; background:#f2f5f4; }
+.member-announcement-actions { display:flex; justify-content:flex-end; gap:10px; padding:12px 2px 2px; }
+.member-announcement-actions button { min-height:44px; }
+body.announcement-open { overflow:hidden; }
+
+@media (max-width:600px) {
+  .admin-tabs { display:grid; grid-template-columns:1fr 1fr; }
+  .admin-tab { padding-inline:8px; font-size:.82rem; }
+  .announcement-admin-actions,
+  .member-announcement-actions { display:grid; grid-template-columns:1fr; }
+  .member-announcement { padding:8px; }
+  .member-announcement-card { max-height:calc(100vh - 16px); border-radius:14px; }
+  .member-announcement-media img { max-height:68vh; }
+}
+
 /* High-contrast history cards inside the account menu */
 body:not(.auth-locked).menu-expanded .history-list {
   background:#0a2a33 !important;

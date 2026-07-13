@@ -2,33 +2,31 @@
   "use strict";
 
   var toggle = document.getElementById("accountTab");
-  if (!toggle) return;
+  var drawer = document.getElementById("authGate");
+  if (!toggle || !drawer) return;
 
-  var expanded = false;
   localStorage.removeItem("ptgsub-menu-expanded");
 
-  function applyState() {
+  function applyState(expanded) {
     document.body.classList.toggle("menu-expanded", expanded);
+    drawer.hidden = !expanded;
     toggle.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-label", expanded ? "Thu gọn menu" : "Mở toàn bộ menu");
-    toggle.title = expanded ? "Thu gọn menu" : "Mở toàn bộ menu";
+    toggle.setAttribute("aria-label", expanded ? "Thu gon menu" : "Mo menu");
+    toggle.title = expanded ? "Thu gon menu" : "Mo menu";
   }
 
   toggle.addEventListener("click", function (event) {
-    if (window.matchMedia("(min-width: 1051px)").matches) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      expanded = !expanded;
-      applyState();
-    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    applyState(!document.body.classList.contains("menu-expanded"));
   }, true);
 
   document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && expanded && window.matchMedia("(min-width: 1051px)").matches) {
-      expanded = false;
-      applyState();
+    if (event.key === "Escape" && document.body.classList.contains("menu-expanded")) {
+      applyState(false);
+      toggle.focus();
     }
   });
 
-  applyState();
+  applyState(false);
 }());
