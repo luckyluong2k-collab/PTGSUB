@@ -5299,47 +5299,6 @@ body.theme-dark .admin-overlay .admin-user-card {
   }
 }
 
-/* Sales-policy chatbot demo */
-.sales-chat-toggle {
-  position:fixed; right:18px; bottom:18px; z-index:1500;
-  display:flex; align-items:center; gap:9px; min-height:52px; padding:8px 15px 8px 8px;
-  border:1px solid #e4c273; border-radius:999px;
-  background:linear-gradient(135deg,#0f766e,#082c35); color:#fff;
-  box-shadow:0 14px 32px rgba(0,0,0,.28); cursor:pointer;
-}
-.sales-chat-toggle span { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:#f1cf75; color:#17302c; font-size:1.2rem; font-weight:950; }
-.sales-chat-toggle b { font-size:.86rem; }
-.sales-chat-panel {
-  position:fixed; right:18px; bottom:82px; z-index:1500;
-  display:grid; grid-template-rows:auto minmax(180px,1fr) auto auto auto;
-  width:min(390px,calc(100vw - 24px)); max-height:min(650px,calc(100dvh - 108px));
-  overflow:hidden; border:1px solid #e4c273; border-radius:18px;
-  background:#082730; color:#fff; box-shadow:0 24px 70px rgba(0,0,0,.42);
-  animation:clickDialogReveal 260ms cubic-bezier(.2,.8,.2,1) both;
-}
-.sales-chat-panel[hidden] { display:none !important; }
-.sales-chat-head { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:linear-gradient(135deg,#0f766e,#0a3942); border-bottom:1px solid rgba(228,194,115,.38); }
-.sales-chat-head div { display:grid; gap:2px; }.sales-chat-head span { color:#c9ddd8; font-size:.72rem; font-weight:850; }.sales-chat-head strong { color:#f5d994; }
-.sales-chat-head button { width:34px; height:34px; border:1px solid #e4c273; border-radius:10px; background:#0b3038; color:#fff; font-size:1.35rem; }
-.sales-chat-messages { display:grid; align-content:start; gap:10px; padding:14px; overflow:auto; background:linear-gradient(160deg,#0a2b34,#061e27); }
-.sales-chat-message { max-width:88%; padding:10px 12px; border-radius:13px; font-size:.84rem; line-height:1.45; white-space:pre-line; }
-.sales-chat-message.bot { justify-self:start; background:#173e46; border:1px solid rgba(228,194,115,.28); color:#f5f8f7; }
-.sales-chat-message.user { justify-self:end; background:#f1cf75; color:#263229; font-weight:800; }
-.sales-chat-message a { color:#f5d994; font-weight:900; }
-.sales-chat-suggestions { display:flex; gap:7px; padding:10px 12px; overflow-x:auto; border-top:1px solid rgba(228,194,115,.2); }
-.sales-chat-suggestions button { flex:0 0 auto; min-height:32px; padding:6px 10px; border:1px solid #57a99f; border-radius:999px; background:#113b43; color:#fff; font-size:.72rem; font-weight:850; }
-.sales-chat-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; padding:10px 12px; }
-.sales-chat-form input { min-height:42px; margin:0; border-color:#507a77; background:#fff; color:#142421; }
-.sales-chat-form button { min-width:62px; border:1px solid #e4c273; border-radius:10px; background:#e4c273; color:#263229; font-weight:950; }
-.sales-chat-panel > small { padding:0 12px 11px; color:#adc5c0 !important; font-size:.65rem; line-height:1.35; }
-body.auth-locked .sales-chat-toggle,
-body.auth-locked .sales-chat-panel { display:none !important; }
-body:not(.theme-dark) .sales-chat-panel { background:#f6fbfa; color:#153b37; }
-body:not(.theme-dark) .sales-chat-messages { background:#edf5f3; }
-body:not(.theme-dark) .sales-chat-message.bot { background:#fff; color:#173b38; border-color:#b8d4cf; }
-body:not(.theme-dark) .sales-chat-suggestions button { background:#e1f2ee; color:#0b625a; }
-@media (max-width:600px) { .sales-chat-toggle { right:10px; bottom:10px; }.sales-chat-toggle b { display:none; }.sales-chat-panel { right:6px; bottom:72px; width:calc(100vw - 12px); max-height:calc(100dvh - 84px); } }
-
 body.auth-locked {
   background:
     radial-gradient(circle at 12% 15%,rgba(15,118,110,.28),transparent 34vw),
@@ -6698,6 +6657,56 @@ body.theme-dark:not(.auth-locked).menu-expanded .logout-menu-button::before {
   }
   .member-announcement-media img {
     max-height:calc(100dvh - 155px) !important;
+  }
+}
+
+/* Mobile menu: one clean left-aligned icon and label grid. */
+@media (max-width:1050px) {
+  body:not(.auth-locked).menu-expanded .auth-actions {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    align-items:stretch !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-actions > :not([hidden]),
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary,
+  body:not(.auth-locked).menu-expanded .auth-actions > details:not([hidden]) > summary {
+    box-sizing:border-box !important;
+    width:100% !important;
+    max-width:none !important;
+    justify-content:flex-start !important;
+    text-align:left !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-actions > .menu-3d-button,
+  body:not(.auth-locked).menu-expanded .auth-actions > .logout-menu-button,
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary {
+    padding-left:16px !important;
+    padding-right:16px !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .menu-3d-icon,
+  body:not(.auth-locked).menu-expanded .menu-3d-button svg,
+  body:not(.auth-locked).menu-expanded .zalo-login-link svg,
+  body:not(.auth-locked).menu-expanded .history-panel-summary::before,
+  body:not(.auth-locked).menu-expanded .drawer-tool-summary::before,
+  body:not(.auth-locked).menu-expanded .logout-menu-button::before,
+  body:not(.auth-locked).menu-expanded .camera-360-icon {
+    flex:0 0 50px !important;
+    margin-left:0 !important;
+    margin-right:14px !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-actions > .menu-3d-button > span:last-child,
+  body:not(.auth-locked).menu-expanded .zalo-login-link > span,
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary {
+    min-width:0 !important;
+    text-align:left !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary::after {
+    margin-left:auto !important;
+    margin-right:0 !important;
   }
 }
 

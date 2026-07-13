@@ -1,17 +1,13 @@
-const CACHE_NAME = "park-pricing-v110-free-entry-auth";
+const CACHE_NAME = "park-pricing-v120-clean-unused-files";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=97",
-  "./unit-data.js?v=64",
-  "./lienke-learned-locations.js?v=2",
-  "./app.js?v=92",
-  "./ui-chatbot.js?v=2",
+  "./styles.css?v=101",
+  "./app.js?v=93",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=78",
+  "./firebase-auth.js?v=79",
   "./ui-menu.js?v=2",
   "./manifest.webmanifest",
-  "./icon.svg",
   "./favicon.png",
   "./apple-touch-icon.png",
   "./sun-group-icon.png",

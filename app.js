@@ -3358,7 +3358,7 @@ function applyAppUrlParams() {
   }
 }
 
-document.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-filter])").forEach((input) => {
+els.pricingForm.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-filter])").forEach((input) => {
   input.addEventListener("input", () => {
     if (input === els.unitCode) {
       const matchedUnit = applyUnitCatalog();
