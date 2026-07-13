@@ -12,8 +12,11 @@
   <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=104">
-  <link rel="stylesheet" href="mid-autumn-theme.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=105">
+  <link rel="stylesheet" href="mid-autumn-theme.css?v=3">
 </head>
 <body class="auth-locked">
   <div id="midAutumnDecor" class="mid-autumn-decor" aria-hidden="true" data-html2canvas-ignore="true" hidden>
@@ -439,29 +442,6 @@
       </div>
       <button class="unit-map-button" id="unitMapBtn" type="button">T&#7841;o &#7843;nh ch&#7881; c&#259;n</button>
       </div>
-      <div class="tts-chart-panel" id="ttsChartPanel">
-        <div class="tts-chart-head">
-          <div>
-            <span>Bi&#7875;u &#273;&#7891; TTS</span>
-            <h3>Gi&#225; Ph&#7843;i Thanh To&#225;n Theo Th&#225;ng</h3>
-          </div>
-          <strong id="ttsChartNow">Hi&#7879;n t&#7841;i</strong>
-        </div>
-        <div class="tts-chart-wrap">
-          <svg id="ttsPriceChart" viewBox="0 0 720 330" role="img" aria-label="Bi&#7875;u &#273;&#7891; gi&#225; ph&#7843;i thanh to&#225;n theo th&#225;ng"></svg>
-          <div class="tts-chart-tooltip" id="ttsChartTooltip" aria-hidden="true"></div>
-        </div>
-        <div class="tts-chart-meta">
-          <div><span>Ph&#432;&#417;ng th&#7913;c</span><strong id="ttsChartMethod">TTS 95%</strong></div>
-          <div><span>Gi&#225; hi&#7879;n t&#7841;i</span><strong id="ttsChartCurrent">0 &#273;</strong></div>
-          <div><span>K&#7871;t th&#250;c CK</span><strong id="ttsChartEnd">0 &#273;</strong></div>
-        </div>
-        <div class="tts-chart-tabs" role="radiogroup" aria-label="Ch&#7885;n ph&#432;&#417;ng th&#7913;c TTS cho bi&#7875;u &#273;&#7891;">
-          <button type="button" data-tts-chart-scenario="tts50">TTS 50%</button>
-          <button type="button" data-tts-chart-scenario="tts70">TTS 70%</button>
-          <button type="button" data-tts-chart-scenario="tts95" class="active">TTS 95%</button>
-        </div>
-      </div>
     </section>
 
     <div class="dashboard-rail dashboard-rail-right">
@@ -476,6 +456,30 @@
     </section>
     </div>
     </div>
+
+    <section class="tts-chart-panel chart-wide-panel" id="ttsChartPanel" aria-labelledby="ttsChartTitle">
+      <div class="tts-chart-head">
+        <div>
+          <span>Bi&#7875;u &#273;&#7891; TTS</span>
+          <h3 id="ttsChartTitle">Gi&#225; Ph&#7843;i Thanh To&#225;n Theo Th&#225;ng</h3>
+        </div>
+        <strong id="ttsChartNow">Hi&#7879;n t&#7841;i</strong>
+      </div>
+      <div class="tts-chart-wrap">
+        <svg id="ttsPriceChart" viewBox="0 0 720 330" role="img" aria-label="Bi&#7875;u &#273;&#7891; gi&#225; ph&#7843;i thanh to&#225;n theo th&#225;ng"></svg>
+        <div class="tts-chart-tooltip" id="ttsChartTooltip" aria-hidden="true"></div>
+      </div>
+      <div class="tts-chart-meta">
+        <div><span>Ph&#432;&#417;ng th&#7913;c</span><strong id="ttsChartMethod">TTS 95%</strong></div>
+        <div><span>Gi&#225; hi&#7879;n t&#7841;i</span><strong id="ttsChartCurrent">0 &#273;</strong></div>
+        <div><span>K&#7871;t th&#250;c CK</span><strong id="ttsChartEnd">0 &#273;</strong></div>
+      </div>
+      <div class="tts-chart-tabs" role="radiogroup" aria-label="Ch&#7885;n ph&#432;&#417;ng th&#7913;c TTS cho bi&#7875;u &#273;&#7891;">
+        <button type="button" data-tts-chart-scenario="tts50">TTS 50%</button>
+        <button type="button" data-tts-chart-scenario="tts70">TTS 70%</button>
+        <button type="button" data-tts-chart-scenario="tts95" class="active">TTS 95%</button>
+      </div>
+    </section>
 
     <section class="kuula-tour-section" id="camera360Tour" aria-labelledby="camera360TourTitle">
       <div class="kuula-tour-head">

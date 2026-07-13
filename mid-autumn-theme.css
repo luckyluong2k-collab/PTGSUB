@@ -11,6 +11,44 @@ body.theme-mid-autumn-red-gold {
     radial-gradient(circle at 85% 9%,rgba(255,217,120,.22) 0 7rem,transparent 7.2rem),
     linear-gradient(145deg,var(--theme-bg-dark),var(--theme-bg) 45%,#6d0717);
   background-attachment:fixed;
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif;
+}
+
+body.theme-mid-autumn-red-gold button,
+body.theme-mid-autumn-red-gold input,
+body.theme-mid-autumn-red-gold select,
+body.theme-mid-autumn-red-gold textarea {
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif !important;
+}
+
+body.theme-mid-autumn-red-gold h1,
+body.theme-mid-autumn-red-gold h2,
+body.theme-mid-autumn-red-gold h3,
+body.theme-mid-autumn-red-gold .brand-copy h1 strong,
+body.theme-mid-autumn-red-gold .form-section-title,
+body.theme-mid-autumn-red-gold .tts-chart-head h3 {
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif !important;
+  font-weight:800 !important;
+  letter-spacing:-.035em;
+  line-height:1.12;
+}
+
+body.theme-mid-autumn-red-gold .summary-band strong,
+body.theme-mid-autumn-red-gold .result-list strong,
+body.theme-mid-autumn-red-gold .quote-title,
+body.theme-mid-autumn-red-gold .quote-stat strong,
+body.theme-mid-autumn-red-gold .tts-chart-meta strong {
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif !important;
+  font-weight:800 !important;
+  letter-spacing:-.025em;
+}
+
+body.theme-mid-autumn-red-gold .eyebrow,
+body.theme-mid-autumn-red-gold label,
+body.theme-mid-autumn-red-gold .summary-band .label,
+body.theme-mid-autumn-red-gold .tts-chart-head span {
+  font-weight:700;
+  letter-spacing:-.012em;
 }
 
 .mid-autumn-decor {

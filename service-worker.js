@@ -1,9 +1,9 @@
-const CACHE_NAME = "park-pricing-v128-mid-autumn-decor";
+const CACHE_NAME = "park-pricing-v130-mid-autumn-typography";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=104",
-  "./mid-autumn-theme.css?v=2",
+  "./styles.css?v=105",
+  "./mid-autumn-theme.css?v=3",
   "./app.js?v=93",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=82",
