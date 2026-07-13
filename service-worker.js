@@ -1,13 +1,14 @@
-const CACHE_NAME = "park-pricing-v125-site-theme-manager";
+const CACHE_NAME = "park-pricing-v126-mid-autumn-theme";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=104",
+  "./mid-autumn-theme.css?v=1",
   "./app.js?v=93",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=81",
+  "./firebase-auth.js?v=82",
   "./ui-menu.js?v=2",
-  "./ui-theme.js?v=2",
+  "./ui-theme.js?v=3",
   "./manifest.webmanifest",
   "./favicon.png",
   "./apple-touch-icon.png",

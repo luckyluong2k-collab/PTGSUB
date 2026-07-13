@@ -7104,7 +7104,7 @@ body[data-site-theme="navy-gold"] {
 
 .site-theme-preview {
   display:grid;
-  grid-template-columns:1.6fr 1fr 1fr .8fr;
+  grid-template-columns:repeat(var(--theme-color-count,4),minmax(0,1fr));
   min-height:92px;
   overflow:hidden;
   border:1px solid #91ada8;

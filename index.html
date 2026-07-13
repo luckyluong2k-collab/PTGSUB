@@ -13,8 +13,24 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css?v=104">
+  <link rel="stylesheet" href="mid-autumn-theme.css?v=1">
 </head>
 <body class="auth-locked">
+  <div class="mid-autumn-decor" aria-hidden="true">
+    <span class="mid-autumn-stars"></span>
+    <span class="mid-autumn-moon"></span>
+    <span class="mid-autumn-cloud cloud-one"></span>
+    <span class="mid-autumn-cloud cloud-two"></span>
+    <svg class="mid-autumn-star-lantern" viewBox="0 0 120 150" focusable="false">
+      <path d="M60 5v24" stroke="#ffd978" stroke-width="4"/><path d="M60 28 71 51l26 4-19 18 5 26-23-12-23 12 5-26-19-18 26-4z" fill="#f5c451" stroke="#fff0aa" stroke-width="4"/><path d="m60 37 7 20 21 1-16 13 5 20-17-11-17 11 5-20-16-13 21-1z" fill="#b51b31"/><path d="M60 88v52M45 101l15 39 15-39" stroke="#ffd978" stroke-width="3"/>
+    </svg>
+    <svg class="mid-autumn-red-lantern" viewBox="0 0 80 150" focusable="false">
+      <path d="M40 0v24" stroke="#ffd978" stroke-width="4"/><path d="M22 25h36M22 104h36" stroke="#ffd978" stroke-width="6"/><path d="M17 32q23-18 46 0v63q-23 18-46 0z" fill="#c51f35" stroke="#f5c451" stroke-width="3"/><path d="M40 30v68M27 29q-8 35 0 69M53 29q8 35 0 69" fill="none" stroke="#ffd978" stroke-width="2"/><path d="M40 107v36M30 112l10 31 10-31" stroke="#ffd978" stroke-width="3"/>
+    </svg>
+    <svg class="mid-autumn-rabbit" viewBox="0 0 100 130" focusable="false">
+      <ellipse cx="38" cy="30" rx="12" ry="31" fill="#fff7e8"/><ellipse cx="63" cy="28" rx="12" ry="31" fill="#fff7e8"/><circle cx="50" cy="64" r="30" fill="#fff7e8"/><ellipse cx="49" cy="108" rx="35" ry="24" fill="#fff7e8"/><circle cx="38" cy="61" r="3" fill="#8b0f23"/><circle cx="62" cy="61" r="3" fill="#8b0f23"/>
+    </svg>
+  </div>
   <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="true">
     <span>Menu</span>
   </button>
@@ -522,10 +538,10 @@
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="app.js?v=93"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
-  <script type="module" src="firebase-auth.js?v=81"></script>
+  <script type="module" src="firebase-auth.js?v=82"></script>
   <script src="ui-admin-search.js?v=1"></script>
   <script src="ui-menu.js?v=2"></script>
   <script src="ui-payment.js?v=1"></script>
-  <script src="ui-theme.js?v=2"></script>
+  <script src="ui-theme.js?v=3"></script>
 </body>
 </html>

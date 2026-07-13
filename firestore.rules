@@ -77,10 +77,28 @@ service cloud.firestore {
       allow delete: if isAdmin() && !isSelf(uid);
     }
 
+    function validSystemTheme() {
+      return request.resource.data.keys().hasOnly([
+          "themeId",
+          "updatedBy",
+          "updatedAt"
+        ])
+        && request.resource.data.themeId in [
+          "navy-gold",
+          "mid-autumn-red-gold"
+        ];
+    }
+
+    match /settings/siteTheme {
+      allow get: if signedIn();
+      allow create, update: if isAdmin() && validSystemTheme();
+      allow delete: if isAdmin();
+    }
+
     match /settings/{settingId} {
       allow get: if signedIn();
       allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if isAdmin() && settingId != "siteTheme";
     }
   }
 }

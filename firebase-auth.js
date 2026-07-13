@@ -732,17 +732,17 @@ function setSiteThemeStatus(message, isError = false) {
   siteThemeStatus.classList.toggle("is-error", isError);
 }
 
-function applySiteTheme(themeId) {
+function applySystemTheme(themeId) {
   currentSiteThemeId = normalizedSiteThemeId(themeId);
-  if (typeof window.ptgsubApplySiteTheme === "function") {
-    window.ptgsubApplySiteTheme(currentSiteThemeId);
+  if (typeof window.applySystemTheme === "function") {
+    window.applySystemTheme(currentSiteThemeId);
   } else {
     document.body.dataset.siteTheme = currentSiteThemeId;
   }
-  renderSiteThemeManager();
+  updateThemeCardState(currentSiteThemeId);
 }
 
-function renderSiteThemeManager() {
+function renderThemeCatalog() {
   if (!siteThemeList) return;
   siteThemeList.textContent = "";
 
@@ -754,9 +754,13 @@ function renderSiteThemeManager() {
 
     const preview = document.createElement("div");
     preview.className = "site-theme-preview";
-    const colors = Array.isArray(theme.colors) && theme.colors.length ? theme.colors : ["#071c22", "#0f766e", "#d7b46a", "#f5faf8"];
-    colors.slice(0, 4).forEach((color, index) => preview.style.setProperty(`--theme-color-${index + 1}`, color));
-    preview.innerHTML = '<span></span><span></span><span></span><span></span>';
+    const colors = Array.isArray(theme.colors) && theme.colors.length ? theme.colors : ["#071c22"];
+    preview.style.setProperty("--theme-color-count", String(colors.length));
+    colors.forEach((color) => {
+      const swatch = document.createElement("span");
+      swatch.style.backgroundColor = color;
+      preview.appendChild(swatch);
+    });
 
     const content = document.createElement("div");
     content.className = "site-theme-card-content";
@@ -778,15 +782,20 @@ function renderSiteThemeManager() {
     selectButton.type = "button";
     selectButton.className = "site-theme-select";
     selectButton.disabled = selected;
-    selectButton.textContent = selected ? "Đang sử dụng" : "Sử dụng giao diện này";
-    selectButton.addEventListener("click", () => saveSiteTheme(theme.id));
+    selectButton.textContent = selected ? "Đang sử dụng" : "Áp dụng giao diện";
+    selectButton.addEventListener("click", () => saveSystemTheme(theme.id));
 
     card.append(preview, content, selectButton);
     siteThemeList.appendChild(card);
   });
 }
 
-async function saveSiteTheme(themeId) {
+function updateThemeCardState(themeId) {
+  currentSiteThemeId = normalizedSiteThemeId(themeId);
+  renderThemeCatalog();
+}
+
+async function saveSystemTheme(themeId) {
   if (!currentIsAdmin) return;
   const selectedId = normalizedSiteThemeId(themeId);
   setSiteThemeStatus(`Đang áp dụng giao diện ${siteThemeName(selectedId)}...`);
@@ -797,27 +806,27 @@ async function saveSiteTheme(themeId) {
       updatedBy: currentUserEmail,
       updatedAt: serverTimestamp(),
     }, { merge: true });
-    applySiteTheme(selectedId);
+    applySystemTheme(selectedId);
     setSiteThemeStatus(`Đã áp dụng ${siteThemeName(selectedId)} cho toàn bộ thành viên.`);
   } catch (error) {
-    renderSiteThemeManager();
+    renderThemeCatalog();
     setSiteThemeStatus(`Không đổi được giao diện: ${authErrorMessage(error)}`, true);
   }
 }
 
-function stopSiteThemeSync() {
+function stopSystemThemeSync() {
   if (typeof siteThemeUnsubscribe === "function") siteThemeUnsubscribe();
   siteThemeUnsubscribe = null;
 }
 
-function startSiteThemeSync() {
-  stopSiteThemeSync();
+function loadSystemTheme() {
+  stopSystemThemeSync();
   siteThemeUnsubscribe = onSnapshot(doc(db, "settings", "siteTheme"), (snapshot) => {
     const selectedId = snapshot.exists() ? snapshot.data()?.themeId : "navy-gold";
-    applySiteTheme(selectedId);
+    applySystemTheme(selectedId);
     setSiteThemeStatus(`Giao diện hiện tại: ${siteThemeName(currentSiteThemeId)}.`);
   }, (error) => {
-    applySiteTheme(currentSiteThemeId || "navy-gold");
+    applySystemTheme(currentSiteThemeId || "navy-gold");
     setSiteThemeStatus(`Không đồng bộ được giao diện: ${authErrorMessage(error)}`, true);
   });
 }
@@ -837,7 +846,7 @@ function selectAdminTab(tabName) {
   adminThemeTab?.setAttribute("aria-selected", String(showTheme));
   const search = document.querySelector(".admin-user-search");
   if (search) search.hidden = !showUsers;
-  if (showTheme) renderSiteThemeManager();
+  if (showTheme) renderThemeCatalog();
 }
 
 function safeAnnouncementUrl(value) {
@@ -1010,7 +1019,7 @@ async function enterApprovedApp(user, data) {
   stopApprovalPolling();
   currentUserData = data;
   currentIsAdmin = isAdminEmail(currentUserEmail) || data.role === "admin";
-  startSiteThemeSync();
+  loadSystemTheme();
 
   showApp(user.email, data);
   renderMyHistory(data.recentSearches || []);
@@ -1308,7 +1317,7 @@ adminAnnouncementTab?.addEventListener("click", () => {
 
 adminThemeTab?.addEventListener("click", () => {
   selectAdminTab("theme");
-  renderSiteThemeManager();
+  renderThemeCatalog();
 });
 
 announcementImageInput?.addEventListener("change", async () => {
@@ -1481,7 +1490,7 @@ onAuthStateChanged(auth, async (user) => {
       if (!user) {
         stopApprovalPolling();
         stopAccessExpiryTimer();
-        stopSiteThemeSync();
+        stopSystemThemeSync();
         currentUserId = "";
       currentUserEmail = "";
       currentUserData = null;
