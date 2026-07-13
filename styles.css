@@ -5423,7 +5423,7 @@ body.auth-locked .free-version-link:hover {
   body.auth-locked .login-price-spotlight { animation: none !important; transform: none !important; }
 }
 
-/* Payment QR dialog opened from the 129k membership card */
+/* Payment QR dialog opened from the 1999K membership card */
 body.auth-locked .login-price-spotlight {
   cursor:pointer;
 }
