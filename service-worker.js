@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v147-loan-same-tab";
+const CACHE_NAME = "park-pricing-v148-lowrise-auto-map";
 const ASSETS = [
   "./",
   "./index.html",
