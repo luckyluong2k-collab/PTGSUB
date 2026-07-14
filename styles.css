@@ -184,6 +184,78 @@ h2 {
   color: #1b5e20;
 }
 
+.social-chip.forum {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: #e6c36e;
+  background: #fff8df;
+  color: #7a1424;
+  transform-style: preserve-3d;
+  animation: forum-chip-float-3d 2.8s ease-in-out infinite;
+  box-shadow: 0 5px 0 #b8862d, 0 13px 24px rgba(122, 20, 36, 0.24);
+  will-change: transform;
+}
+
+.social-chip[hidden] {
+  display: none !important;
+}
+
+.social-chip.forum::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -35% auto -35% -45%;
+  width: 32%;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+  animation: forum-chip-shine 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.social-chip.forum > svg,
+.social-chip.forum > span {
+  position: relative;
+  z-index: 1;
+}
+
+.social-chip.forum:hover,
+.social-chip.forum:focus-visible {
+  animation-play-state: paused;
+  transform: perspective(520px) translateY(-5px) scale(1.06) rotateX(5deg) rotateY(-4deg);
+  box-shadow: 0 7px 0 #a87320, 0 18px 30px rgba(122, 20, 36, 0.32);
+}
+
+@keyframes forum-chip-float-3d {
+  0%, 100% {
+    transform: perspective(520px) translateY(0) rotateX(0deg) rotateY(-3deg);
+  }
+  50% {
+    transform: perspective(520px) translateY(-4px) rotateX(4deg) rotateY(3deg);
+  }
+}
+
+@keyframes forum-chip-shine {
+  0%, 58% { left: -45%; opacity: 0; }
+  66% { opacity: 1; }
+  88%, 100% { left: 122%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-chip.forum,
+  .social-chip.forum::after {
+    animation: none;
+  }
+}
+
+.forum-bubble {
+  fill: #a40f2c;
+}
+
+.forum-dot {
+  fill: #ffd978;
+}
+
 .tk-cyan {
   fill: #25f4ee;
 }
@@ -2063,6 +2135,13 @@ body {
 .social-chip.drive {
   border-color: rgba(215, 180, 106, 0.38);
   background: rgba(255, 250, 240, 0.94);
+}
+
+.social-chip.forum {
+  border-color: rgba(215, 180, 106, 0.52);
+  background: rgba(255, 247, 223, 0.96);
+  color: #721426;
+  box-shadow: 0 5px 0 #b8862d, 0 13px 24px rgba(4, 18, 22, 0.24);
 }
 
 .icon-button,

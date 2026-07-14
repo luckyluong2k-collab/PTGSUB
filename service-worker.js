@@ -1,12 +1,13 @@
-const CACHE_NAME = "park-pricing-v141-payment-schedule-excel";
+const CACHE_NAME = "park-pricing-v143-member-forum-3d";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=109",
+  "./forum.html",
+  "./styles.css?v=110",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=101",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=82",
+  "./firebase-auth.js?v=84",
   "./ui-menu.js?v=2",
   "./ui-theme.js?v=4",
   "./manifest.webmanifest",
@@ -59,14 +60,17 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   if (event.request.mode === "navigate") {
+    const requestUrl = new URL(event.request.url);
+    const isForumPage = requestUrl.pathname.endsWith("/forum.html");
+    const cacheKey = isForumPage ? "./forum.html" : "./index.html";
     event.respondWith(
       fetch(event.request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(cacheKey, copy));
           return response;
         })
-        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match(cacheKey)))
     );
     return;
   }

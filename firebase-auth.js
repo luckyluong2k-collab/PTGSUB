@@ -86,6 +86,7 @@ const logoutBtn = document.querySelector("#logoutBtn");
 const authStatus = document.querySelector("#authStatus");
 const adminPanel = document.querySelector("#adminPanel");
 const adminOpenBtn = document.querySelector("#adminOpenBtn");
+const adminForumLink = document.querySelector("#adminForumLink");
 const adminCloseBtn = document.querySelector("#adminCloseBtn");
 const adminUsers = document.querySelector("#adminUsers");
 const adminUsersTab = document.querySelector("#adminUsersTab");
@@ -299,6 +300,7 @@ function setMenuAuthState(isInsideApp) {
   if (loginIntro) loginIntro.hidden = isInsideApp;
   if (loginMenuSection) loginMenuSection.open = !isInsideApp;
   if (freeVersionLink) freeVersionLink.hidden = isInsideApp;
+  if (adminForumLink) adminForumLink.hidden = !isInsideApp;
   protectedMenuItems.forEach((item) => {
     item.hidden = !isInsideApp;
   });
