@@ -1,12 +1,17 @@
-const CACHE_NAME = "park-pricing-v148-lowrise-auto-map";
+const CACHE_NAME = "park-pricing-v152-remove-flora-menu";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
-  "./styles.css?v=112",
+  "./quote.html",
+  "./quote-admin-demo.html",
+  "./quote-demo.css?v=2",
+  "./styles.css?v=113",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=104",
+  "./app.js?v=105",
   "./forum.js?v=1",
+  "./quote-demo.js?v=2",
+  "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=84",
   "./ui-unit-lookup.js?v=1",

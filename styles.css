@@ -6196,7 +6196,7 @@ body:not(.auth-locked).menu-expanded .camera-360-icon:hover {
   filter:none !important;
 }
 
-/* Camera 360 uses the same understandable icon tile as every menu tool */
+/* Flora Avenue uses the same understandable icon tile as every menu tool */
 body:not(.auth-locked).menu-expanded .auth-actions .camera-360-link {
   border-color:rgba(228,194,115,.48) !important;
   background:linear-gradient(145deg,#123745,#092431) !important;
@@ -6873,7 +6873,7 @@ body.auth-locked .free-version-link .menu-3d-icon {
   }
 }
 
-/* Final Camera 360 tile alignment: large number, optically centered. */
+/* Final Flora Avenue tile alignment: compact initials, optically centered. */
 body:not(.auth-locked).menu-expanded .camera-360-icon {
   display:grid !important;
   place-items:center !important;
@@ -6882,7 +6882,7 @@ body:not(.auth-locked).menu-expanded .camera-360-icon {
   padding:0 !important;
   font-size:1.55rem !important;
   line-height:1 !important;
-  letter-spacing:-.08em !important;
+  letter-spacing:0 !important;
   text-align:center !important;
   text-indent:-.04em;
 }
