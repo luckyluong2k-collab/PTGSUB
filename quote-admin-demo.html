@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12245c">
+  <title>Admin demo bao gia | PTGSUB</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="stylesheet" href="quote-demo.css?v=2">
+</head>
+<body>
+  <main class="quote-admin-dashboard">
+    <header class="quote-admin-head">
+      <div>
+        <p class="quote-demo-eyebrow">Admin demo</p>
+        <h1>Theo d&#245;i m&#227; b&#225;o gi&#225; <span id="quoteCode">AB7K29</span></h1>
+      </div>
+      <div class="quote-admin-actions">
+        <a class="quote-demo-admin-link" id="openQuoteLink" href="quote.html?code=AB7K29" target="_blank" rel="noopener">M&#7903; trang kh&#225;ch</a>
+        <button class="quote-demo-copy" id="copyQuoteLink" type="button">Copy link</button>
+        <button class="quote-demo-copy" id="seedStats" type="button">T&#7841;o thao t&#225;c m&#7851;u</button>
+        <button class="quote-demo-copy" id="resetStats" type="button">Reset demo</button>
+      </div>
+    </header>
+
+    <section class="quote-admin-card">
+      <div class="quote-admin-kpis">
+        <div class="quote-admin-kpi">
+          <span>S&#7889; l&#432;&#7907;t m&#7903;</span>
+          <strong id="opens">0</strong>
+        </div>
+        <div class="quote-admin-kpi">
+          <span>B&#7845;m Zalo</span>
+          <strong id="zaloClicks">0</strong>
+        </div>
+        <div class="quote-admin-kpi">
+          <span>B&#7845;m g&#7885;i</span>
+          <strong id="callClicks">0</strong>
+        </div>
+        <div class="quote-admin-kpi">
+          <span>B&#7845;m Flora Avenue</span>
+          <strong id="floraClicks">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-admin-card">
+      <h2>M&#7913;c &#273;&#7897; kh&#225;ch &#273;&#227; xem</h2>
+      <p id="lastSeen">Ch&#432;a c&#243; d&#7919; li&#7879;u m&#7903; link.</p>
+      <div class="quote-progress" aria-label="Tien do doc trang"><span id="readProgress"></span></div>
+      <p><strong id="readProgressText">0%</strong> trang b&#225;o gi&#225; &#273;&#227; &#273;&#432;&#7907;c xem.</p>
+    </section>
+
+    <section class="quote-admin-card">
+      <h2>D&#242;ng th&#7901;i gian thao t&#225;c</h2>
+      <div class="quote-event-list" id="eventList">
+        <p class="quote-empty">M&#7903; trang kh&#225;ch r&#7891;i quay l&#7841;i &#273;&#226;y &#273;&#7875; xem log.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="quote-admin-demo.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+﻿HUONG DAN BAT DANG NHAP + DUYET GMAIL
+
+LINK DUNG DE MO APP:
+- Dung link web deploy cua app, vi du: https://ptgsub.luckyluong2k.workers.dev
+- KHONG mo truc tiep https://ptg-sub.firebaseapp.com. Day chi la domain handler cua Firebase Auth nen co the hien "The requested action is invalid".
+
+1. Firebase Console > Authentication > Sign-in method:
+   - Bat Google provider.
+   - Neu dang nhap bao loi authorized-domain, vao Authentication > Settings > Authorized domains va them:
+     ptgsub.luckyluong2k.workers.dev
+     localhost
+     127.0.0.1
+   - Neu sau nay doi link web/domain, them dung domain moi vao day.
+
+2. Firebase Console > Firestore Database:
+   - Tao database neu chua co.
+   - Vao tab Rules.
+   - Dan noi dung trong file firestore.rules vao va Publish.
+
+3. Admin mac dinh:
+   - Gmail: luckyluong2k@gmail.com
+   - Gmail nay dang nhap lan dau se tu duoc duyet va co role admin.
+
+4. Cach duyet nguoi dung:
+   - Nguoi moi bam Dang nhap bang Google.
+   - Neu chua duyet, app se hien trang thai cho duyet.
+   - Admin dang nhap, bam nut Tai khoan, muc Quan ly nguoi dung se co nut Duyet/Chan.
+
+5. Luu y bao mat:
+   - Lop nay chan giao dien app va lich su nguoi dung bang Firebase Auth + Firestore Rules.
+   - Neu Google Sheet dang de public, nguoi co link sheet van co the xem sheet truc tiep.

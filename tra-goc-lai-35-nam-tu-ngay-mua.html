@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#061f28">
+  <script>document.documentElement.classList.toggle("theme-dark",localStorage.getItem("ptgsub-ui-theme")==="dark");</script>
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="sun-group-icon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="loan-theme.css?v=1">
+  <title>Tính gốc lãi 35 năm từ ngày mua | Sun Urban City</title>
+  <style>
+    :root { --navy:#07194a; --blue:#12347c; --gold:#ffd833; --ink:#12213d; --muted:#62708c; --line:#dce3ef; --soft:#f3f6fc; --red:#c82d2d; --green:#14724e; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:linear-gradient(145deg,#edf3ff,#f9fbff 44%,#eef1f8); font:15px/1.45 Arial,Helvetica,sans-serif; }
+    .page { width:min(1120px,100%); margin:0 auto; padding:28px 16px 44px; }
+    .loan-brandbar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin:0 0 14px; padding:12px 14px; border:1px solid #cfe0f6; border-radius:16px; background:rgba(255,255,255,.9); box-shadow:0 10px 28px #14336c12; }
+    .loan-brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .loan-brand img { width:68px; height:48px; object-fit:cover; border-radius:12px; border:1px solid #f0d37b; box-shadow:0 7px 16px #1725541c; }
+    .loan-brand span { display:block; color:#5b6b85; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .loan-brand strong { display:block; color:#07194a; font-size:18px; line-height:1.12; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .home-link { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:0 16px; border:1px solid #7dd3fc; border-radius:999px; background:linear-gradient(180deg,#e0f7ff,#8bdcff); color:#075985; font-weight:900; text-decoration:none; box-shadow:0 7px 0 #38a3dc,0 14px 22px #0ea5e936; }
+    .home-link:hover, .home-link:focus-visible { transform:translateY(-1px); filter:brightness(1.03); outline:none; }
+    .home-link:active { transform:translateY(5px); box-shadow:0 2px 0 #38a3dc,0 8px 14px #0ea5e92b; }
+    .hero { color:#fff; background:radial-gradient(circle at 90% 0,#315fc6 0,transparent 32%),linear-gradient(122deg,#06133c,#102e72); border-radius:22px 22px 8px 8px; padding:26px 28px; box-shadow:0 14px 34px #0b24603b; }
+    .eyebrow { margin:0 0 7px; color:var(--gold); font-weight:700; letter-spacing:.08em; font-size:12px; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(25px,4vw,38px); line-height:1.15; }
+    .hero p { max-width:780px; color:#e5edff; margin:11px 0 0; }
+    .notice { display:flex; gap:10px; align-items:flex-start; padding:13px 16px; background:#fff6d7; color:#6a5000; border:1px solid #f0d472; border-radius:10px; margin:16px 0; }
+    .notice strong { color:#5f4600; }
+    .layout { display:grid; grid-template-columns:minmax(300px,.92fr) minmax(420px,1.55fr); gap:18px; align-items:start; }
+    .panel { background:#fff; border:1px solid #e1e7f1; border-radius:14px; box-shadow:0 8px 22px #14295d0c; overflow:hidden; }
+    .panel-title { margin:0; padding:17px 19px 13px; font-size:18px; border-bottom:1px solid var(--line); }
+    .inputs { padding:14px 18px 18px; }
+    .field { margin:0 0 13px; }
+    label { display:flex; justify-content:space-between; gap:8px; margin:0 0 6px; font-weight:700; font-size:13px; }
+    label span { color:var(--muted); font-weight:400; text-align:right; }
+    input { width:100%; border:1px solid #cbd5e4; border-radius:9px; color:var(--ink); background:#fff; padding:11px 12px; font-size:16px; outline:none; }
+    input:focus { border-color:#3565c1; box-shadow:0 0 0 3px #3565c21f; }
+    input[readonly] { background:#f1f4f9; color:#40506d; font-weight:700; cursor:not-allowed; }
+    .input-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .hint { font-size:12px; color:var(--muted); margin:3px 0 0; }
+    .assumption { border-top:1px solid var(--line); margin-top:16px; padding-top:14px; color:var(--muted); font-size:12px; }
+    .results { padding:17px 18px 19px; }
+    .headline { padding:17px; border-radius:12px; color:#fff; background:linear-gradient(120deg,#102c72,#2059bd); }
+    .headline p { margin:0 0 4px; color:#dce8ff; font-size:13px; }
+    .headline strong { display:block; color:var(--gold); font-size:clamp(27px,4vw,36px); letter-spacing:-.03em; line-height:1.05; }
+    .headline small { display:block; margin-top:6px; color:#e3ecff; }
+    .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:13px 0; }
+    .stat { border:1px solid var(--line); background:#fbfcff; padding:11px; border-radius:10px; }
+    .stat b { display:block; color:var(--muted); font-size:12px; font-weight:600; }
+    .stat strong { display:block; margin-top:3px; font-size:17px; }
+    .stat.red strong { color:var(--red); }
+    .stat.green strong { color:var(--green); }
+    .cashflow { margin:14px 0 0; border-top:1px solid var(--line); padding-top:14px; }
+    .cashflow h3 { margin:0 0 9px; font-size:16px; }
+    .table-wrap { max-height:510px; overflow:auto; border:1px solid var(--line); border-radius:10px; }
+    table { border-collapse:collapse; width:100%; min-width:830px; font-size:13px; }
+    th { position:sticky; top:0; z-index:2; text-align:right; background:#edf3ff; color:#314b7d; padding:9px 10px; white-space:nowrap; }
+    th:first-child, td:first-child { text-align:center; }
+    th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3) { text-align:left; }
+    td { text-align:right; padding:9px 10px; border-top:1px solid #e9edf4; white-space:nowrap; }
+    tr.support-row td { background:#f7f9fd; color:#6a7892; }
+    tr.first-payment td { background:#fff8da; font-weight:700; }
+    .badge { display:inline-block; padding:3px 7px; border-radius:999px; font-size:11px; font-weight:700; }
+    .badge.support { color:#31518f; background:#e8efff; }
+    .badge.repay { color:#176348; background:#e5f7ef; }
+    .summary { margin-top:14px; padding:13px 15px; border-left:4px solid var(--gold); border-radius:8px; background:#f7f9fd; color:#41506e; }
+    .summary b { color:var(--ink); }
+    .footnote { margin:14px 0 0; color:#6a7892; font-size:12px; }
+    @media (max-width:760px) {
+      .page { padding:16px 10px 30px; }
+      .loan-brandbar { align-items:stretch; flex-direction:column; }
+      .home-link { width:100%; }
+      .hero { border-radius:14px 14px 6px 6px; padding:22px 18px; }
+      .layout { grid-template-columns:1fr; }
+      .stats { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:480px) { .input-row, .stats { grid-template-columns:1fr; } }
+    /* Navy-gold visual system shared with the main pricing page */
+    :root { --navy:#061f28; --navy-2:#0d3039; --navy-3:#16434d; --blue:#0f766e; --gold:#e4c273; --ink:#f4f7f6; --muted:#bfd0cd; --line:rgba(228,194,115,.3); --soft:#0a2932; --red:#ff756d; --green:#78e0a0; }
+    body {
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% 10%,rgba(15,118,110,.22),transparent 32vw),
+        radial-gradient(circle at 92% 88%,rgba(228,194,115,.12),transparent 30vw),
+        linear-gradient(145deg,#03171d,#082a32 58%,#061f27);
+      font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    }
+    .page { width:min(1400px,calc(100% - 24px)); padding:14px 0 34px; }
+    .loan-brandbar {
+      position:sticky; top:0; z-index:20;
+      margin-bottom:10px; padding:8px 12px;
+      border:1px solid rgba(228,194,115,.42); border-radius:13px;
+      background:linear-gradient(120deg,#061f28,#0b3038 64%,#132f31);
+      box-shadow:0 14px 34px rgba(0,0,0,.28);
+      backdrop-filter:blur(14px);
+    }
+    .loan-brand img {
+      width:50px; height:44px; padding:2px;
+      border:1px solid var(--gold); border-radius:10px;
+      background:linear-gradient(145deg,#fff0bb,#b78935);
+      box-shadow:0 8px 18px rgba(0,0,0,.3);
+    }
+    .loan-brand span { color:var(--gold); font-family:Georgia,"Times New Roman",serif; font-size:10px; letter-spacing:.12em; }
+    .loan-brand strong { color:#fff; font-size:16px; font-weight:950; letter-spacing:-.02em; }
+    .home-link {
+      min-height:36px; padding:0 14px;
+      border:1px solid #f2d99c; border-radius:10px;
+      background:linear-gradient(145deg,#e4c273,#bd9140);
+      color:#18230e; box-shadow:0 5px 0 #76531f,0 11px 20px rgba(0,0,0,.22);
+    }
+    .home-link:active { box-shadow:0 2px 0 #76531f,0 6px 12px rgba(0,0,0,.2); }
+    .hero {
+      padding:22px 24px; border:1px solid rgba(228,194,115,.42); border-radius:16px;
+      background:radial-gradient(circle at 90% 0,rgba(37,167,154,.28),transparent 34%),linear-gradient(125deg,#071f28,#123f49);
+      box-shadow:0 18px 42px rgba(0,0,0,.28);
+    }
+    .eyebrow { color:var(--gold); }
+    h1 { color:#fff; font-size:clamp(25px,3vw,40px); font-weight:1000; letter-spacing:-.035em; }
+    .hero p { color:#d7e3e1; }
+    .notice {
+      margin:10px 0; padding:10px 13px;
+      border:1px solid rgba(228,194,115,.52); border-radius:10px;
+      background:linear-gradient(135deg,#3e3215,#2a281b); color:#f5e5bc;
+    }
+    .notice strong { color:#ffe7a5; }
+    .layout { grid-template-columns:minmax(300px,.8fr) minmax(0,1.7fr); gap:10px; }
+    .panel {
+      border:1px solid rgba(228,194,115,.32); border-radius:13px;
+      background:linear-gradient(145deg,#0d3039,#071f28); color:#fff;
+      box-shadow:0 16px 36px rgba(0,0,0,.24);
+    }
+    .panel-title { padding:12px 14px 10px; border-bottom-color:rgba(228,194,115,.3); color:var(--gold); font-size:17px; font-weight:950; }
+    .inputs,.results { padding:12px 14px 15px; }
+    .field { margin-bottom:10px; }
+    label { color:#f4dea6; }
+    label span,.hint,.assumption,.footnote { color:var(--muted); }
+    input {
+      min-height:40px; padding:8px 10px;
+      border:1px solid rgba(228,194,115,.34); border-radius:9px;
+      background:#041b22; color:#fff;
+    }
+    input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(228,194,115,.14); }
+    input[readonly] { background:#102e36; color:#d5e1df; }
+    .assumption { border-top-color:rgba(228,194,115,.24); }
+    .headline {
+      padding:14px; border:1px solid rgba(228,194,115,.48); border-radius:11px;
+      background:linear-gradient(125deg,#174652,#0c303a); box-shadow:0 12px 26px rgba(0,0,0,.22);
+    }
+    .headline p,.headline small { color:#d7e3e1; }
+    .headline strong { color:#ffe16a; }
+    .stats { gap:8px; margin:10px 0; }
+    .stat { padding:9px; border-color:rgba(228,194,115,.3); border-radius:9px; background:linear-gradient(145deg,#16434d,#0b2b34); }
+    .stat b { color:#f4dea6; }
+    .stat strong { color:#fff; }
+    .cashflow { margin-top:10px; padding-top:10px; border-top-color:rgba(228,194,115,.25); }
+    .cashflow h3 { color:var(--gold); }
+    .table-wrap { border-color:rgba(228,194,115,.3); background:#061f28; }
+    th { background:#16434d; color:#f4dea6; }
+    td { border-top-color:rgba(228,194,115,.14); color:#e9f0ef; }
+    tbody tr:nth-child(even) td { background:#0a2932; }
+    tr.support-row td { background:#102e36; color:#bfd0cd; }
+    tr.first-payment td { background:#3d341b; color:#fff1bd; }
+    .badge.support { color:#bfe6df; background:#12453f; }
+    .badge.repay { color:#b9efca; background:#16452c; }
+    .summary { border-left-color:var(--gold); background:#123b44; color:#d7e3e1; }
+    .summary b { color:#fff; }
+    @media (max-width:760px) {
+      .page { width:calc(100% - 16px); padding:8px 0 24px; }
+      .loan-brandbar { position:static; }
+      .layout { grid-template-columns:1fr; }
+      .hero { padding:18px 15px; }
+    }
+  </style>
+  <style>
+    body.loan-auth-checking { overflow:hidden; }
+    body.loan-auth-checking > .page { visibility:hidden; }
+    .loan-auth-guard { position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:20px; background:linear-gradient(145deg,#03171d,#082a32 58%,#061f27); }
+    .loan-auth-guard-card { display:grid; justify-items:center; gap:10px; width:min(390px,100%); padding:28px; border:1px solid rgba(228,194,115,.5); border-radius:18px; background:linear-gradient(145deg,#10343d,#071f28); color:#fff; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.48); }
+    .loan-auth-guard-card img { width:64px; height:64px; padding:3px; object-fit:cover; border:1px solid #e4c273; border-radius:14px; background:linear-gradient(145deg,#fff0bb,#b78935); }
+    .loan-auth-guard-card strong { color:#e4c273; font-size:18px; }
+    .loan-auth-guard-card span { color:#c9d9d6; }
+    .loan-auth-spinner { width:30px; height:30px; border:3px solid rgba(228,194,115,.22); border-top-color:#e4c273; border-radius:50%; animation:loanAuthSpin .8s linear infinite; }
+    @keyframes loanAuthSpin { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion:reduce) { .loan-auth-spinner { animation:none; border-top-color:rgba(228,194,115,.22); } }
+  </style>
+</head>
+<body class="loan-auth-checking">
+  <div class="loan-auth-guard" id="loanAuthGuard" role="status" aria-live="polite">
+    <div class="loan-auth-guard-card">
+      <img src="sun-group-icon.png" alt="Sun Group">
+      <strong>&#272;ang ki&#7875;m tra quy&#7873;n truy c&#7853;p</strong>
+      <span>Trang n&#224;y ch&#7881; d&#224;nh cho th&#224;nh vi&#234;n &#273;&#227; &#273;&#259;ng nh&#7853;p.</span>
+      <span class="loan-auth-spinner" aria-hidden="true"></span>
+    </div>
+  </div>
+  <main class="page">
+    <div class="loan-brandbar">
+      <div class="loan-brand">
+        <img src="sun-group-logo.png" alt="Sun Group" onerror="this.hidden=true">
+        <div>
+          <span>Sun Urban City</span>
+          <strong>Lịch trả gốc lãi sau HTLS</strong>
+        </div>
+      </div>
+      <a class="home-link" id="homeLink" href="index.html">Trang chủ</a>
+    </div>
+
+    <section class="hero">
+      <p class="eyebrow">Sun Urban City · Công cụ tư vấn tài chính</p>
+      <h1>Lịch trả gốc và lãi trong 35 năm từ ngày mua</h1>
+      <p>Tổng thời gian được cố định 35 năm (420 tháng) kể từ ngày mua hàng. Thời gian hỗ trợ lãi suất được tính bên trong 420 tháng, không cộng thêm vào cuối kỳ vay.</p>
+    </section>
+
+    <div class="notice">
+      <span>ℹ</span>
+      <div><strong>Nguyên tắc 35 năm:</strong> nếu HTLS 30 tháng thì khách trả gốc và lãi trong 390 tháng còn lại. Kỳ cuối kết thúc đúng 35 năm sau ngày mua hàng.</div>
+    </div>
+
+    <section class="layout">
+      <section class="panel">
+        <h2 class="panel-title">Thông số khoản vay</h2>
+        <div class="inputs">
+          <div class="field">
+            <label for="unitCode">Mã căn <span>không bắt buộc</span></label>
+            <input id="unitCode" type="text" placeholder="Ví dụ: C1707">
+          </div>
+          <div class="field">
+            <label for="purchaseDate">Ngày mua hàng <span>mốc bắt đầu 35 năm</span></label>
+            <input id="purchaseDate" type="date">
+          </div>
+          <div class="field">
+            <label for="price">Giá căn sau chiết khấu <span>đồng</span></label>
+            <input id="price" inputmode="numeric" value="2000000000">
+          </div>
+          <div class="input-row">
+            <div class="field">
+              <label for="loanPct">Tỷ lệ vay <span>% giá căn</span></label>
+              <input id="loanPct" inputmode="decimal" value="70">
+            </div>
+            <div class="field">
+              <label for="support">Hỗ trợ lãi suất <span>tháng trong 420 tháng</span></label>
+              <input id="support" inputmode="numeric" value="30">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="field">
+              <label for="rate">Lãi suất sau HTLS <span>%/năm dự kiến</span></label>
+              <input id="rate" inputmode="decimal" value="10">
+            </div>
+            <div class="field">
+              <label for="term">Thời gian trả gốc <span>420 − HTLS</span></label>
+              <input id="term" type="text" inputmode="numeric" value="390 tháng">
+            </div>
+          </div>
+          <p class="hint">Tổng kỳ vay luôn là 420 tháng. Khi thay đổi số tháng HTLS, số tháng trả gốc sẽ tự động cập nhật.</p>
+          <div class="assumption"><b>Logic tính:</b> trong thời gian HTLS, khách chưa trả gốc và lãi được CĐT hỗ trợ. Từ kỳ đầu sau HTLS, gốc trả đều = khoản vay ÷ số tháng còn lại; lãi = dư nợ đầu kỳ × lãi suất năm ÷ 12.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Kết quả khách cần chuẩn bị</h2>
+        <div class="results">
+          <div class="headline">
+            <p id="firstLabel">Khoản phải trả tại kỳ đầu sau HTLS</p>
+            <strong id="firstPayment">—</strong>
+            <small id="firstBreakdown">—</small>
+          </div>
+          <div class="stats">
+            <div class="stat"><b>Khoản vay dự kiến</b><strong id="loanAmount">—</strong></div>
+            <div class="stat"><b>Gốc trả đều/tháng</b><strong id="principalMonthly">—</strong></div>
+            <div class="stat"><b>Thời gian trả gốc</b><strong id="repaymentTerm">—</strong></div>
+            <div class="stat green"><b>Ngày kết thúc 35 năm</b><strong id="endDate">—</strong></div>
+            <div class="stat"><b>Dư nợ sau 12 kỳ trả</b><strong id="balanceAfter12">—</strong></div>
+            <div class="stat red"><b>Thu nhập tham khảo*</b><strong id="incomeProof">—</strong></div>
+          </div>
+          <div class="cashflow">
+            <h3 id="scheduleTitle">Lịch đầy đủ 420 tháng từ ngày mua</h3>
+            <div class="table-wrap">
+              <table aria-label="Lịch trả nợ 35 năm từ ngày mua hàng">
+                <thead>
+                  <tr><th>Tháng</th><th>Ngày dự kiến</th><th>Giai đoạn</th><th>Gốc khách trả</th><th>Lãi khách trả</th><th>Tổng trả</th><th>Dư nợ cuối kỳ</th></tr>
+                </thead>
+                <tbody id="schedule"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="summary" id="summary">—</div>
+          <p class="footnote">* Mốc thu nhập tham khảo = khoản trả cao nhất + 12 triệu đồng/tháng. Ngày trong bảng là ngày dự kiến theo chu kỳ hằng tháng tính từ ngày mua. Với ngày 29, 30 hoặc 31, hệ thống tự điều chỉnh về ngày cuối cùng của tháng nếu tháng đó không có ngày tương ứng.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const TOTAL_MONTHS = 35 * 12;
+    const $ = id => document.getElementById(id);
+    const inputIds = ['unitCode','purchaseDate','price','loanPct','support','rate','term'];
+    const money = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 });
+    const dateFormat = new Intl.DateTimeFormat('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const vnd = n => Number.isFinite(n) ? `${money.format(Math.round(n))} đ` : '—';
+
+    const parseNumber = value => {
+      let raw = String(value ?? '').replace(/[^0-9,.-]/g, '');
+      const separators = (raw.match(/[,.]/g) || []).length;
+      const last = Math.max(raw.lastIndexOf(','), raw.lastIndexOf('.'));
+      const decimals = last >= 0 ? raw.length - last - 1 : 0;
+      if (separators === 1 && decimals > 0 && decimals <= 2) {
+        raw = raw.slice(0, last).replace(/[,.]/g, '') + '.' + raw.slice(last + 1);
+      } else {
+        raw = raw.replace(/[,.]/g, '');
+      }
+      return Number(raw) || 0;
+    };
+
+    const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+
+    function toInputDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseLocalDate(value) {
+      const parts = String(value || '').split('-').map(Number);
+      if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return new Date();
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function addMonthsClamped(sourceDate, months) {
+      const year = sourceDate.getFullYear();
+      const month = sourceDate.getMonth() + months;
+      const day = sourceDate.getDate();
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      return new Date(year, month, Math.min(day, lastDay));
+    }
+
+    function render() {
+      updateHomeLink();
+      const purchaseDate = parseLocalDate($('purchaseDate').value);
+      const price = parseNumber($('price').value);
+      const loanPct = Math.max(0, Math.min(100, parseNumber($('loanPct').value)));
+      const supportInput = Math.max(0, Math.min(TOTAL_MONTHS - 1, Math.round(parseNumber($('support').value))));
+      const termInput = Math.max(1, Math.min(TOTAL_MONTHS, Math.round(parseNumber($('term').value)) || TOTAL_MONTHS - supportInput));
+      const termManual = $('term').dataset.manual === '1' || document.activeElement === $('term');
+      const term = termManual ? termInput : TOTAL_MONTHS - supportInput;
+      const support = termManual ? Math.max(0, TOTAL_MONTHS - term) : supportInput;
+      const annualRate = Math.max(0, parseNumber($('rate').value)) / 100;
+      const loan = price * loanPct / 100;
+      const monthlyPrincipal = term > 0 ? loan / term : 0;
+      const monthlyRate = annualRate / 12;
+      const rows = [];
+      let highest = 0;
+      let balance = loan;
+      let paymentNo = 0;
+      let balanceAfter12 = loan;
+      let firstPayment = null;
+      let lastPayment = null;
+
+      $('support').value = String(support);
+      $('term').value = `${term} tháng`;
+
+      for (let month = 1; month <= TOTAL_MONTHS; month++) {
+        const date = addMonthsClamped(purchaseDate, month);
+        const isSupport = month <= support;
+        let principal = 0;
+        let interest = 0;
+        let total = 0;
+
+        if (!isSupport) {
+          paymentNo += 1;
+          interest = balance * monthlyRate;
+          principal = paymentNo === term ? balance : monthlyPrincipal;
+          total = principal + interest;
+          balance = Math.max(0, balance - principal);
+          highest = Math.max(highest, total);
+
+          const paymentRow = { month, date, principal, interest, total, balance, isSupport:false, paymentNo };
+          if (!firstPayment) firstPayment = paymentRow;
+          lastPayment = paymentRow;
+          if (paymentNo === Math.min(12, term)) balanceAfter12 = balance;
+        }
+
+        rows.push({ month, date, principal, interest, total, balance, isSupport, paymentNo });
+      }
+
+      const unit = $('unitCode').value.trim();
+      const endDate = addMonthsClamped(purchaseDate, TOTAL_MONTHS);
+      const first = firstPayment || { month:support + 1, date:addMonthsClamped(purchaseDate, support + 1), principal:0, interest:0, total:0 };
+      const last = lastPayment || first;
+
+      $('firstLabel').textContent = `Kỳ ${first.month} · ${dateFormat.format(first.date)}${unit ? ` · căn ${unit}` : ''}`;
+      $('firstPayment').textContent = vnd(first.total);
+      $('firstBreakdown').textContent = `Gốc ${vnd(first.principal)} + lãi ${vnd(first.interest)} · sau ${support} tháng HTLS`;
+      $('loanAmount').textContent = vnd(loan);
+      $('principalMonthly').textContent = vnd(monthlyPrincipal);
+      $('repaymentTerm').textContent = `${term} tháng`;
+      $('endDate').textContent = dateFormat.format(endDate);
+      $('balanceAfter12').textContent = vnd(balanceAfter12);
+      $('incomeProof').textContent = vnd(highest + 12000000);
+      $('scheduleTitle').textContent = `Lịch đầy đủ ${TOTAL_MONTHS} tháng · từ ${dateFormat.format(purchaseDate)} đến ${dateFormat.format(endDate)}`;
+
+      $('schedule').innerHTML = rows.map(r => {
+        const rowClass = r.isSupport ? 'support-row' : (r.paymentNo === 1 ? 'first-payment' : '');
+        const stage = r.isSupport
+          ? '<span class="badge support">HTLS</span>'
+          : '<span class="badge repay">Trả nợ</span>';
+        return `<tr class="${rowClass}"><td>${r.month}</td><td>${dateFormat.format(r.date)}</td><td>${stage}</td><td>${vnd(r.principal)}</td><td>${vnd(r.interest)}</td><td>${vnd(r.total)}</td><td>${vnd(r.balance)}</td></tr>`;
+      }).join('');
+
+      $('summary').innerHTML = `<b>Tóm tắt:</b> Từ ngày mua <b>${dateFormat.format(purchaseDate)}</b>, khoản vay chạy đúng <b>35 năm (${TOTAL_MONTHS} tháng)</b>. Khách được HTLS ${support} tháng, sau đó trả gốc đều ${vnd(monthlyPrincipal)}/tháng trong ${term} tháng. Kỳ trả đầu tiên là tháng ${first.month} vào ngày <b>${dateFormat.format(first.date)}</b>, mức trả dự kiến ${vnd(first.total)}. Kỳ cuối là tháng ${last.month} vào ngày <b>${dateFormat.format(last.date)}</b>, kết thúc ngày ${dateFormat.format(endDate)}.`;
+    }
+
+    function applyUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const unit = params.get('unit') || params.get('unitCode') || params.get('maCan');
+      const loan = params.get('loan') || params.get('loanAmount') || params.get('bankDisbursement');
+      const price = params.get('price');
+      const loanPct = params.get('loanPct');
+      const support = params.get('support');
+      const term = params.get('term');
+      const rate = params.get('rate');
+      const purchaseDate = params.get('purchaseDate') || params.get('quoteDate') || params.get('date');
+
+      if (unit) $('unitCode').value = unit;
+      if (loan) {
+        $('price').value = Math.round(parseNumber(loan)).toString();
+        $('loanPct').value = loanPct || '100';
+      } else if (price) {
+        $('price').value = Math.round(parseNumber(price)).toString();
+        if (loanPct) $('loanPct').value = loanPct;
+      } else if (loanPct) {
+        $('loanPct').value = loanPct;
+      }
+      if (support) {
+        $('support').value = String(Math.round(parseNumber(support)));
+        $('term').dataset.manual = '0';
+      }
+      if (term) {
+        $('term').value = `${Math.round(parseNumber(term))} tháng`;
+        $('term').dataset.manual = '1';
+      }
+      if (rate) $('rate').value = rate;
+      if (purchaseDate) $('purchaseDate').value = purchaseDate;
+    }
+
+    function updateHomeLink() {
+      const home = $('homeLink');
+      if (!home) return;
+      const params = new URLSearchParams();
+      const unit = $('unitCode').value.trim();
+      if (unit) params.set('unit', unit);
+      params.set('scenario', 'loan');
+      home.href = `index.html?${params.toString()}`;
+    }
+
+    if (!$('purchaseDate').value) $('purchaseDate').value = toInputDate(new Date());
+    applyUrlParams();
+    $('term').addEventListener('input', () => { $('term').dataset.manual = '1'; });
+    $('support').addEventListener('input', () => { $('term').dataset.manual = '0'; });
+    inputIds.forEach(id => $(id).addEventListener('input', render));
+    $('price').addEventListener('blur', () => {
+      const n = parseNumber($('price').value);
+      if (n) $('price').value = Math.round(n).toString();
+      render();
+    });
+    render();
+  </script>
+  <script src="loan-theme.js?v=1"></script>
+  <script type="module" src="loan-auth-guard.js?v=1"></script>
+</body>
+</html>
