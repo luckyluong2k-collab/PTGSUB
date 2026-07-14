@@ -8,22 +8,65 @@
     fixedDiscounts: { Studio: 70000000, "1BR+": 100000000, "2BR": 150000000 },
     completionUnits: { Studio: 5100000, "1BR+": 4600000, "2BR": 5400000 },
     ttsJuly: { tts95: 0.125, tts70: 0.10, tts50: 0.08 },
+    standardSchedule: {
+      installmentRates: [0.10, 0.10, 0.10, 0.10, 0.10],
+      handoverRate: 0.30,
+      completionFollowsInstallments: true,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts70: { postRates: [], handoverRate: 0.25 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    completionContractRate: 0.70,
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 6,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 36,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-05-30", standard: "2027-05-30", tts50: "2027-05-30",
+      tts70: "2027-05-30", tts95: "2027-05-30",
+    },
     effectiveDate: "2026-04-16",
     handover: "2027-05-30",
     customerHandover: "2027-05-30",
     loanSupport: "HTLS 24 tháng, không muộn hơn 15/08/2028",
   },
   P10P18: {
-    name: "P10/P16/P18",
+    name: "P10/P11/P16/P18",
     hasCompletion: true,
     completionMode: "netTimes112",
     // CSBH: gói hoàn thiện là giá trị cộng thêm, không phải một khoản CK.
     completionDiscount: 0,
     noLoanDiscount: 0.01,
     fixedDiscounts: {},
-    completionUnits: { Studio: 4722222, "1BR+": 4259259, "2BR": 5000000 },
+    completionUnits: { Studio: 4722222.22222222, "1BR+": 4259259, "2BR": 5000000 },
     ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.035 },
     earlyBird: 0.01,
+    standardSchedule: {
+      installmentRates: [0.10, 0.20, 0.25],
+      handoverRate: 0.25,
+      completionContractRate: 0.50,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts70: { postRates: [0.10, 0.10], handoverRate: 0.05 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    completionContractRate: 0.50,
+    standardSecondPaymentDays: 6,
+    loanSecondPaymentDays: 6,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 36,
+    standardInstallmentOffsetsDays: [36, 186, 366],
+    scheduleHandover: {
+      loan: "2027-09-30", standard: "2027-09-30", tts50: "2027-09-30",
+      tts70: "2027-09-30", tts95: "2027-09-30",
+    },
     effectiveDate: "2026-05-01",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
@@ -39,6 +82,29 @@
     completionUnits: {},
     ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.045 },
     earlyBird: 0.01,
+    standardSchedule: {
+      installmentRates: [
+        0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+        0.10, 0.05, 0.05, 0.05, 0.05, 0.05,
+      ],
+      handoverRate: 0,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.05, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 9,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 69,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-09-30", standard: "2028-09-30", tts50: "2028-09-30",
+      tts70: "2028-09-30", tts95: "2027-09-30",
+    },
     effectiveDate: "2026-06-20",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
@@ -54,6 +120,29 @@
     completionUnits: {},
     ttsJuly: { tts95: 0.105, tts70: 0.055, tts50: 0.025 },
     earlyBird: 0.01,
+    standardSchedule: {
+      installmentRates: [
+        0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+        0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+      ],
+      handoverRate: 0,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 9,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 69,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-12-31", standard: "2028-12-31", tts50: "2028-12-31",
+      tts70: "2028-12-31", tts95: "2027-12-31",
+    },
     effectiveDate: "2026-03-11",
     handover: "2028-12-31",
     customerHandover: "2027-12-31",
@@ -72,6 +161,26 @@
     tmdvDiscount: 0.10,
     tmdvDefault: true,
     ttsJuly: { tts95: 0.125, tts70: 0.08, tts50: 0.06 },
+    standardSchedule: {
+      installmentRates: [0.10, 0.10, 0.10, 0.10, 0.10],
+      handoverRate: 0.30,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts70: { postRates: [], handoverRate: 0.25 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 6,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 36,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-05-30", standard: "2027-05-30", tts50: "2027-05-30",
+      tts70: "2027-05-30", tts95: "2027-05-30",
+    },
     effectiveDate: "2026-04-01",
     handover: "2027-05-30",
     loanSupport: "HTLS 30 tháng, không quá 24/09/2028",
@@ -89,6 +198,25 @@
     tmdvDiscount: 0.10,
     tmdvDefault: true,
     ttsJuly: { tts95: 0.14, tts70: 0.09, tts50: 0.065 },
+    standardSchedule: {
+      installmentRates: [0.10, 0.20, 0.25],
+      handoverRate: 0.25,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts70: { postRates: [0.10, 0.10], handoverRate: 0.05 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 6,
+    loanSecondPaymentDays: 6,
+    ttsSecondPaymentDays: 6,
+    contractDays: 9,
+    loanFourthPaymentDays: 36,
+    standardInstallmentOffsetsDays: [36, 186, 366],
+    scheduleHandover: {
+      loan: "2027-09-30", standard: "2027-09-30", tts50: "2027-09-30",
+      tts70: "2027-09-30", tts95: "2027-09-30",
+    },
     effectiveDate: "2026-05-06",
     handover: "2027-09-30",
     loanSupport: "HTLS 30 tháng, không quá 24/09/2028",
@@ -108,6 +236,29 @@
     ttsJuly: { tts95: 0.21, tts70: 0.145, tts50: 0.12 },
     scenarioLabels: { tts95: "TTS 100%" },
     lowRiseTts100Schedule: true,
+    standardSchedule: {
+      installmentRates: [
+        0.10, 0.05, 0.05, 0.05, 0.10,
+        0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+      ],
+      handoverRate: 0,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 9,
+    ttsSecondPaymentDays: 6,
+    contractDays: 29,
+    loanFourthPaymentDays: 69,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-03-31", standard: "2029-05-15", tts50: "2029-05-15",
+      tts70: "2029-05-15", tts95: "2027-03-31",
+    },
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -127,6 +278,29 @@
     ttsJuly: { tts95: 0.16, tts70: 0.095, tts50: 0.07 },
     scenarioLabels: { tts95: "TTS 100%" },
     lowRiseTts100Schedule: true,
+    standardSchedule: {
+      installmentRates: [
+        0.10, 0.05, 0.05, 0.05, 0.10,
+        0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+      ],
+      handoverRate: 0,
+    },
+    ttsSchedule: {
+      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts95: { postRates: [], handoverRate: 0 },
+    },
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 9,
+    ttsSecondPaymentDays: 6,
+    contractDays: 29,
+    loanFourthPaymentDays: 69,
+    standardInstallmentFirstDays: 69,
+    standardInstallmentIntervalDays: 60,
+    scheduleHandover: {
+      loan: "2027-03-31", standard: "2029-05-15", tts50: "2029-05-15",
+      tts70: "2029-05-15", tts95: "2027-03-31",
+    },
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -1394,10 +1568,9 @@ function inferPolicyGroup(code, tower, rawType, title) {
     return ["P10", "P11"].includes(tower) ? "KHOIDE_P10P11" : "KHOIDE_P3P9";
   }
   if (["P3", "P4", "P5", "P6", "P8", "P9"].includes(tower)) return "P3P9";
-  if (["P10", "P16", "P18"].includes(tower)) return "P10P18";
+  if (["P10", "P11", "P16", "P18"].includes(tower)) return "P10P18";
   if (["P7", "P15", "P19"].includes(tower)) return "P7P15P19";
   if (["P24", "P25", "P26"].includes(tower)) return "P24P26";
-  if (["P10", "P11"].includes(tower)) return "KHOIDE_P10P11";
   return "";
 }
 
@@ -1814,7 +1987,8 @@ function completionBreakdown(policy, unitType, area) {
   } else if (policy.completionMode === "netTimes112") {
     const net = unit * area;
     grossWithVat = round(net * 1.1);
-    maintenance = round(net * 0.02);
+    // CSBH làm tròn một lần trên tổng 1,12; lấy phần còn lại làm KPBT.
+    maintenance = round(net * 1.12) - grossWithVat;
   }
   return { grossWithVat, maintenance, total: grossWithVat + maintenance };
 }
@@ -1823,46 +1997,96 @@ function completionValue(policy, unitType, area) {
   return completionBreakdown(policy, unitType, area).total;
 }
 
+function scheduleHandoverDate(policy, scenario) {
+  return dateFromText(policy?.scheduleHandover?.[scenario] || policy?.handover);
+}
+
+function standardInstallmentDates(policy, quoteDate, count) {
+  if (Array.isArray(policy?.standardInstallmentOffsetsDays)) {
+    return policy.standardInstallmentOffsetsDays
+      .slice(0, count)
+      .map((days) => addDays(quoteDate, days));
+  }
+  const firstDays = policy?.standardInstallmentFirstDays ?? 69;
+  const intervalDays = policy?.standardInstallmentIntervalDays ?? 60;
+  return Array.from({ length: count }, (_, index) => addDays(quoteDate, firstDays + intervalDays * index));
+}
+
+function reconcileSchedule(rows, total) {
+  const totalRows = rows.reduce((sum, [, amount]) => sum + round(amount), 0);
+  const diff = round(total - totalRows);
+  if (!diff) return rows;
+  const handoverIndex = rows.findIndex(([label]) => /^Bàn giao/.test(String(label)));
+  const targetIndex = handoverIndex >= 0 ? handoverIndex : Math.max(0, rows.length - 2);
+  rows[targetIndex][1] = round(rows[targetIndex][1] + diff);
+  return rows;
+}
+
 function buildStandardSchedule(result) {
+  const policy = result.policy;
+  const config = policy.standardSchedule || {};
+  const installmentRates = config.installmentRates || [];
   const deposit = depositByType[result.unitType] || 0;
-  const quoteDate = dateFromText(els.quoteDate.value);
-  const handoverDate = dateFromText(result.policy.handover);
-  const secondDate = addDays(quoteDate, 9);
-  const installmentDates = spreadDates(addDays(secondDate, 60), addDays(handoverDate, -14), 15);
-  const completion = completionBreakdown(result.policy, result.unitType, result.area);
-  const paymentBasisRawWithVat = result.paymentBasisRawWithVat || result.rawWithVat;
+  const quoteDate = dateFromText(result.quoteDate || els.quoteDate.value);
+  const handoverDate = scheduleHandoverDate(policy, "standard");
+  const secondDate = addDays(quoteDate, policy.standardSecondPaymentDays ?? 9);
+  const installmentDates = standardInstallmentDates(policy, quoteDate, installmentRates.length);
+  const completion = completionBreakdown(policy, result.unitType, result.area);
+  const paymentBasisRawWithVat = result.rawWithVat;
+  const completionFollowsInstallments = Boolean(config.completionFollowsInstallments);
+  let completionGrossPaid = 0;
+
+  let secondAmount = Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit));
+  if (completionFollowsInstallments && completion.grossWithVat) {
+    const completionSecond = round(completion.grossWithVat * 0.15);
+    secondAmount += completionSecond;
+    completionGrossPaid += completionSecond;
+  }
 
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
-    [`Lần 2 - 15% (${formatDateText(secondDate)})`, round(paymentBasisRawWithVat * 0.15 - deposit)],
+    [`Lần 2 - đủ 15% (${formatDateText(secondDate)})`, secondAmount],
   ];
 
-  if (completion.total) {
+  const completionContractRate = config.completionContractRate ?? policy.completionContractRate ?? 0;
+  if (completion.grossWithVat && !completionFollowsInstallments && completionContractRate) {
+    const contractDate = addDays(quoteDate, policy.contractDays ?? 9);
+    const contractAmount = round(completion.grossWithVat * completionContractRate);
+    completionGrossPaid += contractAmount;
     rows.push([
-      `Ký HĐMB - 70% hoàn thiện (${formatDateText(addDays(secondDate, 3))})`,
-      round(completion.grossWithVat * 0.70),
+      `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
+      contractAmount,
     ]);
   }
 
-  rows.push([`Lần 3 - 10% (${formatDateText(installmentDates[0])})`, round(result.rawWithVat * 0.10)]);
-  for (let index = 0; index < 14; index += 1) {
+  installmentRates.forEach((rate, index) => {
+    let amount = round(result.rawWithVat * rate);
+    if (completionFollowsInstallments && completion.grossWithVat) {
+      const completionAmount = round(completion.grossWithVat * rate);
+      amount += completionAmount;
+      completionGrossPaid += completionAmount;
+    }
     rows.push([
-      `Lần ${index + 4} - 5% (${formatDateText(installmentDates[index + 1])})`,
-      round(result.rawWithVat * 0.05),
+      `Lần ${index + 3} - ${percent(rate)} (${formatDateText(installmentDates[index])})`,
+      amount,
     ]);
-  }
+  });
 
+  const completionAtHandover = Math.max(0, completion.grossWithVat - completionGrossPaid);
+  const handoverRate = config.handoverRate || 0;
   rows.push([
-    `Bàn giao - KPBT + thuế 5% (${formatDateText(handoverDate)})`,
-    round(result.maintenance + result.vat * 0.05 + completion.grossWithVat * 0.30 + completion.maintenance),
+    `Bàn giao${handoverRate ? ` - ${percent(handoverRate)}` : ""} + KPBT/thuế (${formatDateText(handoverDate)})`,
+    round(
+      result.rawWithVat * handoverRate
+      + result.maintenance
+      + result.vat * 0.05
+      + completionAtHandover
+      + completion.maintenance
+    ),
   ]);
   rows.push([`5% GCN (${formatDateText(handoverDate)})`, round(result.netAfterDiscount * 0.05)]);
 
-  const totalRows = rows.reduce((sum, [, amount]) => sum + round(amount), 0);
-  const diff = result.total - totalRows;
-  if (diff) rows[rows.length - 2][1] = round(rows[rows.length - 2][1] + diff);
-
-  return rows;
+  return reconcileSchedule(rows, result.total);
 }
 
 function ttsRatioFromScenario(scenario, policy) {
@@ -1882,64 +2106,126 @@ function ttsDeadlineFromQuote(dateText) {
   return deadline;
 }
 
+function buildLoanSchedule(result) {
+  const policy = result.policy;
+  const deposit = depositByType[result.unitType] || 0;
+  const quoteDate = dateFromText(result.quoteDate || els.quoteDate.value);
+  const secondDate = addDays(quoteDate, policy.loanSecondPaymentDays ?? 9);
+  const contractDate = addDays(quoteDate, policy.contractDays ?? 9);
+  const bankDate = addDays(contractDate, policy.bankDisbursementAfterContractDays ?? 15);
+  const fourthDate = addDays(quoteDate, policy.loanFourthPaymentDays ?? 69);
+  const handoverDate = scheduleHandoverDate(policy, "loan");
+  const completion = completionBreakdown(policy, result.unitType, result.area);
+  const customerRate = Math.max(0, 0.80 - result.loanRatio);
+  const secondAmount = Math.max(0, round(result.rawWithVat * 0.15 - deposit));
+  const customerAmount = round(result.rawWithVat * customerRate);
+  const completionContractRate = policy.completionContractRate || 0;
+  let completionGrossPaid = 0;
+
+  const rows = [
+    [`Cọc (${formatDateText(quoteDate)})`, deposit],
+    [`Lần 2 - đủ 15% (${formatDateText(secondDate)})`, secondAmount],
+  ];
+
+  if (completion.grossWithVat && completionContractRate) {
+    const contractAmount = round(completion.grossWithVat * completionContractRate);
+    completionGrossPaid += contractAmount;
+    rows.push([
+      `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
+      contractAmount,
+    ]);
+  }
+
+  rows.push([
+    `Ngân hàng giải ngân ${percent(result.loanRatio)} (${formatDateText(bankDate)})`,
+    result.bankDisbursement,
+  ]);
+  if (customerRate) {
+    rows.push([
+      `Lần 4 - khách thanh toán ${percent(customerRate)} (${formatDateText(fourthDate)})`,
+      customerAmount,
+    ]);
+  }
+
+  const completionAtHandover = Math.max(0, completion.grossWithVat - completionGrossPaid);
+  rows.push([
+    `Bàn giao - KPBT + thuế 5% (${formatDateText(handoverDate)})`,
+    round(result.maintenance + result.vat * 0.05 + completionAtHandover + completion.maintenance),
+  ]);
+  rows.push([`5% GCN (${formatDateText(handoverDate)})`, round(result.netAfterDiscount * 0.05)]);
+
+  return {
+    rows: reconcileSchedule(rows, result.total),
+    upfront: round(deposit + secondAmount + customerAmount),
+    upfrontRate: 0.15 + customerRate,
+  };
+}
+
 function buildTtsSchedule(result) {
   const ttsRatio = ttsRatioFromScenario(result.scenario, result.policy);
   const deposit = depositByType[result.unitType] || 0;
   const quoteDateText = result.quoteDate || els.quoteDate.value;
   const quoteDate = dateFromText(quoteDateText);
   const deadline = ttsDeadlineFromQuote(quoteDateText);
-  const handoverDate = dateFromText(result.policy.handover);
+  const secondDate = addDays(quoteDate, result.policy.ttsSecondPaymentDays ?? 6);
+  const handoverDate = scheduleHandoverDate(result.policy, result.scenario);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
   const paymentBasisRawWithVat = result.rawWithVat;
-  const isLowRiseTts100 = Boolean(result.policy.lowRiseTts100Schedule && result.scenario === "tts95");
+  const config = result.policy.ttsSchedule?.[result.scenario] || { postRates: [], handoverRate: 0 };
+  const postRates = config.postRates || [];
+  const postDates = spreadDates(addDays(deadline, 60), addDays(handoverDate, -14), postRates.length);
+  const completionContractRate = result.policy.completionContractRate || 0;
+  let completionGrossPaid = 0;
+  const secondAmount = Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit));
   const rows = [
     [`Cọc (${formatDateText(quoteDate)})`, deposit],
+    [
+      `Lần 2 - đủ 15% (${formatDateText(secondDate)})`,
+      secondAmount,
+    ],
   ];
 
-  if (isLowRiseTts100) {
+  if (completion.grossWithVat && completionContractRate) {
+    const contractDate = addDays(quoteDate, result.policy.contractDays ?? 9);
+    const contractAmount = round(completion.grossWithVat * completionContractRate);
+    completionGrossPaid += contractAmount;
     rows.push([
-      `Thanh toán lần 2 95% (${formatDateText(deadline)})`,
-      Math.max(0, round(paymentBasisRawWithVat * 0.95 - deposit)),
-    ]);
-  } else {
-    rows.push([
-      `Thanh toán lần 2 ${scenarioLabel(result.scenario, result.policy)} (${formatDateText(deadline)})`,
-      Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit)),
+      `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
+      contractAmount,
     ]);
   }
 
-  if (completion.total) {
-    rows.push([`Ký HĐMB - 70% hoàn thiện`, round(completion.grossWithVat * 0.70)]);
-  }
-
-  if (result.scenario === "tts50") {
-    rows.push([`Đợt tiếp theo - 5%`, round(result.rawWithVat * 0.05)]);
-    rows.push([`Đợt tiếp theo - 10%`, round(result.rawWithVat * 0.10)]);
+  const topUpRate = Math.max(0, ttsRatio - 0.15);
+  const topUpAmount = Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit - secondAmount));
+  if (topUpRate && topUpAmount) {
     rows.push([
-      `Bàn giao - 30% + KPBT/thuế (${formatDateText(handoverDate)})`,
-      round(result.rawWithVat * 0.30 + result.maintenance + result.vat * 0.05 + completion.grossWithVat * 0.30 + completion.maintenance),
-    ]);
-  } else if (result.scenario === "tts70") {
-    rows.push([`Đợt tiếp theo - 10%`, round(result.rawWithVat * 0.10)]);
-    rows.push([`Đợt tiếp theo - 10%`, round(result.rawWithVat * 0.10)]);
-    rows.push([
-      `Bàn giao - 5% + KPBT/thuế (${formatDateText(handoverDate)})`,
-      round(result.rawWithVat * 0.05 + result.maintenance + result.vat * 0.05 + completion.grossWithVat * 0.30 + completion.maintenance),
-    ]);
-  } else {
-    rows.push([
-      `Bàn giao - KPBT + thuế 5% (${formatDateText(handoverDate)})`,
-      round(result.maintenance + result.vat * 0.05 + completion.grossWithVat * 0.30 + completion.maintenance),
+      `Thanh toán thêm ${percent(topUpRate)} - đủ ${percent(ttsRatio)} (${formatDateText(deadline)})`,
+      topUpAmount,
     ]);
   }
 
-  rows.push([`5% GCN`, round(result.netAfterDiscount * 0.05)]);
+  postRates.forEach((rate, index) => {
+    rows.push([
+      `Đợt tiếp theo ${index + 1} - ${percent(rate)} (${formatDateText(postDates[index])})`,
+      round(result.rawWithVat * rate),
+    ]);
+  });
 
-  const totalRows = rows.reduce((sum, [, amount]) => sum + round(amount), 0);
-  const diff = result.total - totalRows;
-  if (diff) rows[rows.length - 2][1] = round(rows[rows.length - 2][1] + diff);
+  const completionAtHandover = Math.max(0, completion.grossWithVat - completionGrossPaid);
+  const handoverRate = config.handoverRate || 0;
+  rows.push([
+    `Bàn giao${handoverRate ? ` - ${percent(handoverRate)}` : ""} + KPBT/thuế (${formatDateText(handoverDate)})`,
+    round(
+      result.rawWithVat * handoverRate
+      + result.maintenance
+      + result.vat * 0.05
+      + completionAtHandover
+      + completion.maintenance
+    ),
+  ]);
+  rows.push([`5% GCN (${formatDateText(handoverDate)})`, round(result.netAfterDiscount * 0.05)]);
 
-  return rows;
+  return reconcileSchedule(rows, result.total);
 }
 
 function emphasizePercentText(text, enabled = true) {
@@ -2034,34 +2320,36 @@ function calculate(options = {}) {
   const completion = completionValue(policy, unitType, area);
   const total = rawGrossAfterDiscount + completion;
   const rawWithVat = netAfterDiscount + vat;
-  const noGuaranteeBasis = includeGuarantee
-    ? calculate({ scenario, quoteDate: quoteDateText, includeGuarantee: false })
-    : null;
-  const paymentBasisRawWithVat = noGuaranteeBasis
-    ? noGuaranteeBasis.netAfterDiscount + noGuaranteeBasis.vat
-    : rawWithVat;
+  // Mọi đợt thanh toán phải chạy trên giá sau tất cả CK, kể cả CK bảo lãnh NH 1%.
+  const paymentBasisRawWithVat = rawWithVat;
   const bankDisbursement = scenario === "loan" ? round(rawWithVat * loanRatio) : 0;
-  const deposit = depositByType[unitType] || 0;
 
   let upfront = 0;
+  let upfrontRate = 0.25;
   let schedule = [];
   if (scenario === "loan") {
-    const payment2 = round(paymentBasisRawWithVat * 0.15 - deposit);
-    const payment4 = round(paymentBasisRawWithVat * 0.10);
-    upfront = deposit + payment2 + payment4;
-
-    schedule = [
-      ["Trả trước 25%", upfront],
-      [`NH giải ngân ${percent(loanRatio)}`, bankDisbursement],
-      ["Bàn giao", round(maintenance + vat * 0.05 + completion * 0.30)],
-      ["5% GCN", round(netAfterDiscount * 0.05)],
-    ];
-    if (completion) {
-      schedule.splice(1, 0, ["HĐMB - 70% nội thất", round(completion * 0.70)]);
-    }
+    const loanPlan = buildLoanSchedule({
+      policy,
+      scenario,
+      quoteDate: quoteDateText,
+      unitType,
+      area,
+      netAfterDiscount,
+      vat,
+      maintenance,
+      total,
+      rawWithVat,
+      paymentBasisRawWithVat,
+      bankDisbursement,
+      loanRatio,
+    });
+    upfront = loanPlan.upfront;
+    upfrontRate = loanPlan.upfrontRate;
+    schedule = loanPlan.rows;
   } else if (scenario === "standard") {
     schedule = buildStandardSchedule({
       policy,
+      quoteDate: quoteDateText,
       unitType,
       area,
       netAfterDiscount,
@@ -2110,6 +2398,7 @@ function calculate(options = {}) {
     bankDisbursement,
     loanRatio,
     upfront,
+    upfrontRate,
     schedule,
     ttsRate,
   };
@@ -2241,7 +2530,8 @@ function renderQuoteCard(result, isLoan, isTts) {
   ];
 
   if (isLoan) {
-    stats.push(quoteCardStat("Trả trước 25%", money(result.upfront), "25%", "warm"));
+    const upfrontText = percent(result.upfrontRate || 0.25);
+    stats.push(quoteCardStat(`Trả trước ${upfrontText}`, money(result.upfront), upfrontText, "warm"));
     stats.push(quoteCardStat(`NH giải ngân ${percent(result.loanRatio)}`, money(result.bankDisbursement), "NH", "blue"));
   } else if (isTts) {
     stats.push(quoteCardStat(depositRow[0], money(depositRow[1]), "Cọc", "warm"));
@@ -2290,7 +2580,7 @@ function multiQuoteSecondary(result) {
   const isTts = isTtsScenario(result.scenario);
   if (isLoan) {
     return {
-      label: "Trả trước 25%",
+      label: `Trả trước ${percent(result.upfrontRate || 0.25)}`,
       value: money(result.upfront),
       meta: `NH giải ngân ${percent(result.loanRatio)}: ${money(result.bankDisbursement)}`,
     };
@@ -2862,7 +3152,7 @@ function mapLabelLines(results = []) {
     });
     if (result.scenario === "loan") {
       lines.push({
-        text: `Trả trước 25%: ${money(result.upfront)}`,
+        text: `Trả trước ${percent(result.upfrontRate || 0.25)}: ${money(result.upfront)}`,
         size: list.length > 2 ? 31 : 42,
         weight: 850,
         color: "#ffffff",
@@ -3260,7 +3550,7 @@ function render() {
   els.summaryBand.style.gridTemplateColumns = isLoan || isTts ? "1fr 1fr" : "1fr";
   els.upfrontPrice.classList.toggle("summary-mini", isTts);
   if (isLoan) {
-    els.upfrontLabel.textContent = "Trả trước 25%";
+    els.upfrontLabel.textContent = `Trả trước ${percent(result.upfrontRate || 0.25)}`;
     els.upfrontPrice.textContent = money(result.upfront);
   } else if (isTts) {
     const depositRow = result.schedule[0] || ["Cọc", 0];
@@ -3295,7 +3585,7 @@ function makeQuoteText(result) {
     `Giá Cuối Phải TT: ${money(result.total)}`,
   ];
   if (result.scenario === "loan") {
-    parts.push(`Trả trước 25%: ${money(result.upfront)}`);
+    parts.push(`Trả trước ${percent(result.upfrontRate || 0.25)}: ${money(result.upfront)}`);
     parts.push(`NH giải ngân ${percent(result.loanRatio)}: ${money(result.bankDisbursement)}`);
     parts.push(`HTLS: ${result.policy.loanSupport}`);
   }
