@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=112">
+  <link rel="stylesheet" href="styles.css?v=113">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -66,7 +66,7 @@
           <li>Xuất file ảnh/PDF báo giá nhanh.</li>
           <li>Tạo biểu đồ biến động giá theo từng tháng khi chiết khấu thay đổi.</li>
           <li>Tạo ảnh chỉ căn và ghi giá tiền Chung Cư (LK đang update).</li>
-          <li>Sao chép nhanh link vị trí dự án, Camera 360, CSBH, Bảng Hàng...</li>
+          <li>Sao chép nhanh link vị trí dự án, Flora Avenue, CSBH, Bảng Hàng...</li>
         </ul>
         <div class="login-price-spotlight" aria-label="Giá hỗ trợ cập nhật">
           <span>Chỉ</span>
@@ -100,9 +100,14 @@
           <div id="myHistoryList" class="history-list"></div>
         </details>
 
-        <a class="camera-360-link menu-3d-button" id="camera360Section" data-auth-menu hidden href="https://pano.cool/@TicaLand/ti-n-subc-08-06?s=w8DL1v" target="_blank" rel="noopener noreferrer">
-          <span class="camera-360-icon" aria-hidden="true">360</span>
-          <span>Camera 360</span>
+        <a class="camera-360-link menu-3d-button" id="camera360Section" data-auth-menu hidden href="#floraAvenueTour">
+          <span class="camera-360-icon" aria-hidden="true">FA</span>
+          <span>Flora Avenue</span>
+        </a>
+
+        <a class="menu-3d-button" id="customerQuoteDemoLink" data-auth-menu hidden href="quote-admin-demo.html?code=AB7K29&amp;seed=1">
+          <span class="menu-3d-icon" aria-hidden="true">BG</span>
+          <span>B&#225;o gi&#225; cho kh&#225;ch</span>
         </a>
 
         <a class="model-home-link menu-3d-button" id="modelHomeSection" data-auth-menu hidden href="https://drive.google.com/drive/folders/11zfFpF3DPZksh8a5A3my-rQjCDn1I9AO" target="_blank" rel="noopener noreferrer" aria-label="Mở ảnh nhà mẫu trong cửa sổ mới">
@@ -496,18 +501,18 @@
       </div>
     </section>
 
-    <section class="kuula-tour-section" id="camera360Tour" aria-labelledby="camera360TourTitle">
+    <section class="kuula-tour-section" id="floraAvenueTour" aria-labelledby="floraAvenueTourTitle">
       <div class="kuula-tour-head">
         <div>
           <p class="eyebrow">Kh&#225;m ph&#225; d&#7921; &#225;n</p>
-          <h2 id="camera360TourTitle">Camera 360</h2>
+          <h2 id="floraAvenueTourTitle">Flora Avenue</h2>
         </div>
-        <a href="https://kuula.co/share/collection/7TZM2?logo=0&amp;info=1&amp;fs=1&amp;vr=0&amp;sd=1&amp;thumbs=1" target="_blank" rel="noopener noreferrer">M&#7903; to&#224;n m&#224;n h&#236;nh</a>
+        <a href="https://kuula.co/share/LKxQl/collection/7TZM2?logo=0&amp;info=1&amp;fs=1&amp;vr=0&amp;sd=1&amp;thumbs=1" target="_blank" rel="noopener noreferrer">M&#7903; to&#224;n m&#224;n h&#236;nh</a>
       </div>
       <div class="kuula-tour-frame">
         <iframe
-          title="Camera 360 d&#7921; &#225;n"
-          src="https://kuula.co/share/collection/7TZM2?logo=0&amp;info=1&amp;fs=1&amp;vr=0&amp;sd=1&amp;thumbs=1"
+          title="Flora Avenue"
+          src="https://kuula.co/share/LKxQl/collection/7TZM2?logo=0&amp;info=1&amp;fs=1&amp;vr=0&amp;sd=1&amp;thumbs=1"
           frameborder="0"
           scrolling="no"
           loading="lazy"
@@ -581,7 +586,7 @@
 
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="app.js?v=104"></script>
+  <script src="app.js?v=105"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=84"></script>
   <script src="ui-admin-search.js?v=1"></script>
