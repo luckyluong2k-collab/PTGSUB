@@ -1,17 +1,17 @@
-const CACHE_NAME = "park-pricing-v152-remove-flora-menu";
+const CACHE_NAME = "park-pricing-v153-dynamic-quote-demo";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./quote.html",
   "./quote-admin-demo.html",
-  "./quote-demo.css?v=2",
+  "./quote-demo.css?v=3",
   "./styles.css?v=113",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=105",
+  "./app.js?v=106",
   "./forum.js?v=1",
-  "./quote-demo.js?v=2",
-  "./quote-admin-demo.js?v=2",
+  "./quote-demo.js?v=3",
+  "./quote-admin-demo.js?v=3",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=84",
   "./ui-unit-lookup.js?v=1",
@@ -26,7 +26,6 @@ const ASSETS = [
   "./sun-group-logo.png",
   "./payment-qr.png",
   "./lowrise-map-sharp.jpg",
-  "./lienke.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -71,8 +70,12 @@ self.addEventListener("fetch", (event) => {
 
   if (event.request.mode === "navigate") {
     const requestUrl = new URL(event.request.url);
-    const isForumPage = requestUrl.pathname.endsWith("/forum.html");
-    const cacheKey = isForumPage ? "./forum.html" : "./index.html";
+    const pageCacheKeys = [
+      ["forum.html", "./forum.html"],
+      ["quote.html", "./quote.html"],
+      ["quote-admin-demo.html", "./quote-admin-demo.html"],
+    ];
+    const cacheKey = pageCacheKeys.find(([page]) => requestUrl.pathname.endsWith(`/${page}`))?.[1] || "./index.html";
     event.respondWith(
       fetch(event.request)
         .then((response) => {

@@ -4,6 +4,7 @@
   const params = new URLSearchParams(window.location.search);
   const code = String(params.get("code") || "AB7K29").trim().toUpperCase();
   const analyticsKey = "ptgsub_quote_demo_analytics_v1";
+  const quoteStoreKey = "ptgsub_quote_demo_quotes_v2";
 
   function $(selector) {
     return document.querySelector(selector);
@@ -19,6 +20,26 @@
 
   function writeStore(store) {
     localStorage.setItem(analyticsKey, JSON.stringify(store));
+  }
+
+  function readQuotes() {
+    try {
+      return JSON.parse(localStorage.getItem(quoteStoreKey) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function activeQuote() {
+    const quote = readQuotes()[code] || {};
+    return {
+      code,
+      customerName: quote.customerName || "khách hàng",
+      unitCode: quote.unitCode || "Chưa có dữ liệu",
+      scenarioName: quote.scenarioName || "Demo",
+      finalPrice: quote.finalPrice || "--",
+      advisor: quote.advisor || "Mã mẫu chưa có snapshot từ web chính. Hãy tạo báo giá từ menu của web chính để tự điền thông tin căn vừa tra.",
+    };
   }
 
   function seedDemoStats() {
@@ -79,12 +100,19 @@
   }
 
   function render() {
+    const quote = activeQuote();
     const store = readStore();
     const stats = store[code] || {};
     const actions = stats.actions || {};
     const pct = Math.max(0, Math.min(100, Number(stats.maxScrollPct || 0)));
+    document.title = `Admin demo ${code}`;
     $("#quoteCode").textContent = code;
     $("#openQuoteLink").href = `quote.html?code=${encodeURIComponent(code)}`;
+    $("#adminCustomerName").textContent = quote.customerName;
+    $("#adminUnitCode").textContent = quote.unitCode;
+    $("#adminScenario").textContent = quote.scenarioName;
+    $("#adminFinalPrice").textContent = quote.finalPrice;
+    $("#adminQuoteNote").textContent = quote.advisor;
     $("#opens").textContent = String(stats.opens || 0);
     $("#zaloClicks").textContent = String(actions.zalo || 0);
     $("#callClicks").textContent = String(actions.call || 0);

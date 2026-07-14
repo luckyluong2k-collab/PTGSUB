@@ -37,7 +37,8 @@
 
   const params = new URLSearchParams(window.location.search);
   const code = String(params.get("code") || "AB7K29").trim().toUpperCase();
-  const quote = QUOTES[code] || QUOTES.AB7K29;
+  const quoteStoreKey = "ptgsub_quote_demo_quotes_v2";
+  const quote = normalizeQuote(readJson(quoteStoreKey, {})[code] || QUOTES[code] || QUOTES.AB7K29, code);
   const quoteStateKey = `ptgsub_quote_demo_quote_${quote.code}`;
   const analyticsKey = "ptgsub_quote_demo_analytics_v1";
   const sessionKey = `ptgsub_quote_demo_session_${quote.code}`;
@@ -63,11 +64,34 @@
     }
   }
 
+  function normalizeQuote(raw, requestedCode) {
+    const fallback = QUOTES.AB7K29;
+    const merged = Object.assign({}, fallback, raw || {});
+    const normalizedCode = String(merged.code || requestedCode || fallback.code).trim().toUpperCase();
+    return Object.assign(merged, {
+      code: normalizedCode,
+      customerName: merged.customerName || "khách hàng",
+      unitCode: merged.unitCode || fallback.unitCode,
+      unitType: merged.unitType || "Chưa cập nhật",
+      tower: merged.tower || "Chưa cập nhật",
+      floor: merged.floor || "",
+      view: merged.view || "Chưa cập nhật",
+      area: merged.area || "Chưa cập nhật",
+      direction: merged.direction || "Chưa cập nhật",
+      tags: Array.isArray(merged.tags) ? merged.tags : [],
+      schedule: Array.isArray(merged.schedule) ? merged.schedule : [],
+      loan: Array.isArray(merged.loan) ? merged.loan : [],
+      loanAmount: Number(merged.loanAmount || 0),
+      supportMonths: Number(merged.supportMonths || 30),
+      purchaseDate: merged.purchaseDate || new Date().toISOString().slice(0, 10),
+    });
+  }
+
   function quoteState() {
     const current = readJson(quoteStateKey, null);
     if (current?.createdAt && current?.expiresAt) return current;
-    const createdAt = Date.now();
-    const expiresAt = createdAt + 3 * 24 * 60 * 60 * 1000;
+    const createdAt = Number(quote.createdAt || Date.now());
+    const expiresAt = Number(quote.expiresAt || (createdAt + 3 * 24 * 60 * 60 * 1000));
     const next = { createdAt, expiresAt };
     writeJson(quoteStateKey, next);
     return next;
@@ -146,7 +170,7 @@
   function renderRows(container, rows) {
     if (!container) return;
     container.textContent = "";
-    rows.forEach(([label, value, meta]) => {
+    (rows || []).forEach(([label, value, meta]) => {
       const row = document.createElement("div");
       row.className = "quote-demo-row";
       const left = document.createElement("span");
@@ -160,16 +184,19 @@
 
   function renderQuote() {
     const state = quoteState();
-    document.title = `Bao gia ${quote.unitCode} - ${quote.code}`;
-    $("#adminDemoLink").href = `quote-admin-demo.html?code=${quote.code}`;
+    const towerFloor = quote.floor
+      ? `${quote.tower || "Chưa cập nhật"} / tầng ${quote.floor}`
+      : (quote.tower || "Chưa cập nhật");
+    document.title = `Báo giá ${quote.unitCode} - ${quote.code}`;
+    $("#adminDemoLink").href = `quote-admin-demo.html?code=${encodeURIComponent(quote.code)}`;
     $("#quoteTitle").textContent = `Dành riêng cho ${quote.customerName}`;
     $("#quoteIntro").textContent = `Phương án tài chính căn ${quote.unitCode} được lập theo dữ liệu tại thời điểm tạo báo giá.`;
     $("#quoteNotice").innerHTML = `Báo giá được tạo lúc <strong>${formatDate(state.createdAt)}</strong>. Vui lòng liên hệ chuyên viên để xác nhận bảng hàng và chính sách hiện tại trước khi đặt cọc.`;
-    $("#finalPrice").textContent = quote.finalPrice;
-    $("#upfront").textContent = quote.upfront;
-    $("#bankLoan").textContent = quote.bankLoan;
+    $("#finalPrice").textContent = quote.finalPrice || "--";
+    $("#upfront").textContent = quote.upfront || "--";
+    $("#bankLoan").textContent = quote.bankLoan || "--";
     $("#unitCode").textContent = quote.unitCode;
-    $("#advisorNote").textContent = quote.advisor;
+    $("#advisorNote").textContent = quote.advisor || "Thông tin trong link này được khóa theo thời điểm tạo báo giá.";
     const tags = $("#quoteTags");
     tags.textContent = "";
     quote.tags.forEach((tag) => {
@@ -179,18 +206,20 @@
     });
     renderRows($("#unitInfo"), [
       ["Loại căn", quote.unitType],
-      ["Tòa / tầng", `${quote.tower} / tầng ${quote.floor}`],
+      ["Tòa / tầng", towerFloor],
       ["Diện tích", quote.area],
-      ["Hướng / view", `${quote.direction} - ${quote.view}`]
+      ["Hướng / view", `${quote.direction} - ${quote.view}`],
+      ...(quote.policyName ? [["Nhóm chính sách", quote.policyName]] : []),
+      ...(quote.scenarioName ? [["Phương án", quote.scenarioName]] : [])
     ]);
     renderRows($("#paymentSchedule"), quote.schedule);
     renderRows($("#loanInfo"), quote.loan);
     const loanUrl = new URL("tra-goc-lai-35-nam-tu-ngay-mua.html", window.location.href);
     loanUrl.searchParams.set("unit", quote.unitCode);
-    loanUrl.searchParams.set("loan", String(quote.loanAmount));
+    loanUrl.searchParams.set("loan", String(quote.loanAmount || 0));
     loanUrl.searchParams.set("loanPct", "100");
-    loanUrl.searchParams.set("support", String(quote.supportMonths));
-    loanUrl.searchParams.set("purchaseDate", quote.purchaseDate);
+    loanUrl.searchParams.set("support", String(quote.supportMonths || 30));
+    loanUrl.searchParams.set("purchaseDate", quote.purchaseDate || new Date().toISOString().slice(0, 10));
     $("#loanScheduleLink").href = loanUrl.toString();
   }
 

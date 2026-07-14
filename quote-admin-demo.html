@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#12245c">
   <title>Admin demo bao gia | PTGSUB</title>
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
-  <link rel="stylesheet" href="quote-demo.css?v=2">
+  <link rel="stylesheet" href="quote-demo.css?v=3">
 </head>
 <body>
   <main class="quote-admin-dashboard">
@@ -22,6 +22,29 @@
         <button class="quote-demo-copy" id="resetStats" type="button">Reset demo</button>
       </div>
     </header>
+
+    <section class="quote-admin-card quote-admin-summary">
+      <h2>Thông tin báo giá</h2>
+      <div class="quote-admin-summary-grid">
+        <div>
+          <span>Khách hàng</span>
+          <strong id="adminCustomerName">--</strong>
+        </div>
+        <div>
+          <span>Mã căn</span>
+          <strong id="adminUnitCode">--</strong>
+        </div>
+        <div>
+          <span>Phương án</span>
+          <strong id="adminScenario">--</strong>
+        </div>
+        <div>
+          <span>Giá sau ưu đãi</span>
+          <strong id="adminFinalPrice">--</strong>
+        </div>
+      </div>
+      <p id="adminQuoteNote">Mã báo giá mẫu sẽ hiển thị tại đây sau khi tạo từ web chính.</p>
+    </section>
 
     <section class="quote-admin-card">
       <div class="quote-admin-kpis">
@@ -59,6 +82,6 @@
     </section>
   </main>
 
-  <script src="quote-admin-demo.js?v=2"></script>
+  <script src="quote-admin-demo.js?v=3"></script>
 </body>
 </html>

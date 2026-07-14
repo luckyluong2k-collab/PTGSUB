@@ -1,4 +1,4 @@
-﻿const policies = {
+const policies = {
   P3P9: {
     name: "P3-P9",
     hasCompletion: true,
@@ -389,6 +389,7 @@ const scenarioLabels = {
 };
 
 const quoteScenarios = ["loan", "standard", "tts50", "tts70", "tts95"];
+const QUOTE_DEMO_QUOTES_KEY = "ptgsub_quote_demo_quotes_v2";
 
 function scenarioLabel(scenario, policy = policies.P3P9) {
   return policy?.scenarioLabels?.[scenario] || scenarioLabels[scenario] || scenario;
@@ -421,6 +422,7 @@ const els = {
   discountRows: document.querySelector("#discountRows"),
   scheduleRows: document.querySelector("#scheduleRows"),
   copyBtn: document.querySelector("#copyBtn"),
+  customerQuoteDemoLink: document.querySelector("#customerQuoteDemoLink"),
   quoteImageBtn: document.querySelector("#quoteImageBtn"),
   pdfBtn: document.querySelector("#pdfBtn"),
   multiQuoteBtn: document.querySelector("#multiQuoteBtn"),
@@ -487,7 +489,7 @@ let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 
 const unitMapImage = "phankhupark-map.png";
 const lowRiseMapImage = "lowrise-map-sharp.jpg";
-const lienKeMapImage = "lienke.png";
+const lienKeMapImage = lowRiseMapImage;
 const LOW_RISE_BASE_WIDTH = 2048;
 const LOW_RISE_BASE_HEIGHT = 1448;
 const LOW_RISE_SOURCE_SCALE = 2;
@@ -577,33 +579,54 @@ function makeLowRiseMapLocation(x, y, options = {}) {
 }
 
 function makeLienKeMapLocation(x, y, options = {}) {
-  const width = options.width || 42;
-  const height = options.height || 62;
-  const cropWidth = options.cropWidth || 1500;
-  const cropHeight = options.cropHeight || 900;
-  const maxCropX = Math.max(0, LIEN_KE_BASE_WIDTH - cropWidth);
-  const maxCropY = Math.max(0, LIEN_KE_BASE_HEIGHT - cropHeight);
-  const cropX = Math.min(maxCropX, Math.max(0, options.cropX ?? x - 560));
-  const cropY = Math.min(maxCropY, Math.max(0, options.cropY ?? y - 330));
+  // Dữ liệu dãy căn được khai báo theo hệ tọa độ 5854 x 3667.
+  // Repo GitHub Pages đã có lowrise-map-sharp.jpg nhưng không có lienke.png,
+  // vì vậy chuyển tọa độ tự động sang đúng kích thước ảnh thấp tầng hiện có.
+  const imageWidth = LOW_RISE_BASE_WIDTH * LOW_RISE_SOURCE_SCALE;
+  const imageHeight = LOW_RISE_BASE_HEIGHT * LOW_RISE_SOURCE_SCALE;
+  const scaleX = imageWidth / LIEN_KE_BASE_WIDTH;
+  const scaleY = imageHeight / LIEN_KE_BASE_HEIGHT;
+  const sx = (value) => Math.round(Number(value || 0) * scaleX);
+  const sy = (value) => Math.round(Number(value || 0) * scaleY);
+
+  const layoutWidth = options.width || 42;
+  const layoutHeight = options.height || 62;
+  const layoutCropWidth = options.cropWidth || 1500;
+  const layoutCropHeight = options.cropHeight || 900;
+  const layoutCropX = options.cropX ?? x - 560;
+  const layoutCropY = options.cropY ?? y - 330;
+
+  const unitX = sx(x);
+  const unitY = sy(y);
+  const width = Math.max(8, sx(layoutWidth));
+  const height = Math.max(16, sy(layoutHeight));
+  const cropWidth = Math.min(imageWidth, Math.max(640, sx(layoutCropWidth)));
+  const cropHeight = Math.min(imageHeight, Math.max(380, sy(layoutCropHeight)));
+  const maxCropX = Math.max(0, imageWidth - cropWidth);
+  const maxCropY = Math.max(0, imageHeight - cropHeight);
+  const cropX = Math.min(maxCropX, Math.max(0, sx(layoutCropX)));
+  const cropY = Math.min(maxCropY, Math.max(0, sy(layoutCropY)));
   const labelOnLeft = options.labelOnLeft ?? x > LIEN_KE_BASE_WIDTH * 0.62;
+  const labelWidth = Math.min(cropWidth - 30, Math.max(430, sx(700)));
+  const labelHeight = Math.max(100, sy(145));
   const label = {
-    x: labelOnLeft ? cropX + 34 : cropX + cropWidth - 760,
-    y: cropY + 34,
-    width: 700,
-    height: 145,
+    x: labelOnLeft ? cropX + 24 : Math.max(cropX + 24, cropX + cropWidth - labelWidth - 24),
+    y: cropY + 24,
+    width: labelWidth,
+    height: labelHeight,
   };
 
   return {
     image: lienKeMapImage,
-    scale: 1,
+    scale: 0.64,
     crop: { x: cropX, y: cropY, width: cropWidth, height: cropHeight },
-    unitRect: { x, y, width, height },
+    unitRect: { x: unitX, y: unitY, width, height },
     label,
     arrowStart: {
       x: labelOnLeft ? label.x + label.width : label.x,
-      y: label.y + 150,
+      y: label.y + label.height + 8,
     },
-    arrowEnd: { x: x + width / 2, y: y + height / 2 },
+    arrowEnd: { x: unitX + width / 2, y: unitY + height / 2 },
   };
 }
 
@@ -3667,6 +3690,160 @@ function makeQuoteText(result) {
   return parts.join("\n");
 }
 
+function compactMoney(value) {
+  const amount = round(value);
+  if (amount >= 1000000000) {
+    return `${(amount / 1000000000).toLocaleString("vi-VN", { maximumFractionDigits: 2 })} tỷ`;
+  }
+  if (amount >= 1000000) {
+    return `${(amount / 1000000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} triệu`;
+  }
+  return money(amount);
+}
+
+function quoteDemoAmountText(value, fallback = "Theo CSBH") {
+  const amount = round(value);
+  return amount ? compactMoney(amount) : fallback;
+}
+
+function readCustomerQuoteDemos() {
+  try {
+    const raw = localStorage.getItem(QUOTE_DEMO_QUOTES_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeCustomerQuoteDemos(store) {
+  try {
+    const entries = Object.entries(store)
+      .sort((a, b) => Number(a[1]?.createdAt || 0) - Number(b[1]?.createdAt || 0))
+      .slice(-40);
+    localStorage.setItem(QUOTE_DEMO_QUOTES_KEY, JSON.stringify(Object.fromEntries(entries)));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function makeCustomerQuoteCode(unitCode) {
+  const clean = normalizeUnitCode(unitCode).replace(/[^A-Z0-9]/g, "") || "BG";
+  const suffix = Date.now().toString(36).slice(-5).toUpperCase();
+  return `${clean}-${suffix}`;
+}
+
+function quoteDemoPreparedCapital(result) {
+  if (result.scenario === "loan") return result.upfront;
+  const firstRows = (result.schedule || []).slice(0, 2);
+  const firstAmount = firstRows.reduce((sum, item) => sum + round(item?.[1]), 0);
+  return firstAmount || round(result.total * 0.2);
+}
+
+function quoteDemoPaymentRows(result) {
+  const rows = (result.schedule || [])
+    .filter((item) => Array.isArray(item) && item[0])
+    .slice(0, 8)
+    .map(([label, value]) => [label, quoteDemoAmountText(value)]);
+  if (rows.length) return rows;
+  return [["Lịch thanh toán", "Đang cập nhật theo CSBH"]];
+}
+
+function quoteDemoLoanRows(result) {
+  const rows = [
+    ["Phương án", scenarioLabel(result.scenario, result.policy)],
+    ["Ngày báo giá", formatDateText(result.quoteDate)],
+    ["Giá sau ưu đãi", compactMoney(result.total)],
+  ];
+
+  if (result.scenario === "loan") {
+    rows.push(
+      ["Khoản vay", compactMoney(result.bankDisbursement)],
+      ["Tỷ lệ vay", percent(result.loanRatio)],
+      ["Hỗ trợ lãi suất", result.policy.loanSupport || "Chưa cập nhật"]
+    );
+  } else {
+    rows.push(
+      ["Khoản vay", "Không vay"],
+      ["Vốn vào ban đầu", compactMoney(quoteDemoPreparedCapital(result))]
+    );
+  }
+
+  return rows;
+}
+
+function buildCustomerQuoteDemoSnapshot(result) {
+  const unitCode = normalizeUnitCode(els.unitCode.value) || els.unitCode.value.trim();
+  if (!unitCode) {
+    throw new Error("missing-unit");
+  }
+
+  const unit = unitCatalog[unitCode] || {};
+  const createdAt = Date.now();
+  const scenarioName = scenarioLabel(result.scenario, result.policy);
+  const areaText = unitAreaText(unit);
+  const loanAmount = result.scenario === "loan" ? round(result.bankDisbursement) : 0;
+  const supportTag = result.policy.loanSupport
+    ? String(result.policy.loanSupport).split(",")[0]
+    : "";
+
+  return {
+    code: makeCustomerQuoteCode(unitCode),
+    customerName: "khách hàng",
+    unitCode,
+    unitType: result.unitType || unit.unitType || els.unitType.value || "Chưa cập nhật",
+    policyName: result.policy.name,
+    scenarioName,
+    tower: unitTower(unit, unitCode),
+    floor: unitFloor(unit, unitCode),
+    apartmentNo: unitApartmentNumber(unitCode, unit),
+    view: unit.view || "Chưa cập nhật",
+    area: areaText !== "Chưa cập nhật" ? areaText : (result.area ? `${result.area} m2` : "Chưa cập nhật"),
+    direction: unit.direction || "Chưa cập nhật",
+    finalPrice: compactMoney(result.total),
+    finalPriceFull: money(result.total),
+    listedGross: compactMoney(result.listedGross),
+    netAfterDiscount: compactMoney(result.netAfterDiscount),
+    rawGrossAfterDiscount: compactMoney(result.rawGrossAfterDiscount),
+    completion: result.completion ? compactMoney(result.completion) : "Không áp dụng",
+    upfront: compactMoney(quoteDemoPreparedCapital(result)),
+    bankLoan: loanAmount ? compactMoney(loanAmount) : "Không vay",
+    loanAmount,
+    supportMonths: loanSupportMonths(result.policy),
+    purchaseDate: result.quoteDate || els.quoteDate.value || new Date(createdAt).toISOString().slice(0, 10),
+    tags: [
+      scenarioName,
+      result.scenario === "loan" ? `Vay ${percent(result.loanRatio)}` : "Không vay",
+      supportTag,
+      "Dữ liệu từ web chính",
+    ].filter(Boolean),
+    advisor: `Báo giá được tạo từ web chính lúc ${new Date(createdAt).toLocaleString("vi-VN")}. Snapshot này khóa theo mã căn ${unitCode}, nhóm ${result.policy.name} và phương án ${scenarioName}.`,
+    schedule: quoteDemoPaymentRows(result),
+    loan: quoteDemoLoanRows(result),
+    createdAt,
+    expiresAt: createdAt + 3 * 24 * 60 * 60 * 1000,
+  };
+}
+
+function openCustomerQuoteDemo(event) {
+  event?.preventDefault();
+
+  try {
+    const result = calculate();
+    const snapshot = buildCustomerQuoteDemoSnapshot(result);
+    const store = readCustomerQuoteDemos();
+    store[snapshot.code] = snapshot;
+    if (!writeCustomerQuoteDemos(store)) {
+      showToast("Không lưu được mã báo giá trên trình duyệt này");
+      return;
+    }
+    window.location.href = `quote-admin-demo.html?code=${encodeURIComponent(snapshot.code)}`;
+  } catch {
+    showToast("Nhập hoặc chọn mã căn trước khi tạo báo giá");
+  }
+}
+
 function showToast(message) {
   const isUnitAutofill = String(message || "").startsWith("Đã tự điền mã căn");
   window.clearTimeout(els.toast._hideTimer);
@@ -3836,6 +4013,8 @@ els.resetBtn.addEventListener("click", resetDefaults);
 
 els.loanScheduleBtn?.addEventListener("click", openLoanScheduleCalculator);
 
+els.customerQuoteDemoLink?.addEventListener("click", openCustomerQuoteDemo);
+
 els.copyBtn.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(lastQuoteText);
@@ -3950,7 +4129,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=85", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=86", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
@@ -3988,9 +4167,6 @@ refreshCatalogFromGoogle()
     render();
     showToast(error?.message || "Không đọc được bảng hàng mới");
   });
-
-
-
 
 
 
