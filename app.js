@@ -14,7 +14,7 @@
       completionFollowsInstallments: true,
     },
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts50: { postRates: [0.05, 0.10], postOffsetsDays: [249, 309], handoverRate: 0.30 },
       tts70: { postRates: [], handoverRate: 0.25 },
       tts95: { postRates: [], handoverRate: 0 },
     },
@@ -90,8 +90,16 @@
       handoverRate: 0,
     },
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.05, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts50: {
+        postRates: [0.05, 0.05, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [429, 489, 549, 609, 669, 729, 789, 849],
+        handoverRate: 0,
+      },
+      tts70: {
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [609, 669, 729, 789, 849],
+        handoverRate: 0,
+      },
       tts95: { postRates: [], handoverRate: 0 },
     },
     standardSecondPaymentDays: 9,
@@ -128,8 +136,16 @@
       handoverRate: 0,
     },
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
+      tts50: {
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [429, 489, 549, 609, 669, 729, 789, 849, 909],
+        handoverRate: 0,
+      },
+      tts70: {
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [669, 729, 789, 849, 909],
+        handoverRate: 0,
+      },
       tts95: { postRates: [], handoverRate: 0 },
     },
     standardSecondPaymentDays: 9,
@@ -166,7 +182,7 @@
       handoverRate: 0.30,
     },
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
+      tts50: { postRates: [0.05, 0.10], postOffsetsDays: [249, 309], handoverRate: 0.30 },
       tts70: { postRates: [], handoverRate: 0.25 },
       tts95: { postRates: [], handoverRate: 0 },
     },
@@ -243,15 +259,27 @@
       ],
       handoverRate: 0,
     },
+    standardInstallmentOffsetsDays: [69, 129, 189, 249, 309, 678, 429, 489, 549, 609, 699, 789, 879, 969],
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts95: { postRates: [], handoverRate: 0 },
+      tts50: {
+        topUpRates: [0.10, 0.25],
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [678, 429, 489, 549, 609, 699, 789, 879, 969],
+        handoverRate: 0,
+      },
+      tts70: {
+        topUpRates: [0.10, 0.45],
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [609, 699, 789, 879, 969],
+        handoverRate: 0,
+      },
+      tts95: { topUpRates: [0.10, 0.70], postRates: [], handoverRate: 0 },
     },
     standardSecondPaymentDays: 9,
     loanSecondPaymentDays: 9,
     ttsSecondPaymentDays: 6,
     contractDays: 29,
+    bankDisbursementAfterContractDays: 14,
     loanFourthPaymentDays: 69,
     standardInstallmentFirstDays: 69,
     standardInstallmentIntervalDays: 60,
@@ -259,6 +287,7 @@
       loan: "2027-03-31", standard: "2029-05-15", tts50: "2029-05-15",
       tts70: "2029-05-15", tts95: "2027-03-31",
     },
+    scheduleHandoverOffsetsDays: { standard: 1044, tts50: 1044, tts70: 1044 },
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -285,15 +314,27 @@
       ],
       handoverRate: 0,
     },
+    standardInstallmentOffsetsDays: [69, 129, 189, 249, 309, 678, 429, 489, 549, 609, 699, 789, 879, 969],
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts70: { postRates: [0.05, 0.05, 0.05, 0.05, 0.05], handoverRate: 0 },
-      tts95: { postRates: [], handoverRate: 0 },
+      tts50: {
+        topUpRates: [0.10, 0.25],
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [678, 429, 489, 549, 609, 699, 789, 879, 969],
+        handoverRate: 0,
+      },
+      tts70: {
+        topUpRates: [0.10, 0.45],
+        postRates: [0.05, 0.05, 0.05, 0.05, 0.05],
+        postOffsetsDays: [609, 699, 789, 879, 969],
+        handoverRate: 0,
+      },
+      tts95: { topUpRates: [0.10, 0.70], postRates: [], handoverRate: 0 },
     },
     standardSecondPaymentDays: 9,
     loanSecondPaymentDays: 9,
     ttsSecondPaymentDays: 6,
     contractDays: 29,
+    bankDisbursementAfterContractDays: 14,
     loanFourthPaymentDays: 69,
     standardInstallmentFirstDays: 69,
     standardInstallmentIntervalDays: 60,
@@ -301,6 +342,7 @@
       loan: "2027-03-31", standard: "2029-05-15", tts50: "2029-05-15",
       tts70: "2029-05-15", tts95: "2027-03-31",
     },
+    scheduleHandoverOffsetsDays: { standard: 1044, tts50: 1044, tts70: 1044 },
     effectiveDate: "2026-06-18",
     handover: "2027-04-30",
     loanSupport: "HTLS 36 tháng, không muộn hơn 30/06/2029",
@@ -1997,7 +2039,11 @@ function completionValue(policy, unitType, area) {
   return completionBreakdown(policy, unitType, area).total;
 }
 
-function scheduleHandoverDate(policy, scenario) {
+function scheduleHandoverDate(policy, scenario, quoteDateText) {
+  const offsetDays = policy?.scheduleHandoverOffsetsDays?.[scenario];
+  if (Number.isFinite(offsetDays)) {
+    return addDays(dateFromText(quoteDateText), offsetDays);
+  }
   return dateFromText(policy?.scheduleHandover?.[scenario] || policy?.handover);
 }
 
@@ -2010,6 +2056,15 @@ function standardInstallmentDates(policy, quoteDate, count) {
   const firstDays = policy?.standardInstallmentFirstDays ?? 69;
   const intervalDays = policy?.standardInstallmentIntervalDays ?? 60;
   return Array.from({ length: count }, (_, index) => addDays(quoteDate, firstDays + intervalDays * index));
+}
+
+function ttsPostInstallmentDates(config, quoteDate, deadline, handoverDate, count) {
+  if (Array.isArray(config?.postOffsetsDays)) {
+    return config.postOffsetsDays
+      .slice(0, count)
+      .map((days) => addDays(quoteDate, days));
+  }
+  return spreadDates(addDays(deadline, 60), addDays(handoverDate, -14), count);
 }
 
 function reconcileSchedule(rows, total) {
@@ -2028,7 +2083,7 @@ function buildStandardSchedule(result) {
   const installmentRates = config.installmentRates || [];
   const deposit = depositByType[result.unitType] || 0;
   const quoteDate = dateFromText(result.quoteDate || els.quoteDate.value);
-  const handoverDate = scheduleHandoverDate(policy, "standard");
+  const handoverDate = scheduleHandoverDate(policy, "standard", result.quoteDate || els.quoteDate.value);
   const secondDate = addDays(quoteDate, policy.standardSecondPaymentDays ?? 9);
   const installmentDates = standardInstallmentDates(policy, quoteDate, installmentRates.length);
   const completion = completionBreakdown(policy, result.unitType, result.area);
@@ -2048,15 +2103,17 @@ function buildStandardSchedule(result) {
     [`Lần 2 - đủ 15% (${formatDateText(secondDate)})`, secondAmount],
   ];
 
+  const contractDate = addDays(quoteDate, policy.contractDays ?? 9);
   const completionContractRate = config.completionContractRate ?? policy.completionContractRate ?? 0;
   if (completion.grossWithVat && !completionFollowsInstallments && completionContractRate) {
-    const contractDate = addDays(quoteDate, policy.contractDays ?? 9);
     const contractAmount = round(completion.grossWithVat * completionContractRate);
     completionGrossPaid += contractAmount;
     rows.push([
       `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
       contractAmount,
     ]);
+  } else {
+    rows.push([`Ký HĐMB (${formatDateText(contractDate)})`, null]);
   }
 
   installmentRates.forEach((rate, index) => {
@@ -2114,7 +2171,7 @@ function buildLoanSchedule(result) {
   const contractDate = addDays(quoteDate, policy.contractDays ?? 9);
   const bankDate = addDays(contractDate, policy.bankDisbursementAfterContractDays ?? 15);
   const fourthDate = addDays(quoteDate, policy.loanFourthPaymentDays ?? 69);
-  const handoverDate = scheduleHandoverDate(policy, "loan");
+  const handoverDate = scheduleHandoverDate(policy, "loan", result.quoteDate || els.quoteDate.value);
   const completion = completionBreakdown(policy, result.unitType, result.area);
   const customerRate = Math.max(0, 0.80 - result.loanRatio);
   const secondAmount = Math.max(0, round(result.rawWithVat * 0.15 - deposit));
@@ -2134,6 +2191,8 @@ function buildLoanSchedule(result) {
       `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
       contractAmount,
     ]);
+  } else {
+    rows.push([`Ký HĐMB (${formatDateText(contractDate)})`, null]);
   }
 
   rows.push([
@@ -2168,12 +2227,12 @@ function buildTtsSchedule(result) {
   const quoteDate = dateFromText(quoteDateText);
   const deadline = ttsDeadlineFromQuote(quoteDateText);
   const secondDate = addDays(quoteDate, result.policy.ttsSecondPaymentDays ?? 6);
-  const handoverDate = scheduleHandoverDate(result.policy, result.scenario);
+  const handoverDate = scheduleHandoverDate(result.policy, result.scenario, quoteDateText);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
   const paymentBasisRawWithVat = result.rawWithVat;
   const config = result.policy.ttsSchedule?.[result.scenario] || { postRates: [], handoverRate: 0 };
   const postRates = config.postRates || [];
-  const postDates = spreadDates(addDays(deadline, 60), addDays(handoverDate, -14), postRates.length);
+  const postDates = ttsPostInstallmentDates(config, quoteDate, deadline, handoverDate, postRates.length);
   const completionContractRate = result.policy.completionContractRate || 0;
   let completionGrossPaid = 0;
   const secondAmount = Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit));
@@ -2185,23 +2244,33 @@ function buildTtsSchedule(result) {
     ],
   ];
 
+  const topUpRate = Math.max(0, ttsRatio - 0.15);
+  const topUpAmount = Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit - secondAmount));
+  if (topUpRate && topUpAmount) {
+    const topUpRates = Array.isArray(config.topUpRates) && config.topUpRates.length
+      ? config.topUpRates
+      : [topUpRate];
+    topUpRates.forEach((rate, index) => {
+      const amount = topUpRates.length > 1
+        ? round(paymentBasisRawWithVat * rate)
+        : topUpAmount;
+      const label = topUpRates.length > 1
+        ? `Lần ${index + 3} - ${percent(rate)}${index === topUpRates.length - 1 ? ` - đủ ${percent(ttsRatio)}` : ""} (chậm nhất ${formatDateText(deadline)})`
+        : `Thanh toán thêm ${percent(rate)} - đủ ${percent(ttsRatio)} (${formatDateText(deadline)})`;
+      rows.push([label, amount]);
+    });
+  }
+
+  const contractDate = addDays(quoteDate, result.policy.contractDays ?? 9);
   if (completion.grossWithVat && completionContractRate) {
-    const contractDate = addDays(quoteDate, result.policy.contractDays ?? 9);
     const contractAmount = round(completion.grossWithVat * completionContractRate);
     completionGrossPaid += contractAmount;
     rows.push([
       `Ký HĐMB - ${percent(completionContractRate)} hoàn thiện (${formatDateText(contractDate)})`,
       contractAmount,
     ]);
-  }
-
-  const topUpRate = Math.max(0, ttsRatio - 0.15);
-  const topUpAmount = Math.max(0, round(paymentBasisRawWithVat * ttsRatio - deposit - secondAmount));
-  if (topUpRate && topUpAmount) {
-    rows.push([
-      `Thanh toán thêm ${percent(topUpRate)} - đủ ${percent(ttsRatio)} (${formatDateText(deadline)})`,
-      topUpAmount,
-    ]);
+  } else {
+    rows.push([`Ký HĐMB (${formatDateText(contractDate)})`, null]);
   }
 
   postRates.forEach((rate, index) => {
@@ -2938,6 +3007,9 @@ function discountRowsHtml(result) {
 
 function scheduleRowsHtml(result) {
   return result.schedule.map(([label, value]) => {
+    if (value === null || value === undefined) {
+      return row(label, "Mốc thủ tục", "highlight schedule-milestone");
+    }
     const className = /NH|Tổng|Trả|Bàn giao|GCN/.test(label) ? "highlight" : "";
     return row(label, money(value), className);
   }).join("");
