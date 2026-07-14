@@ -1,11 +1,22 @@
 body.theme-mid-autumn-red-gold {
-  --theme-bg-dark:#5f0614;
-  --theme-bg:#8b0f23;
-  --theme-bg-light:#b51b31;
-  --theme-gold:#f5c451;
-  --theme-gold-light:#ffd978;
+  --theme-bg-dark:#720018;
+  --theme-bg:#99102d;
+  --theme-bg-light:#b91b3d;
+  --theme-gold:#f7c64f;
+  --theme-gold-light:#ffda78;
   --theme-cream:#fff7e8;
-  --theme-text:#4b1620;
+  --theme-text:#4b101c;
+  --bg:#720018;
+  --panel:#fff7e8;
+  --ink:#4b101c;
+  --muted:#76525a;
+  --brand:#99102d;
+  --brand-deep:#720018;
+  --gold:#f7c64f;
+  --line:#e7c66f;
+  --ui-border:#d8a63d;
+  --ui-soft:#fff1cf;
+  --ui-shadow:0 12px 28px rgba(75,16,28,.18);
   color:var(--theme-text);
   background:
     radial-gradient(circle at 85% 9%,rgba(255,217,120,.22) 0 7rem,transparent 7.2rem),
@@ -49,6 +60,26 @@ body.theme-mid-autumn-red-gold .summary-band .label,
 body.theme-mid-autumn-red-gold .tts-chart-head span {
   font-weight:700;
   letter-spacing:-.012em;
+}
+
+body.theme-mid-autumn-red-gold .chart-wide-toggle {
+  border-color:var(--theme-gold) !important;
+  background:linear-gradient(135deg,var(--theme-bg-dark),var(--theme-bg-light)) !important;
+  color:var(--theme-gold-light) !important;
+}
+
+body.theme-mid-autumn-red-gold .chart-wide-toggle > svg {
+  background:linear-gradient(135deg,var(--theme-gold-light),var(--theme-gold));
+  stroke:var(--theme-bg-dark);
+}
+
+body.theme-mid-autumn-red-gold .chart-wide-toggle small {
+  color:#fff0dc !important;
+}
+
+body.theme-mid-autumn-red-gold #ttsPriceChart text {
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif;
+  letter-spacing:-.025em;
 }
 
 .mid-autumn-decor {
@@ -182,15 +213,17 @@ body.theme-mid-autumn-red-gold .mid-autumn-banner-art {
 }
 
 body.theme-mid-autumn-red-gold .brand-hero {
-  min-height:190px !important;
+  position:relative !important;
+  top:auto !important;
+  min-height:130px !important;
   max-height:none !important;
 }
 
 .mid-autumn-banner-moon {
   position:absolute;
-  top:18px;
-  right:34px;
-  width:142px;
+  top:9px;
+  right:28px;
+  width:108px;
   aspect-ratio:1;
   border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fffdf1 0 16%,transparent 17%),radial-gradient(circle,#fff1be 0 54%,#ffd978 73%,#df9f1c 100%);
@@ -205,9 +238,9 @@ body.theme-mid-autumn-red-gold .brand-hero {
   filter:drop-shadow(0 7px 10px rgba(53,0,8,.45));
 }
 
-.mid-autumn-banner-star { top:-8px; right:260px; width:88px; transform-origin:50% 0; animation:midAutumnSwing 4.2s ease-in-out infinite; }
-.mid-autumn-banner-lantern { top:9px; right:188px; width:62px; transform-origin:50% 0; animation:midAutumnRoundLanternSwing 5.8s ease-in-out infinite; }
-.mid-autumn-banner-rabbit { right:112px; bottom:-10px; width:82px; animation:midAutumnRabbitFloat 4.8s ease-in-out infinite; }
+.mid-autumn-banner-star { top:-5px; right:210px; width:66px; transform-origin:50% 0; animation:midAutumnSwing 4.2s ease-in-out infinite; }
+.mid-autumn-banner-lantern { top:5px; right:154px; width:48px; transform-origin:50% 0; animation:midAutumnRoundLanternSwing 5.8s ease-in-out infinite; }
+.mid-autumn-banner-rabbit { right:82px; bottom:-8px; width:62px; animation:midAutumnRabbitFloat 4.8s ease-in-out infinite; }
 .mid-autumn-banner-cloud { position:absolute; width:135px; height:28px; border-radius:50%; background:rgba(255,247,232,.16); }
 .mid-autumn-banner-cloud::before,.mid-autumn-banner-cloud::after { content:""; position:absolute; bottom:2px; border-radius:50%; background:inherit; }
 .mid-autumn-banner-cloud::before { left:20px; width:52px; height:48px; }
@@ -384,6 +417,139 @@ body.theme-mid-autumn-red-gold .toast {
   color:#fff !important;
 }
 
+/* Lock the Mid-Autumn interface to one red-gold-cream palette. */
+body.theme-mid-autumn-red-gold .panel h2,
+body.theme-mid-autumn-red-gold .results-card h2,
+body.theme-mid-autumn-red-gold .tts-chart-head h3,
+body.theme-mid-autumn-red-gold .form-section-title,
+body.theme-mid-autumn-red-gold .discount-panel h2,
+body.theme-mid-autumn-red-gold .schedule-panel h2 {
+  color:var(--theme-bg) !important;
+  background:none !important;
+  -webkit-background-clip:border-box !important;
+  background-clip:border-box !important;
+  -webkit-text-fill-color:var(--theme-bg) !important;
+  text-shadow:none !important;
+}
+
+body.theme-mid-autumn-red-gold .form-section-title::after,
+body.theme-mid-autumn-red-gold .panel h2::after,
+body.theme-mid-autumn-red-gold .results-card h2::after {
+  background:var(--theme-gold) !important;
+}
+
+body.theme-mid-autumn-red-gold .unit-lookup-button,
+body.theme-mid-autumn-red-gold .multi-quote-toggle,
+body.theme-mid-autumn-red-gold .unit-map-button,
+body.theme-mid-autumn-red-gold .address-copy-btn,
+body.theme-mid-autumn-red-gold .loan-schedule-button,
+body.theme-mid-autumn-red-gold .account-tab {
+  border-color:var(--theme-gold) !important;
+  background:linear-gradient(135deg,var(--theme-bg-light),var(--theme-bg-dark)) !important;
+  color:#fff7e8 !important;
+  box-shadow:0 6px 14px rgba(95,6,20,.24) !important;
+}
+
+body.theme-mid-autumn-red-gold .social-chip,
+body.theme-mid-autumn-red-gold .social-chip.zalo,
+body.theme-mid-autumn-red-gold .social-chip.drive,
+body.theme-mid-autumn-red-gold .icon-button,
+body.theme-mid-autumn-red-gold .theme-toggle {
+  border-color:var(--theme-gold) !important;
+  background:var(--theme-cream) !important;
+  color:var(--theme-bg-dark) !important;
+}
+
+body.theme-mid-autumn-red-gold .theme-toggle-track { background:var(--theme-gold) !important; }
+body.theme-mid-autumn-red-gold .theme-toggle-knob { background:var(--theme-bg) !important; }
+body.theme-mid-autumn-red-gold input[type="checkbox"] { accent-color:var(--theme-bg-light); }
+
+body.theme-mid-autumn-red-gold .quote-badge,
+body.theme-mid-autumn-red-gold .quote-stat-top em,
+body.theme-mid-autumn-red-gold .quote-stat-blue .quote-stat-top em,
+body.theme-mid-autumn-red-gold .quote-stat-green .quote-stat-top em,
+body.theme-mid-autumn-red-gold .quote-stat-warm .quote-stat-top em {
+  border-color:#d8a63b !important;
+  background:var(--theme-gold-light) !important;
+  color:var(--theme-bg-dark) !important;
+}
+
+body.theme-mid-autumn-red-gold .quote-stat,
+body.theme-mid-autumn-red-gold .quote-stat-blue,
+body.theme-mid-autumn-red-gold .quote-stat-green,
+body.theme-mid-autumn-red-gold .quote-stat-warm {
+  border-color:#e1bd68 !important;
+  border-left-color:var(--theme-bg-light) !important;
+  background:linear-gradient(145deg,#fffdf8,var(--theme-cream)) !important;
+}
+
+body.theme-mid-autumn-red-gold .quote-stat strong,
+body.theme-mid-autumn-red-gold .quote-stat-green strong,
+body.theme-mid-autumn-red-gold .quote-stat-top,
+body.theme-mid-autumn-red-gold .result-list strong,
+body.theme-mid-autumn-red-gold .tts-chart-tooltip strong {
+  color:var(--theme-bg) !important;
+}
+
+body.theme-mid-autumn-red-gold .tts-chart-tooltip {
+  border-color:var(--theme-gold) !important;
+  background:var(--theme-cream) !important;
+}
+
+body.theme-mid-autumn-red-gold .tts-chart-tabs button.active {
+  border-color:#a76c12 !important;
+  background:var(--theme-gold) !important;
+  color:var(--theme-bg-dark) !important;
+}
+
+/* Strict event palette: remove leftover navy/teal accents from shared components. */
+body.theme-mid-autumn-red-gold .finder-toggle-icon,
+body.theme-mid-autumn-red-gold .chart-wide-toggle > svg,
+body.theme-mid-autumn-red-gold .quote-status,
+body.theme-mid-autumn-red-gold .quote-status.loan,
+body.theme-mid-autumn-red-gold .toast,
+body.theme-mid-autumn-red-gold .account-tab,
+body.theme-mid-autumn-red-gold .unit-lookup-button,
+body.theme-mid-autumn-red-gold .multi-quote-toggle,
+body.theme-mid-autumn-red-gold .unit-map-button,
+body.theme-mid-autumn-red-gold .address-copy-btn {
+  border-color:var(--theme-gold) !important;
+  background:linear-gradient(135deg,var(--theme-bg-light),var(--theme-bg-dark)) !important;
+  color:var(--theme-cream) !important;
+  -webkit-text-fill-color:var(--theme-cream) !important;
+}
+
+body.theme-mid-autumn-red-gold .result-list,
+body.theme-mid-autumn-red-gold .tts-chart-meta,
+body.theme-mid-autumn-red-gold .quote-card,
+body.theme-mid-autumn-red-gold .quote-detail,
+body.theme-mid-autumn-red-gold .quote-discount-list {
+  border-color:var(--theme-gold) !important;
+}
+
+body.theme-mid-autumn-red-gold .row.highlight,
+body.theme-mid-autumn-red-gold .tts-chart-meta > *,
+body.theme-mid-autumn-red-gold .quote-detail,
+body.theme-mid-autumn-red-gold .quote-card-hero {
+  background:var(--theme-cream) !important;
+  color:var(--theme-text) !important;
+}
+
+body.theme-mid-autumn-red-gold .row span,
+body.theme-mid-autumn-red-gold .quote-detail span,
+body.theme-mid-autumn-red-gold .tts-chart-meta span,
+body.theme-mid-autumn-red-gold .chart-wide-toggle small {
+  color:#76525a !important;
+  -webkit-text-fill-color:#76525a !important;
+}
+
+body.theme-mid-autumn-red-gold .result-actions button:not(.primary),
+body.theme-mid-autumn-red-gold .multi-quote-actions button:not(.primary) {
+  border-color:var(--theme-gold) !important;
+  background:var(--theme-bg) !important;
+  color:var(--theme-cream) !important;
+}
+
 @keyframes midAutumnMoonPulse {
   50% {
     transform:scale(1.035);
@@ -417,7 +583,7 @@ body.theme-mid-autumn-red-gold .toast {
 
 @media (max-width:767px) {
   body.theme-mid-autumn-red-gold { background-attachment:scroll; overflow-x:hidden; }
-  body.theme-mid-autumn-red-gold .brand-hero { min-height:205px !important; max-height:none !important; }
+  body.theme-mid-autumn-red-gold .brand-hero { min-height:170px !important; max-height:none !important; }
   .mid-autumn-moon { width:105px; top:86px; right:12px; }
   .mid-autumn-star-lantern { width:72px; top:142px; left:62px; }
   .mid-autumn-round-lantern { display:none; }
@@ -425,10 +591,10 @@ body.theme-mid-autumn-red-gold .toast {
   .mid-autumn-cloud-2,.mid-autumn-cloud-3,.star-mobile-hidden { display:none; }
   .mid-autumn-cloud-1 { top:45%; opacity:.1; }
   .mid-autumn-twinkle-star { width:4px; height:4px; }
-  .mid-autumn-banner-moon { top:74px; right:7px; width:96px; }
-  .mid-autumn-banner-star { top:82px; right:112px; width:62px; }
+  .mid-autumn-banner-moon { top:65px; right:7px; width:78px; }
+  .mid-autumn-banner-star { top:71px; right:92px; width:52px; }
   .mid-autumn-banner-lantern { display:none; }
-  .mid-autumn-banner-rabbit { top:142px; right:18px; bottom:auto; width:64px; }
+  .mid-autumn-banner-rabbit { top:112px; right:15px; bottom:auto; width:54px; }
   .banner-cloud-two { display:none; }
 }
 
@@ -440,9 +606,9 @@ body.theme-mid-autumn-red-gold .toast {
 @media (max-width:430px) {
   .mid-autumn-moon { top:118px; right:8px; width:96px; }
   .mid-autumn-star-lantern { top:168px; left:58px; width:66px; }
-  .mid-autumn-banner-moon { top:98px; width:88px; }
-  .mid-autumn-banner-star { top:111px; right:102px; width:56px; }
-  .mid-autumn-banner-rabbit { top:188px; right:17px; width:62px; }
+  .mid-autumn-banner-moon { top:86px; width:76px; }
+  .mid-autumn-banner-star { top:96px; right:88px; width:48px; }
+  .mid-autumn-banner-rabbit { top:135px; right:14px; width:52px; }
 }
 
 @media print {

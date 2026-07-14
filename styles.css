@@ -7252,11 +7252,52 @@ body.theme-dark .site-theme-status.is-error {
 .chart-wide-panel {
   grid-area:auto !important;
   grid-column:1 / -1 !important;
-  order:20;
+  order:21;
   width:100%;
   margin-top:14px;
   padding:clamp(16px,2vw,24px) !important;
 }
+
+.chart-wide-toggle {
+  grid-area:auto !important;
+  grid-column:1 / -1 !important;
+  order:20;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 34px;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  margin-top:14px;
+  padding:13px 16px;
+  border:1px solid var(--ui-border);
+  border-radius:14px;
+  background:linear-gradient(135deg,#ffffff,#edf7f5);
+  color:#0b5f59;
+  text-align:left;
+  box-shadow:var(--ui-shadow);
+  cursor:pointer;
+}
+
+.chart-wide-toggle > svg {
+  width:38px;
+  height:38px;
+  padding:7px;
+  border-radius:11px;
+  background:#0f766e;
+  stroke:#ffffff;
+  stroke-width:2;
+  fill:none;
+}
+
+.chart-wide-toggle > span:not(.chart-wide-toggle-arrow) {
+  display:grid;
+  gap:2px;
+}
+
+.chart-wide-toggle strong { font-size:1rem; font-weight:900; }
+.chart-wide-toggle small { color:var(--muted); font-size:.78rem; font-weight:650; }
+.chart-wide-toggle-arrow { justify-self:end; font-size:1.45rem; font-weight:900; transition:transform .2s ease; }
+.chart-wide-toggle.is-open .chart-wide-toggle-arrow { transform:rotate(180deg); }
 
 .dashboard-grid {
   order:10;
@@ -7267,31 +7308,50 @@ body.theme-dark .site-theme-status.is-error {
   top:auto !important;
 }
 
+.schedule-panel {
+  position:static !important;
+  top:auto !important;
+}
+
 .kuula-tour-section {
   order:30;
 }
 
 .chart-wide-panel .tts-chart-wrap {
   width:100%;
-  min-height:clamp(330px,44vw,620px);
+  max-width:1100px;
+  min-height:0;
+  margin-inline:auto;
 }
 
 .chart-wide-panel #ttsPriceChart {
   width:100%;
   height:auto;
-  max-height:620px;
+  max-height:440px;
 }
 
 @media (min-width:1051px) {
   .dashboard-grid {
     grid-template-columns:minmax(280px,3fr) minmax(520px,6fr) minmax(260px,3fr) !important;
+    align-items:stretch !important;
   }
 
   .dashboard-rail-left,
   .results-panel,
   .dashboard-rail-right {
-    align-self:start;
+    align-self:stretch;
+    grid-row:1 !important;
   }
+
+  .dashboard-rail-left,
+  .dashboard-rail-right { height:auto; }
+  .results-panel { height:100%; padding:0 !important; }
+
+  .dashboard-rail-left { grid-template-rows:auto minmax(0,1fr); }
+  .dashboard-rail-right { grid-template-rows:repeat(2,minmax(0,1fr)); }
+  .dashboard-rail > .panel,
+  .results-panel,
+  .results-panel > .results-card { height:100%; }
 }
 
 @media (max-width:767px) {
@@ -7300,7 +7360,66 @@ body.theme-dark .site-theme-status.is-error {
     padding:11px !important;
   }
 
-  .chart-wide-panel .tts-chart-wrap {
-    min-height:260px;
+  .chart-wide-toggle {
+    grid-template-columns:38px minmax(0,1fr) 28px;
+    margin-top:8px;
+    padding:11px 12px;
+    border-radius:10px;
   }
+
+  .chart-wide-toggle > svg { width:34px; height:34px; }
+  .chart-wide-toggle strong { font-size:.9rem; }
+  .chart-wide-toggle small { font-size:.72rem; }
+
+  .dashboard-rail-left,
+  .dashboard-rail-right,
+  .results-panel,
+  .dashboard-rail > .panel,
+  .results-panel > .results-card { height:auto; }
+
+  .chart-wide-panel .tts-chart-wrap {
+    max-width:100%;
+    min-height:0;
+  }
+
+  .chart-wide-panel #ttsPriceChart { max-height:330px; }
+}
+
+/* Scrolling layout: the decorative banner leaves the viewport; only prices stay pinned. */
+body:not(.auth-locked) .topbar.brand-hero {
+  position:relative !important;
+  top:auto !important;
+}
+
+body:not(.auth-locked) .summary-band {
+  position:sticky !important;
+  top:0 !important;
+  z-index:40 !important;
+}
+
+/* Fill tall desktop rails with their existing data instead of leaving empty panels. */
+@media (min-width:1051px) {
+  .dashboard-rail-right > .panel {
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+
+  .dashboard-rail-right > .panel > .result-list {
+    flex:1 1 auto;
+    display:grid;
+    grid-auto-rows:minmax(38px,1fr);
+    align-content:stretch;
+    min-height:0;
+  }
+
+  .dashboard-rail-right > .panel > .result-list > .row {
+    height:100%;
+    align-content:center;
+  }
+}
+
+@media (max-width:1050px) {
+  body:not(.auth-locked) .summary-band { top:0 !important; }
+  .dashboard-rail-right > .panel > .result-list { grid-auto-rows:auto; }
 }

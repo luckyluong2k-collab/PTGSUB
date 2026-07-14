@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=105">
-  <link rel="stylesheet" href="mid-autumn-theme.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=108">
+  <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
   <div id="midAutumnDecor" class="mid-autumn-decor" aria-hidden="true" data-html2canvas-ignore="true" hidden>
@@ -457,7 +457,13 @@
     </div>
     </div>
 
-    <section class="tts-chart-panel chart-wide-panel" id="ttsChartPanel" aria-labelledby="ttsChartTitle">
+    <button class="chart-wide-toggle" id="ttsChartToggle" type="button" aria-expanded="false" aria-controls="ttsChartPanel">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V6m0 12h16M7 15l4-4 3 2 5-6"/></svg>
+      <span><strong>M&#7903; bi&#7875;u &#273;&#7891; bi&#7871;n &#273;&#7897;ng gi&#225;</strong><small>Xem gi&#225; ph&#7843;i thanh to&#225;n theo t&#7915;ng th&#225;ng</small></span>
+      <span class="chart-wide-toggle-arrow" aria-hidden="true">&#8964;</span>
+    </button>
+
+    <section class="tts-chart-panel chart-wide-panel" id="ttsChartPanel" aria-labelledby="ttsChartTitle" hidden>
       <div class="tts-chart-head">
         <div>
           <span>Bi&#7875;u &#273;&#7891; TTS</span>
@@ -566,7 +572,7 @@
 
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="app.js?v=93"></script>
+  <script src="app.js?v=94"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=82"></script>
   <script src="ui-admin-search.js?v=1"></script>
