@@ -1,11 +1,11 @@
-const CACHE_NAME = "park-pricing-v144-inline-loan-panel";
+const CACHE_NAME = "park-pricing-v145-loan-window";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
-  "./styles.css?v=111",
+  "./styles.css?v=112",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=102",
+  "./app.js?v=103",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=84",
   "./ui-unit-lookup.js?v=1",

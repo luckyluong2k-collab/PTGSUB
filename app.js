@@ -417,9 +417,6 @@ const els = {
   summaryBand: document.querySelector(".summary-band"),
   upfrontBox: document.querySelector("#upfrontPrice").parentElement,
   loanScheduleBtn: document.querySelector("#loanScheduleBtn"),
-  loanSchedulePanel: document.querySelector("#loanSchedulePanel"),
-  loanScheduleFrame: document.querySelector("#loanScheduleFrame"),
-  loanScheduleClose: document.querySelector("#loanScheduleClose"),
   resultRows: document.querySelector("#resultRows"),
   discountRows: document.querySelector("#discountRows"),
   scheduleRows: document.querySelector("#scheduleRows"),
@@ -3611,32 +3608,9 @@ function loanScheduleUrl(result) {
 function openLoanScheduleCalculator() {
   const result = calculate({ scenario: "loan" });
   const url = loanScheduleUrl(result);
-  if (!els.loanSchedulePanel || !els.loanScheduleFrame) {
-    window.location.href = url;
-    return;
-  }
-  els.loanScheduleFrame.src = url;
-  els.loanSchedulePanel.hidden = false;
-  els.loanSchedulePanel.classList.add("open");
-  els.loanScheduleBtn?.setAttribute("aria-expanded", "true");
-  window.requestAnimationFrame(() => {
-    els.loanSchedulePanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-}
-
-function closeLoanScheduleCalculator() {
-  if (!els.loanSchedulePanel) return;
-  els.loanSchedulePanel.hidden = true;
-  els.loanSchedulePanel.classList.remove("open");
-  els.loanScheduleBtn?.setAttribute("aria-expanded", "false");
-}
-
-function refreshOpenLoanScheduleCalculator(result) {
-  if (!els.loanSchedulePanel || !els.loanScheduleFrame || els.loanSchedulePanel.hidden) return;
-  const url = loanScheduleUrl(result);
-  if (els.loanScheduleFrame.getAttribute("src") !== url) {
-    els.loanScheduleFrame.src = url;
-  }
+  const opened = window.open(url, "_blank");
+  if (opened) opened.opener = null;
+  else window.location.href = url;
 }
 
 function render() {
@@ -3648,8 +3622,6 @@ function render() {
   const isTts = ["tts50", "tts70", "tts95"].includes(activeScenario);
   els.upfrontBox.style.display = isLoan || isTts ? "" : "none";
   if (els.loanScheduleBtn) els.loanScheduleBtn.hidden = !isLoan;
-  if (!isLoan) closeLoanScheduleCalculator();
-  else refreshOpenLoanScheduleCalculator(result);
   els.summaryBand.style.gridTemplateColumns = isLoan || isTts ? "1fr 1fr" : "1fr";
   els.upfrontPrice.classList.toggle("summary-mini", isTts);
   if (isLoan) {
@@ -3865,13 +3837,6 @@ els.scenarioButtons.forEach((button) => {
 els.resetBtn.addEventListener("click", resetDefaults);
 
 els.loanScheduleBtn?.addEventListener("click", openLoanScheduleCalculator);
-els.loanScheduleClose?.addEventListener("click", closeLoanScheduleCalculator);
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && els.loanSchedulePanel && !els.loanSchedulePanel.hidden) {
-    closeLoanScheduleCalculator();
-    els.loanScheduleBtn?.focus();
-  }
-});
 
 els.copyBtn.addEventListener("click", async () => {
   try {
