@@ -1,20 +1,24 @@
-const CACHE_NAME = "park-pricing-v143-member-forum-3d";
+const CACHE_NAME = "park-pricing-v144-inline-loan-panel";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
-  "./styles.css?v=110",
+  "./styles.css?v=111",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=101",
+  "./app.js?v=102",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=84",
+  "./ui-unit-lookup.js?v=1",
+  "./ui-admin-search.js?v=1",
   "./ui-menu.js?v=2",
+  "./ui-payment.js?v=1",
   "./ui-theme.js?v=4",
   "./manifest.webmanifest",
   "./favicon.png",
   "./apple-touch-icon.png",
   "./sun-group-icon.png",
   "./sun-group-logo.png",
+  "./payment-qr.png",
   "./lowrise-map-sharp.jpg",
   "./lienke.png",
 ];
