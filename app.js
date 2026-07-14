@@ -17,11 +17,13 @@
     name: "P10/P16/P18",
     hasCompletion: true,
     completionMode: "netTimes112",
-    completionDiscount: 0.03,
-    noLoanDiscount: 0.05,
+    // CSBH: gói hoàn thiện là giá trị cộng thêm, không phải một khoản CK.
+    completionDiscount: 0,
+    noLoanDiscount: 0.01,
     fixedDiscounts: {},
     completionUnits: { Studio: 4722222, "1BR+": 4259259, "2BR": 5000000 },
-    ttsJuly: { tts95: 0.095, tts70: 0.065, tts50: 0.035 },
+    ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.035 },
+    earlyBird: 0.01,
     effectiveDate: "2026-05-01",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
@@ -35,7 +37,7 @@
     noLoanDiscount: 0.05,
     fixedDiscounts: {},
     completionUnits: {},
-    ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.035 },
+    ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.045 },
     earlyBird: 0.01,
     effectiveDate: "2026-06-20",
     handover: "2027-09-30",
@@ -225,6 +227,7 @@ const els = {
   unitMapOutputActions: document.querySelector("#unitMapOutputActions"),
   unitMapDownload: document.querySelector("#unitMapDownload"),
   unitMapCopy: document.querySelector("#unitMapCopy"),
+  ttsChartToggle: document.querySelector("#ttsChartToggle"),
   ttsChartPanel: document.querySelector("#ttsChartPanel"),
   ttsPriceChart: document.querySelector("#ttsPriceChart"),
   ttsChartTooltip: document.querySelector("#ttsChartTooltip"),
@@ -2002,7 +2005,12 @@ function calculate(options = {}) {
   }
 
   if (scenario !== "loan") {
-    remaining = applyDiscount(discounts, "Không vay 5%", policy.noLoanDiscount, remaining);
+    remaining = applyDiscount(
+      discounts,
+      `Không vay ${percent(policy.noLoanDiscount)}`,
+      policy.noLoanDiscount,
+      remaining
+    );
   }
 
   if (includeGuarantee) {
@@ -2014,13 +2022,14 @@ function calculate(options = {}) {
     remaining = applyDiscount(discounts, `CK ${scenarioLabel(scenario, policy)} ${percent(ttsRate)}`, ttsRate, remaining);
   }
 
-  const netAfterDiscount = round(remaining);
+  let netAfterDiscount = round(remaining);
   const landUseRightValue = policy.landUseRightUnitPrice
     ? round(policy.landUseRightUnitPrice * area)
     : 0;
-  const vatBase = Math.max(0, netAfterDiscount - landUseRightValue);
-  const vat = round(vatBase * vatRate(policy));
-  const maintenance = round(netAfterDiscount * maintenanceRate(policy));
+  let vatBase = Math.max(0, netAfterDiscount - landUseRightValue);
+  let vat = round(vatBase * vatRate(policy));
+  let maintenance = round(netAfterDiscount * maintenanceRate(policy));
+
   const rawGrossAfterDiscount = netAfterDiscount + vat + maintenance;
   const completion = completionValue(policy, unitType, area);
   const total = rawGrossAfterDiscount + completion;
@@ -3157,6 +3166,15 @@ function renderTtsChart() {
   const labelEvery = Math.max(1, Math.ceil(points.length / 7));
   const currentX = chartPoints[currentIndex].x;
   const bandWidth = Math.max(22, xStep * 0.78);
+  const minimumLabelGap = 72;
+  const labelIndexes = new Set([0, currentIndex, points.length - 1]);
+  chartPoints.forEach((point, index) => {
+    if (index % labelEvery !== 0 || labelIndexes.has(index)) return;
+    const hasRoom = [...labelIndexes].every((selectedIndex) => (
+      Math.abs(point.x - chartPoints[selectedIndex].x) >= minimumLabelGap
+    ));
+    if (hasRoom) labelIndexes.add(index);
+  });
 
   els.ttsPriceChart.innerHTML = `
     <rect class="tts-current-band" x="${currentX - bandWidth / 2}" y="${margin.top}" width="${bandWidth}" height="${plotHeight}"></rect>
@@ -3168,7 +3186,7 @@ function renderTtsChart() {
       `;
     }).join("")}
     ${chartPoints.map((point, index) => {
-      const showLabel = index === 0 || index === points.length - 1 || index === currentIndex || index % labelEvery === 0;
+      const showLabel = labelIndexes.has(index);
       return `
         <line class="tts-grid-line" x1="${point.x}" y1="${margin.top}" x2="${point.x}" y2="${height - margin.bottom}" opacity="${showLabel ? "0.65" : "0.25"}"></line>
         ${showLabel ? `<text class="tts-axis-label" x="${point.x}" y="${height - 20}" text-anchor="middle">${safeText(point.label)}</text>` : ""}
@@ -3391,6 +3409,11 @@ els.pricingForm.querySelectorAll("input:not([data-unit-filter]), select:not([dat
   });
 });
 
+// These switches live in the scenario panel, outside #pricingForm.
+// They therefore need their own recalculation listeners.
+els.bankGuarantee?.addEventListener("change", render);
+els.tmdvDiscount?.addEventListener("change", render);
+
 document.querySelectorAll("[data-unit-filter]").forEach((input) => {
   input.addEventListener("input", renderFinder);
   input.addEventListener("change", renderFinder);
@@ -3533,6 +3556,19 @@ els.ttsChartButtons.forEach((button) => {
     activeTtsChartScenario = button.dataset.ttsChartScenario;
     renderTtsChart();
   });
+});
+
+els.ttsChartToggle?.addEventListener("click", () => {
+  const willOpen = els.ttsChartPanel.hidden;
+  els.ttsChartPanel.hidden = !willOpen;
+  els.ttsChartToggle.setAttribute("aria-expanded", String(willOpen));
+  els.ttsChartToggle.classList.toggle("is-open", willOpen);
+  const title = els.ttsChartToggle.querySelector("strong");
+  if (title) title.textContent = willOpen ? "Đóng biểu đồ biến động giá" : "Mở biểu đồ biến động giá";
+  if (willOpen) {
+    renderTtsChart();
+    requestAnimationFrame(() => els.ttsChartPanel.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
 });
 
 els.ttsPriceChart.addEventListener("pointermove", (event) => {

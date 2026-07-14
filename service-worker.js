@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v133-summary-palette-fill";
+const CACHE_NAME = "park-pricing-v138-csbh-calculation";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=108",
+  "./styles.css?v=109",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=94",
+  "./app.js?v=98",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=82",
   "./ui-menu.js?v=2",

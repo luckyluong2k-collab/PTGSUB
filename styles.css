@@ -7397,25 +7397,28 @@ body:not(.auth-locked) .summary-band {
   z-index:40 !important;
 }
 
-/* Fill tall desktop rails with their existing data instead of leaving empty panels. */
+/* Keep the right-hand tables compact and grouped at the top. */
 @media (min-width:1051px) {
+  .dashboard-rail-right {
+    grid-template-rows:auto auto !important;
+    align-content:start !important;
+    align-self:start !important;
+  }
+
   .dashboard-rail-right > .panel {
-    display:flex;
-    flex-direction:column;
-    min-height:0;
+    display:block;
+    height:auto !important;
   }
 
   .dashboard-rail-right > .panel > .result-list {
-    flex:1 1 auto;
-    display:grid;
-    grid-auto-rows:minmax(38px,1fr);
-    align-content:stretch;
-    min-height:0;
+    grid-auto-rows:auto;
+    align-content:start;
   }
 
   .dashboard-rail-right > .panel > .result-list > .row {
-    height:100%;
-    align-content:center;
+    height:auto;
+    min-height:38px !important;
+    padding-block:7px !important;
   }
 }
 
