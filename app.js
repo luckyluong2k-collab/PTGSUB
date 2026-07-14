@@ -3608,9 +3608,7 @@ function loanScheduleUrl(result) {
 function openLoanScheduleCalculator() {
   const result = calculate({ scenario: "loan" });
   const url = loanScheduleUrl(result);
-  const opened = window.open(url, "_blank");
-  if (opened) opened.opener = null;
-  else window.location.href = url;
+  window.location.href = url;
 }
 
 function render() {

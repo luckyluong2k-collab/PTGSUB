@@ -29,6 +29,19 @@ service cloud.firestore {
       return isBootstrapAdmin() || isApprovedAdmin();
     }
 
+    function currentUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isApprovedMember() {
+      return isAdmin()
+        || (
+          signedIn()
+          && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          && currentUserDoc().data.approved == true
+        );
+    }
+
     function allowedUserFields() {
       return request.resource.data.keys().hasOnly([
         "email",
@@ -99,6 +112,53 @@ service cloud.firestore {
       allow get: if signedIn();
       allow list: if isAdmin();
       allow create, update, delete: if isAdmin() && settingId != "siteTheme";
+    }
+
+    function forumPostFields() {
+      return request.resource.data.keys().hasOnly([
+        "uid",
+        "email",
+        "displayName",
+        "body",
+        "createdAt",
+        "updatedAt"
+      ]);
+    }
+
+    function validForumBody() {
+      return request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 1500;
+    }
+
+    function validForumPostCreate() {
+      return forumPostFields()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email is string
+        && request.resource.data.displayName is string
+        && validForumBody()
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function validForumPostUpdate() {
+      return forumPostFields()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.displayName == resource.data.displayName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && validForumBody();
+    }
+
+    match /forumPosts/{postId} {
+      allow get, list: if isApprovedMember();
+      allow create: if isApprovedMember() && validForumPostCreate();
+      allow update: if isApprovedMember()
+        && (resource.data.uid == request.auth.uid || isAdmin())
+        && validForumPostUpdate();
+      allow delete: if isApprovedMember()
+        && (resource.data.uid == request.auth.uid || isAdmin());
     }
   }
 }
