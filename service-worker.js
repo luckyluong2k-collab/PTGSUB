@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v154-lowrise-map-fix";
+const CACHE_NAME = "park-pricing-v155-lowrise-coordinate-rule";
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,7 +14,7 @@ const ASSETS = [
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=84",
-  "./ui-unit-lookup.js?v=1",
+  "./ui-unit-lookup.js?v=2",
   "./ui-admin-search.js?v=1",
   "./ui-menu.js?v=2",
   "./ui-payment.js?v=1",
@@ -44,7 +44,7 @@ async function refreshOpenAppTabs() {
   await Promise.all(clients.map((client) => {
     const url = new URL(client.url);
     const isAppPage = url.origin === self.location.origin
-      && !url.pathname.startsWith("/__/")
+      && !url.pathname.startsWith("/__/" )
       && (url.pathname === "/" || url.pathname.endsWith("/index.html"));
 
     if (!isAppPage || typeof client.navigate !== "function") return null;
