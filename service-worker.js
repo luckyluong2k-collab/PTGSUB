@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v152-remove-flora-menu";
+const CACHE_NAME = "park-pricing-v153-forum-github-pages";
 const ASSETS = [
   "./",
   "./index.html",
