@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v162-notification-permission";
+const CACHE_NAME = "park-pricing-v163-notification-always-on";
 const ASSETS = [
   "./",
   "./index.html",
