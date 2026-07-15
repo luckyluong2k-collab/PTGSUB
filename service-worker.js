@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v163-notification-always-on";
+const CACHE_NAME = "park-pricing-v164-shared-auth";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,7 +12,8 @@ const ASSETS = [
   "./quote-demo.js?v=2",
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=84",
+  "./firebase-auth.js?v=85",
+  "./loan-auth-guard.js?v=2",
   "./ui-unit-lookup.js?v=1",
   "./ui-admin-search.js?v=1",
   "./ui-menu.js?v=2",

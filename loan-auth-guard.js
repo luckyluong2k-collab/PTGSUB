@@ -1,5 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import {
+  browserLocalPersistence,
+  getAuth,
+  onAuthStateChanged,
+  setPersistence,
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import { doc, getDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -31,7 +36,7 @@ function returnToMain() {
   window.location.replace(`index.html?next=${encodeURIComponent(next)}`);
 }
 
-onAuthStateChanged(auth, async (user) => {
+setPersistence(auth, browserLocalPersistence).catch(() => {}).finally(() => onAuthStateChanged(auth, async (user) => {
   if (!user) {
     returnToMain();
     return;
@@ -55,4 +60,4 @@ onAuthStateChanged(auth, async (user) => {
   } catch {
     returnToMain();
   }
-});
+}));

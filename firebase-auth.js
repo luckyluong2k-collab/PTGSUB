@@ -1008,8 +1008,12 @@ function redirectToApprovedChildPage() {
   if (!next) return false;
   try {
     const target = new URL(next, window.location.href);
+    const allowedChildPaths = [
+      "/forum.html",
+      "/tra-goc-lai-35-nam-tu-ngay-mua.html",
+    ];
     const allowed = target.origin === window.location.origin
-      && target.pathname.endsWith("/tra-goc-lai-35-nam-tu-ngay-mua.html");
+      && allowedChildPaths.some((path) => target.pathname.endsWith(path));
     if (!allowed) return false;
     window.location.replace(target.href);
     return true;

@@ -786,6 +786,10 @@
       const expires=timestampMs(data.accessExpiresAt);
       return Boolean(expires&&expires<=Date.now());
     }
+    function returnToMainLogin(){
+      const next=`${location.pathname}${location.search}${location.hash}`;
+      location.replace(`index.html?next=${encodeURIComponent(next)}`);
+    }
     function memberName(){
       return currentUser?.displayName||currentUserData.displayName||currentUser?.email?.split("@")[0]||"Thành viên";
     }
@@ -1523,7 +1527,12 @@
       });
       onAuthStateChanged(auth,async user=>{
         if(!user){
-          currentUser=null;showAuth("Đăng nhập để vào forum","Sử dụng cùng tài khoản Google đã đăng nhập trên trang bảng tính.",true);return;
+          currentUser=null;
+          els.forumLoginBtn.hidden=true;
+          els.authTitle.textContent="Đang chuyển đến trang đăng nhập";
+          els.authMessage.textContent="Bạn chỉ cần đăng nhập một lần. Sau đó hệ thống sẽ tự quay lại Forum.";
+          returnToMainLogin();
+          return;
         }
         try{
           const snap=await getDoc(doc(db,"users",user.uid));
