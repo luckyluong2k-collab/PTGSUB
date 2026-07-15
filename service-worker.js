@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v159-forum-notifications";
+const CACHE_NAME = "park-pricing-v160-inventory-notifications";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,7 +8,7 @@ const ASSETS = [
   "./quote-demo.css?v=2",
   "./styles.css?v=113",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=105",
+  "./app.js?v=106",
   "./quote-demo.js?v=2",
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
@@ -36,6 +36,21 @@ self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = new URL(event.notification.data?.url || "./index.html", self.location.href).href;
+  event.waitUntil((async () => {
+    const windowClients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const client of windowClients) {
+      if (typeof client.navigate === "function") {
+        await client.navigate(targetUrl).catch(() => null);
+      }
+      if (typeof client.focus === "function") return client.focus();
+    }
+    return self.clients.openWindow ? self.clients.openWindow(targetUrl) : null;
+  })());
 });
 
 async function refreshOpenAppTabs() {

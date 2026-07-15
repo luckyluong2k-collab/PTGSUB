@@ -379,6 +379,10 @@ const GOOGLE_SHEET_GIDS = [
   "1510790688",
   "442507581",
 ];
+const INVENTORY_SNAPSHOT_KEY = "ptgsub-inventory-snapshot-v1";
+const INVENTORY_NOTIFICATIONS_KEY = "ptgsub-inventory-notifications-enabled";
+const INVENTORY_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const INVENTORY_REFRESH_MIN_GAP_MS = 60 * 1000;
 
 const scenarioLabels = {
   loan: "Có vay",
@@ -458,6 +462,7 @@ const els = {
   pdfOptionsCancel: document.querySelector("#pdfOptionsCancel"),
   pdfOptionsExport: document.querySelector("#pdfOptionsExport"),
   resetBtn: document.querySelector("#resetBtn"),
+  inventoryNotificationBtn: document.querySelector("#inventoryNotificationBtn"),
   scenarioButtons: document.querySelectorAll(".segmented button"),
   filterTower: document.querySelector("#filterTower"),
   filterType: document.querySelector("#filterType"),
@@ -484,6 +489,9 @@ let lastPolicyKey = "";
 let lastAutoFilledCode = "";
 let skipPolicyDefaultOnce = false;
 let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
+let inventoryRefreshInFlight = false;
+let inventoryMonitorTimer = 0;
+let lastCatalogRefreshAt = 0;
 
 const unitMapImage = "phankhupark-map.png";
 const lowRiseMapImage = "lowrise-map-sharp.jpg";
@@ -1776,6 +1784,152 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
   return { units, stats, metaByCode };
 }
 
+function inventoryNotificationSupported() {
+  return "Notification" in window && "serviceWorker" in navigator;
+}
+
+function inventoryNotificationsEnabled() {
+  return inventoryNotificationSupported()
+    && Notification.permission === "granted"
+    && localStorage.getItem(INVENTORY_NOTIFICATIONS_KEY) === "true";
+}
+
+function updateInventoryNotificationButton() {
+  const button = els.inventoryNotificationBtn;
+  if (!button) return;
+  const label = button.querySelector(".inventory-notification-label");
+  button.classList.remove("is-enabled", "is-blocked");
+  button.disabled = false;
+
+  if (!inventoryNotificationSupported()) {
+    if (label) label.textContent = "Không hỗ trợ";
+    button.title = "Trình duyệt này chưa hỗ trợ thông báo web";
+    button.disabled = true;
+    return;
+  }
+  if (Notification.permission === "denied") {
+    if (label) label.textContent = "Đã chặn";
+    button.title = "Hãy cho phép thông báo trong cài đặt trình duyệt";
+    button.classList.add("is-blocked");
+    return;
+  }
+  if (inventoryNotificationsEnabled()) {
+    if (label) label.textContent = "Đang bật";
+    button.title = "Thông báo biến động bảng hàng đang bật. Bấm để tắt";
+    button.classList.add("is-enabled");
+    return;
+  }
+  if (label) label.textContent = "Bật thông báo";
+  button.title = "Bật thông báo căn mới và căn vừa bán";
+}
+
+async function showInventorySystemNotification(title, body, { code = "", tag = "inventory-update" } = {}) {
+  if (!inventoryNotificationsEnabled()) return;
+  const unitUrl = code ? `./index.html?unit=${encodeURIComponent(code)}` : "./index.html";
+  const registration = await navigator.serviceWorker.ready;
+  await registration.showNotification(title, {
+    body,
+    tag,
+    renotify: true,
+    icon: "./sun-group-icon.png",
+    badge: "./favicon.png",
+    data: { url: unitUrl },
+  });
+}
+
+async function enableInventoryNotifications() {
+  if (!inventoryNotificationSupported()) {
+    showToast("Trình duyệt này chưa hỗ trợ thông báo web");
+    return;
+  }
+  if (inventoryNotificationsEnabled()) {
+    localStorage.removeItem(INVENTORY_NOTIFICATIONS_KEY);
+    updateInventoryNotificationButton();
+    showToast("Đã tắt thông báo biến động bảng hàng");
+    return;
+  }
+  if (Notification.permission === "denied") {
+    updateInventoryNotificationButton();
+    showToast("Thông báo đang bị chặn. Hãy bật lại trong cài đặt trình duyệt");
+    return;
+  }
+  const permission = Notification.permission === "granted"
+    ? "granted"
+    : await Notification.requestPermission();
+  if (permission !== "granted") {
+    localStorage.removeItem(INVENTORY_NOTIFICATIONS_KEY);
+    updateInventoryNotificationButton();
+    showToast("Bạn chưa cấp quyền thông báo");
+    return;
+  }
+  localStorage.setItem(INVENTORY_NOTIFICATIONS_KEY, "true");
+  updateInventoryNotificationButton();
+  showToast("Đã bật thông báo biến động bảng hàng");
+  await showInventorySystemNotification(
+    "Đã bật thông báo bảng hàng",
+    "Bạn sẽ được báo khi có căn mới hoặc căn biến mất khỏi bảng hàng.",
+    { tag: "inventory-notifications-enabled" }
+  ).catch(() => {});
+}
+
+function readInventorySnapshot() {
+  try {
+    const value = JSON.parse(localStorage.getItem(INVENTORY_SNAPSHOT_KEY) || "null");
+    return Array.isArray(value?.codes) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveInventorySnapshot(codes) {
+  localStorage.setItem(INVENTORY_SNAPSHOT_KEY, JSON.stringify({
+    codes: [...codes].sort(),
+    checkedAt: Date.now(),
+  }));
+}
+
+async function processInventoryChanges(freshCatalog) {
+  const currentCodes = Object.keys(freshCatalog).map(normalizeUnitCode).filter(Boolean).sort();
+  const previous = readInventorySnapshot();
+  saveInventorySnapshot(currentCodes);
+  if (!previous?.codes?.length) return;
+
+  const previousSet = new Set(previous.codes.map(normalizeUnitCode).filter(Boolean));
+  const currentSet = new Set(currentCodes);
+  const removed = [...previousSet].filter((code) => !currentSet.has(code)).sort();
+  const added = [...currentSet].filter((code) => !previousSet.has(code)).sort();
+  if (!removed.length && !added.length) return;
+
+  if (removed.length) {
+    const preview = removed.slice(0, 6).join(", ");
+    const title = removed.length === 1
+      ? `Căn ${removed[0]} mới bị bán`
+      : `${removed.length} căn mới bị bán khỏi bảng hàng`;
+    const body = removed.length === 1
+      ? `Căn ${removed[0]} vừa biến mất khỏi bảng hàng.`
+      : `Các căn: ${preview}${removed.length > 6 ? "…" : ""}`;
+    showToast(title);
+    await showInventorySystemNotification(title, body, {
+      code: removed.length === 1 ? removed[0] : "",
+      tag: "inventory-removed",
+    }).catch(() => {});
+  }
+  if (added.length) {
+    const preview = added.slice(0, 6).join(", ");
+    const title = added.length === 1
+      ? `Bảng hàng vừa bổ sung căn ${added[0]}`
+      : `Bảng hàng vừa bổ sung ${added.length} căn mới`;
+    const body = added.length === 1
+      ? `Căn mới: ${added[0]}. Bấm để mở bảng tính giá.`
+      : `Các căn: ${preview}${added.length > 6 ? "…" : ""}`;
+    showToast(title);
+    await showInventorySystemNotification(title, body, {
+      code: added.length === 1 ? added[0] : "",
+      tag: "inventory-added",
+    }).catch(() => {});
+  }
+}
+
 function loadGoogleSheet(gid) {
   return new Promise((resolve, reject) => {
     const callbackName = `__sheet_${gid}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -1808,6 +1962,7 @@ async function refreshCatalogFromGoogle({ showSuccessToast = true } = {}) {
     return loadGoogleSheet(gid).then((response) => ({ gid, gidIndex, response }));
   });
   const results = await Promise.allSettled(sheetJobs);
+  const completeRefresh = results.every((result) => result.status === "fulfilled");
   const freshCatalog = {};
   const freshMetaByCode = {};
   results.forEach((result, resultIndex) => {
@@ -1831,6 +1986,11 @@ async function refreshCatalogFromGoogle({ showSuccessToast = true } = {}) {
   const freshCount = Object.keys(freshCatalog).length;
   console.log(`[Google Sheet] tổng mã sau khi gộp: ${freshCount}`);
   if (!freshCount) throw new Error("Không có mã căn hợp lệ trong bảng hàng");
+  if (completeRefresh) {
+    await processInventoryChanges(freshCatalog);
+  } else {
+    console.warn("[Google Sheet] bỏ qua so sánh biến động vì một hoặc nhiều sheet tải lỗi");
+  }
   unitCatalog = freshCatalog;
   window.unitCatalog = unitCatalog;
   catalogLoading = false;
@@ -1840,8 +2000,33 @@ async function refreshCatalogFromGoogle({ showSuccessToast = true } = {}) {
   applyUnitCatalog();
   renderFinder();
   render();
+  lastCatalogRefreshAt = Date.now();
   if (showSuccessToast) showToast(`Đã lọc còn ${freshCount} căn theo bảng hàng`);
   return freshCount;
+}
+
+async function refreshInventoryCatalog({ showSuccessToast = false } = {}) {
+  if (inventoryRefreshInFlight) return null;
+  inventoryRefreshInFlight = true;
+  try {
+    return await refreshCatalogFromGoogle({ showSuccessToast });
+  } finally {
+    inventoryRefreshInFlight = false;
+  }
+}
+
+function refreshInventoryIfDue() {
+  if (!navigator.onLine) return;
+  if (Date.now() - lastCatalogRefreshAt < INVENTORY_REFRESH_MIN_GAP_MS) return;
+  refreshInventoryCatalog().catch((error) => console.warn("[Bảng hàng] lỗi kiểm tra định kỳ:", error));
+}
+
+function startInventoryMonitoring() {
+  window.clearInterval(inventoryMonitorTimer);
+  inventoryMonitorTimer = window.setInterval(refreshInventoryIfDue, INVENTORY_REFRESH_INTERVAL_MS);
+  document.addEventListener("visibilitychange", refreshInventoryIfDue);
+  window.addEventListener("focus", refreshInventoryIfDue);
+  window.addEventListener("online", refreshInventoryIfDue);
 }
 
 function populateFinderOptions() {
@@ -3833,6 +4018,9 @@ els.scenarioButtons.forEach((button) => {
 });
 
 els.resetBtn.addEventListener("click", resetDefaults);
+els.inventoryNotificationBtn?.addEventListener("click", () => {
+  enableInventoryNotifications().catch(() => showToast("Không bật được thông báo trên thiết bị này"));
+});
 
 els.loanScheduleBtn?.addEventListener("click", openLoanScheduleCalculator);
 
@@ -3950,7 +4138,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=85", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=86", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
@@ -3974,12 +4162,14 @@ function installServiceWorkerUpdates() {
 }
 
 installServiceWorkerUpdates();
+updateInventoryNotificationButton();
+startInventoryMonitoring();
 applyAppUrlParams();
 syncBaseFromGross();
 document.querySelectorAll("[data-money-input]").forEach(formatMoneyInput);
 renderFinder();
 render();
-refreshCatalogFromGoogle()
+refreshInventoryCatalog({ showSuccessToast: true })
   .catch((error) => {
     catalogLoading = false;
     rebuildCatalogEntries();
