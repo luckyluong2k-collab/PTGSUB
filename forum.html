@@ -263,6 +263,23 @@
     .mode-note{padding:13px;border:1px dashed #aab8d0;border-radius:13px;background:#f7f9fd;color:#667085;font-size:11px}
     .mode-note strong{color:#334155}
 
+    .notification-list{display:grid;gap:9px;padding:14px 16px 18px}
+    .notification-item{
+      width:100%;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:start;
+      padding:11px;border:1px solid #dfe6f2;border-radius:13px;background:#fff;color:var(--ink);text-align:left
+    }
+    .notification-item:hover{border-color:#9db9ff;background:#f7f9ff}
+    .notification-item.unread{border-color:#8fb0ff;background:#eef4ff;box-shadow:inset 4px 0 0 #2563eb}
+    .notification-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#e8f0ff;font-size:19px}
+    .notification-item.admin-post .notification-icon{background:#fff2c7}
+    .notification-copy{min-width:0}
+    .notification-copy strong,.notification-copy span{display:block}
+    .notification-copy strong{font-size:13px;line-height:1.4}
+    .notification-copy span{margin-top:3px;color:#7c869b;font-size:11px}
+    .notification-new{width:8px;height:8px;margin-top:8px;border-radius:50%;background:#2563eb}
+    .notification-actions{display:flex;align-items:center;gap:8px}
+    .notification-actions button{min-height:34px;padding:0 10px;border:1px solid #d8e1f0;border-radius:10px;background:#f7f9fd;color:#36506f;font-size:11px;font-weight:900}
+
     .auth-lock{
       position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:18px;
       background:radial-gradient(circle at 50% 0,rgba(37,99,235,.25),transparent 36rem),rgba(5,15,43,.94);
@@ -405,10 +422,10 @@
         <a class="main-tab" href="index.html">🧮 Bảng tính</a>
         <a class="main-tab active" href="forum.html">💬 Diễn đàn</a>
         <button class="main-tab" type="button" data-coming="Kho tài liệu">📚 Tài liệu</button>
-        <button class="main-tab" type="button" data-coming="Thông báo">🔔 Thông báo</button>
+        <button class="main-tab" id="notificationTabBtn" type="button">🔔 Thông báo</button>
       </nav>
       <div class="top-actions">
-        <button class="icon-btn" id="markReadBtn" type="button" title="Đánh dấu đã đọc">🔔<span class="notification-dot" id="notificationCount" hidden>0</span></button>
+        <button class="icon-btn" id="markReadBtn" type="button" title="Mở thông báo" aria-controls="notificationModal" aria-expanded="false">🔔<span class="notification-dot" id="notificationCount" hidden>0</span></button>
         <button class="icon-btn" id="refreshBtn" type="button" title="Làm mới">↻</button>
         <button class="profile-btn" id="profileBtn" type="button">
           <span class="avatar" id="profileAvatar">TV</span>
@@ -569,6 +586,22 @@
     </div>
   </section>
 
+  <section class="modal" id="notificationModal" hidden>
+    <div class="modal-card" style="width:min(680px,100%)">
+      <header class="modal-head">
+        <div>
+          <h2>Thông báo</h2>
+          <span style="color:#7c869b;font-size:12px">Bài mới từ admin và tương tác với bài viết của bạn.</span>
+        </div>
+        <button class="modal-close" id="closeNotifications" type="button" aria-label="Đóng">×</button>
+      </header>
+      <div class="notification-actions" style="justify-content:flex-end;padding:10px 16px 0">
+        <button id="markAllNotificationsRead" type="button">Đánh dấu tất cả đã đọc</button>
+      </div>
+      <div class="notification-list" id="notificationList"></div>
+    </div>
+  </section>
+
   <div class="toast" id="toast" role="status"></div>
 
   <script type="module">
@@ -622,6 +655,7 @@
     const DRAFT_KEY = "ptg-forum-v2-draft";
     const SAVED_KEY = "ptg-forum-v2-saved";
     const LAST_READ_KEY = "ptg-forum-v2-last-read";
+    const NOTIFICATION_READ_KEY = "ptg-forum-v2-notification-read";
     const ONLINE_WINDOW_MS = 2 * 60 * 1000;
     const PRESENCE_REFRESH_MS = 55 * 1000;
 
@@ -666,17 +700,20 @@
       "profileBtn","profileModal","closeProfile","profileDetailName","profileDetailEmail",
       "profileDetailRole","profileDetailStatus","profileMyPosts","logoutBtn","refreshBtn",
       "notificationCount","markReadBtn","myPostsBtn","savedPostsBtn","unreadPostsBtn",
-      "hotList","showPopularBtn","onlineList","onlineLabel","forumModeLabel"
+      "notificationTabBtn","notificationModal","closeNotifications","notificationList",
+      "markAllNotificationsRead","hotList","showPopularBtn","onlineList","onlineLabel","forumModeLabel"
     ].map(id=>[id,document.getElementById(id)]));
 
     let auth=null, db=null, currentUser=null, currentUserData={}, currentIsAdmin=false;
     let posts=[], activeCategory="all", quickFilter="", editingPostId="";
-    let unsubscribePosts=null, unsubscribePresence=null, presenceTimer=0;
+    let unsubscribePosts=null, unsubscribePresence=null, unsubscribeNotifications=null, presenceTimer=0;
+    let notifications=[];
     const likedIds=new Set();
     const commentsCache=new Map();
     const commentsOpen=new Set();
     const savedIds=new Set(loadJson(SAVED_KEY,[]));
     let lastReadAt=Number(localStorage.getItem(LAST_READ_KEY)||0);
+    let notificationReadAt=Number(localStorage.getItem(NOTIFICATION_READ_KEY)||0);
 
     function escapeHtml(value){
       return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
@@ -842,9 +879,87 @@
     function renderStats(){
       const visible=posts.filter(post=>post.status!=="deleted");
       els.statPosts.textContent=String(visible.length);
-      const unread=visible.filter(post=>post.createdAtMs>lastReadAt&&post.authorId!==currentUser?.uid).length;
+      renderNotifications();
+    }
+
+    function notificationItems(){
+      const adminPosts=posts
+        .filter(post=>post.status!=="deleted"
+          && post.authorId!==currentUser?.uid
+          && (post.authorRole==="Quản trị viên"||String(post.authorEmail||"").toLowerCase()===ADMIN_EMAIL))
+        .map(post=>({
+          id:`admin-post-${post.id}`,kind:"admin-post",type:"admin_post",postId:post.id,
+          message:`${post.authorName} vừa đăng bài: ${post.title}`,
+          createdAtMs:post.createdAtMs,read:post.createdAtMs<=notificationReadAt
+        }));
+      return [...adminPosts,...notifications]
+        .sort((a,b)=>b.createdAtMs-a.createdAtMs)
+        .slice(0,100);
+    }
+
+    function renderNotifications(){
+      const items=notificationItems();
+      const unread=items.filter(item=>!item.read).length;
       els.notificationCount.textContent=String(Math.min(unread,99));
       els.notificationCount.hidden=!unread;
+      if(!els.notificationList)return;
+      els.notificationList.innerHTML=items.length?items.map(item=>{
+        const icon=item.type==="admin_post"?"📢":item.type==="like_post"?"❤️":"💬";
+        return `<button class="notification-item ${item.read?"":"unread"} ${item.type==="admin_post"?"admin-post":""}" type="button"
+          data-notification-id="${escapeHtml(item.id)}" data-notification-kind="${escapeHtml(item.kind)}" data-notification-post="${escapeHtml(item.postId||"")}">
+          <span class="notification-icon">${icon}</span>
+          <span class="notification-copy"><strong>${escapeHtml(item.message)}</strong><span>${timeAgo(item.createdAtMs)}</span></span>
+          ${item.read?"":"<i class=\"notification-new\"></i>"}
+        </button>`;
+      }).join(""):`<div class="empty-state"><b>Chưa có thông báo</b>Khi admin đăng bài hoặc có người tương tác với bài của bạn, thông báo sẽ xuất hiện tại đây.</div>`;
+      els.notificationList.querySelectorAll("[data-notification-id]").forEach(btn=>btn.addEventListener("click",()=>openNotification(btn)));
+    }
+
+    function showNotifications(){
+      renderNotifications();
+      els.notificationModal.hidden=false;
+      els.markReadBtn.setAttribute("aria-expanded","true");
+    }
+
+    function closeNotificationModal(){
+      els.notificationModal.hidden=true;
+      els.markReadBtn.setAttribute("aria-expanded","false");
+    }
+
+    async function openNotification(button){
+      const id=button.dataset.notificationId;
+      const kind=button.dataset.notificationKind;
+      const postId=button.dataset.notificationPost;
+      try{
+        if(kind==="personal"){
+          const item=notifications.find(notification=>notification.id===id);
+          if(item&&!item.read&&!LOCAL_MODE){
+            await updateDoc(doc(db,"forumNotifications",id),{read:true});
+            item.read=true;
+          }
+        }else{
+          const item=notificationItems().find(notification=>notification.id===id);
+          notificationReadAt=Math.max(notificationReadAt,item?.createdAtMs||Date.now());
+          localStorage.setItem(NOTIFICATION_READ_KEY,String(notificationReadAt));
+        }
+      }catch(error){showToast(firebaseError(error))}
+      renderNotifications();
+      closeNotificationModal();
+      if(postId)openPost(postId);
+    }
+
+    async function markAllNotificationsRead(){
+      notificationReadAt=Date.now();
+      localStorage.setItem(NOTIFICATION_READ_KEY,String(notificationReadAt));
+      const unread=notifications.filter(item=>!item.read);
+      try{
+        if(!LOCAL_MODE&&unread.length){
+          await Promise.all(unread.map(item=>updateDoc(doc(db,"forumNotifications",item.id),{read:true})));
+          unread.forEach(item=>item.read=true);
+        }
+        renderNotifications();
+        showToast("Đã đánh dấu tất cả thông báo là đã đọc.");
+      }catch(error){showToast(firebaseError(error))}
     }
 
     function postMenu(post){
@@ -1108,6 +1223,25 @@
       renderFeed();
     }
 
+    async function createInteractionNotification(post,type){
+      if(LOCAL_MODE||!db||!currentUser||!post?.authorId||post.authorId===currentUser.uid)return;
+      const actor=memberName();
+      const message=type==="like_post"
+        ? `${actor} đã thích bài viết “${post.title}”.`
+        : `${actor} đã bình luận bài viết “${post.title}”.`;
+      await addDoc(collection(db,"forumNotifications"),{
+        recipientId:post.authorId,
+        actorId:currentUser.uid,
+        actorName:actor,
+        type,
+        postId:post.id,
+        postTitle:post.title,
+        message,
+        read:false,
+        createdAt:serverTimestamp()
+      });
+    }
+
     async function toggleLike(postId){
       const post=posts.find(item=>item.id===postId);if(!post)return;
       try{
@@ -1119,6 +1253,7 @@
         const reactionRef=doc(db,"forumPosts",postId,"reactions",currentUser.uid);
         const postRef=doc(db,"forumPosts",postId);
         const batch=writeBatch(db);
+        const addingLike=!likedIds.has(postId);
         if(likedIds.has(postId)){
           batch.delete(reactionRef);
           batch.update(postRef,{likeCount:increment(-1),updatedAt:serverTimestamp()});
@@ -1128,7 +1263,9 @@
           batch.update(postRef,{likeCount:increment(1),updatedAt:serverTimestamp()});
           likedIds.add(postId);
         }
-        await batch.commit();renderFeed();
+        await batch.commit();
+        if(addingLike)createInteractionNotification(post,"like_post").catch(()=>{});
+        renderFeed();
       }catch(error){
         if(likedIds.has(postId))likedIds.delete(postId);else likedIds.add(postId);
         showToast(firebaseError(error));
@@ -1167,7 +1304,9 @@
           content,status:"active",createdAt:serverTimestamp(),updatedAt:serverTimestamp()
         });
         batch.update(doc(db,"forumPosts",postId),{commentCount:increment(1),updatedAt:serverTimestamp()});
-        await batch.commit();await loadComments(postId);renderFeed();showToast("Đã bình luận.");
+        await batch.commit();
+        createInteractionNotification(post,"comment_post").catch(()=>{});
+        await loadComments(postId);renderFeed();showToast("Đã bình luận.");
       }catch(error){showToast(firebaseError(error))}
     }
 
@@ -1339,6 +1478,25 @@
       );
     }
 
+    function subscribeNotifications(){
+      if(unsubscribeNotifications)unsubscribeNotifications();
+      unsubscribeNotifications=onSnapshot(
+        query(collection(db,"forumNotifications"),where("recipientId","==",currentUser.uid),limit(100)),
+        snapshot=>{
+          notifications=snapshot.docs.map(item=>{
+            const data=item.data()||{};
+            return {
+              id:item.id,kind:"personal",type:data.type||"comment_post",postId:data.postId||"",
+              message:data.message||"Bạn có tương tác mới.",read:data.read===true,
+              createdAtMs:timestampMs(data.createdAt)||Date.now()
+            };
+          });
+          renderNotifications();
+        },
+        error=>showToast(`Không tải được thông báo: ${firebaseError(error)}`)
+      );
+    }
+
     async function beginFirebase(){
       document.body.classList.remove("local-mode");
       els.authMode.textContent="Firebase nhiều thành viên";
@@ -1383,7 +1541,7 @@
           }
           currentUser=user;currentUserData=data;currentIsAdmin=admin;
           unlock();
-          await Promise.all([subscribeForum(),refreshMemberCount()]);
+          await Promise.all([subscribeForum(),subscribeNotifications(),refreshMemberCount()]);
           startPresence();
         }catch(error){showAuth("Không kiểm tra được tài khoản",firebaseError(error),false)}
       });
@@ -1426,15 +1584,17 @@
       catch(error){showToast(firebaseError(error))}
     });
     els.refreshBtn.addEventListener("click",()=>location.reload());
-    els.markReadBtn.addEventListener("click",()=>{
-      lastReadAt=Date.now();localStorage.setItem(LAST_READ_KEY,String(lastReadAt));renderAll();showToast("Đã đánh dấu tất cả là đã đọc.");
-    });
+    els.markReadBtn.addEventListener("click",showNotifications);
+    els.notificationTabBtn.addEventListener("click",showNotifications);
+    els.closeNotifications.addEventListener("click",closeNotificationModal);
+    els.notificationModal.addEventListener("click",event=>{if(event.target===els.notificationModal)closeNotificationModal()});
+    els.markAllNotificationsRead.addEventListener("click",markAllNotificationsRead);
     document.querySelectorAll("[data-coming]").forEach(btn=>btn.addEventListener("click",()=>showToast(`Mục "${btn.dataset.coming}" sẽ được phát triển ở bước tiếp theo.`)));
     document.addEventListener("click",event=>{
       if(!event.target.closest(".post-menu-wrap"))document.querySelectorAll(".post-menu-pop").forEach(menu=>menu.hidden=true);
     });
     document.addEventListener("keydown",event=>{
-      if(event.key==="Escape"){closeComposer();els.profileModal.hidden=true}
+      if(event.key==="Escape"){closeComposer();els.profileModal.hidden=true;closeNotificationModal()}
     });
     window.addEventListener("beforeunload",()=>{
       if(!LOCAL_MODE&&db&&currentUser)deleteDoc(doc(db,"forumPresence",currentUser.uid)).catch(()=>{});

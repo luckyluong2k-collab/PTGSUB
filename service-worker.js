@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v158-forum-v2";
+const CACHE_NAME = "park-pricing-v159-forum-notifications";
 const ASSETS = [
   "./",
   "./index.html",
