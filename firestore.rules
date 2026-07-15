@@ -42,7 +42,14 @@ service cloud.firestore {
           && (
             !currentUserDoc().data.keys().hasAny(["accessExpiresAt"])
             || currentUserDoc().data.accessExpiresAt == null
-            || currentUserDoc().data.accessExpiresAt > request.time
+            || (
+              currentUserDoc().data.accessExpiresAt is int
+              && currentUserDoc().data.accessExpiresAt > request.time.toMillis()
+            )
+            || (
+              currentUserDoc().data.accessExpiresAt is timestamp
+              && currentUserDoc().data.accessExpiresAt > request.time
+            )
           )
         );
     }
