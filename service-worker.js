@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v157-forum-notifications";
+const CACHE_NAME = "park-pricing-v158-forum-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,7 +9,6 @@ const ASSETS = [
   "./styles.css?v=113",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=105",
-  "./forum.js?v=2",
   "./quote-demo.js?v=2",
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
