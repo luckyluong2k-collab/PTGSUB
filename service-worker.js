@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v153-forum-github-pages";
+const CACHE_NAME = "park-pricing-v154-lowrise-map-fix";
 const ASSETS = [
   "./",
   "./index.html",
@@ -26,7 +26,6 @@ const ASSETS = [
   "./sun-group-logo.png",
   "./payment-qr.png",
   "./lowrise-map-sharp.jpg",
-  "./lienke.png",
 ];
 
 self.addEventListener("install", (event) => {
