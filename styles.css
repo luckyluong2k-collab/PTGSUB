@@ -5391,6 +5391,121 @@ body.theme-dark .admin-overlay .admin-user-card {
   .inventory-notification-label { display:none; }
   .topbar .inventory-notification-button { width:36px; min-width:36px; height:36px; padding:0; }
 }
+
+/* Permission gate shown when an approved member enters the pricing app. */
+.inventory-permission-prompt {
+  position:fixed;
+  inset:0;
+  z-index:2600;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  background:rgba(2,16,21,.76);
+  backdrop-filter:blur(9px);
+}
+.inventory-permission-prompt[hidden] { display:none !important; }
+.inventory-permission-card {
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:14px 16px;
+  width:min(520px,100%);
+  padding:24px;
+  border:1px solid rgba(228,194,115,.58);
+  border-radius:22px;
+  background:linear-gradient(145deg,#10343d,#071f27);
+  color:#fff;
+  box-shadow:0 22px 70px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.inventory-permission-icon {
+  display:grid;
+  width:64px;
+  height:64px;
+  place-items:center;
+  border:1px solid rgba(255,230,164,.7);
+  border-radius:18px;
+  background:linear-gradient(145deg,#e7c56e,#aa772c);
+  color:#1c2b29;
+  font-size:2rem;
+  box-shadow:0 8px 0 #6d491b,0 15px 26px rgba(0,0,0,.3);
+}
+.inventory-permission-eyebrow {
+  margin:2px 0 4px;
+  color:#e4c273;
+  font-size:.7rem;
+  font-weight:950;
+  letter-spacing:.12em;
+}
+.inventory-permission-card h2 {
+  margin:0 0 7px;
+  color:#fff;
+  font-size:1.35rem;
+  line-height:1.15;
+}
+.inventory-permission-card h2 + p {
+  margin:0;
+  color:#d2e0de;
+  line-height:1.5;
+}
+.inventory-permission-benefits {
+  grid-column:1 / -1;
+  display:grid;
+  gap:8px;
+  padding:13px 15px;
+  border:1px solid rgba(49,190,173,.28);
+  border-radius:14px;
+  background:rgba(21,153,141,.13);
+  color:#e8f8f5;
+  font-weight:800;
+}
+.inventory-permission-status {
+  grid-column:1 / -1;
+  min-height:20px;
+  margin:0;
+  color:#f1d794;
+  font-size:.78rem;
+  line-height:1.45;
+}
+.inventory-permission-actions {
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:minmax(100px,.7fr) minmax(180px,1.3fr);
+  gap:10px;
+}
+.inventory-permission-actions button {
+  min-height:48px;
+  padding:10px 16px;
+  border-radius:13px;
+  cursor:pointer;
+  font-weight:950;
+}
+.inventory-permission-later {
+  border:1px solid rgba(210,224,222,.36);
+  background:#173740;
+  color:#d8e5e3;
+}
+.inventory-permission-accept {
+  border:1px solid #f3d98e;
+  background:linear-gradient(145deg,#e8ca78,#b78635);
+  color:#142522;
+  box-shadow:0 7px 0 #76531f,0 14px 24px rgba(0,0,0,.28);
+}
+.inventory-permission-accept:hover { transform:translateY(-1px); }
+
+@media (max-width:520px) {
+  .inventory-permission-prompt { padding:12px; }
+  .inventory-permission-card {
+    grid-template-columns:50px minmax(0,1fr);
+    gap:12px;
+    padding:18px 15px;
+    border-radius:18px;
+  }
+  .inventory-permission-icon { width:50px; height:50px; border-radius:14px; font-size:1.55rem; }
+  .inventory-permission-card h2 { font-size:1.12rem; }
+  .inventory-permission-card h2 + p { font-size:.86rem; }
+  .inventory-permission-actions { grid-template-columns:1fr; }
+  .inventory-permission-accept { grid-row:1; }
+  .inventory-permission-later { grid-row:2; }
+}
 @media (prefers-reduced-motion:reduce) {
   .theme-toggle-track,.theme-toggle-knob { transition:none !important; }
 }

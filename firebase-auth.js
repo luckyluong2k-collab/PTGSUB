@@ -345,6 +345,7 @@ function closeDrawer() {
 function showApp(userEmail, data = {}) {
   setAuthLocked(false);
   if (appContent) appContent.hidden = false;
+  window.dispatchEvent(new CustomEvent("ptgsub:app-unlocked"));
   if (loginBtn) loginBtn.hidden = true;
   if (logoutBtn) logoutBtn.hidden = false;
   setMenuAuthState(true);

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=114">
+  <link rel="stylesheet" href="styles.css?v=115">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -217,6 +217,26 @@
       <div class="member-announcement-actions">
         <button class="filter-reset" id="memberAnnouncementClose" type="button">T&#7855;t</button>
         <button class="primary" id="memberAnnouncementSnooze" type="button">Kh&#244;ng hi&#7875;n th&#7883; trong 2 gi&#7901;</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="inventory-permission-prompt" id="inventoryNotificationPrompt" role="dialog" aria-modal="true" aria-labelledby="inventoryNotificationPromptTitle" hidden>
+    <div class="inventory-permission-card">
+      <div class="inventory-permission-icon" aria-hidden="true">&#128276;</div>
+      <div>
+        <p class="inventory-permission-eyebrow">TH&#212;NG B&#193;O B&#7842;NG H&#192;NG</p>
+        <h2 id="inventoryNotificationPromptTitle">B&#7853;t th&#244;ng b&#225;o bi&#7871;n &#273;&#7897;ng</h2>
+        <p id="inventoryNotificationPromptMessage">Cho ph&#233;p thi&#7871;t b&#7883; nh&#7853;n th&#244;ng b&#225;o khi c&#243; c&#259;n m&#7899;i ho&#7863;c c&#259;n v&#7915;a b&#225;n kh&#7887;i b&#7843;ng h&#224;ng.</p>
+      </div>
+      <div class="inventory-permission-benefits">
+        <span>&#10003; C&#259;n bi&#7871;n m&#7845;t: b&#225;o v&#7915;a b&#225;n</span>
+        <span>&#10003; C&#259;n m&#7899;i: b&#225;o v&#7915;a b&#7893; sung</span>
+      </div>
+      <p class="inventory-permission-status" id="inventoryNotificationPromptStatus"></p>
+      <div class="inventory-permission-actions">
+        <button class="inventory-permission-later" id="inventoryNotificationLater" type="button">&#272;&#7875; sau</button>
+        <button class="inventory-permission-accept" id="inventoryNotificationAccept" type="button">B&#7853;t th&#244;ng b&#225;o ngay</button>
       </div>
     </div>
   </section>
@@ -584,7 +604,7 @@
 
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="app.js?v=106"></script>
+  <script src="app.js?v=107"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=84"></script>
   <script src="ui-admin-search.js?v=1"></script>

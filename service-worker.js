@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v161-mobile-header";
+const CACHE_NAME = "park-pricing-v162-notification-permission";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,9 +6,9 @@ const ASSETS = [
   "./quote.html",
   "./quote-admin-demo.html",
   "./quote-demo.css?v=2",
-  "./styles.css?v=114",
+  "./styles.css?v=115",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=106",
+  "./app.js?v=107",
   "./quote-demo.js?v=2",
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",

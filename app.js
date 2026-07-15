@@ -463,6 +463,12 @@ const els = {
   pdfOptionsExport: document.querySelector("#pdfOptionsExport"),
   resetBtn: document.querySelector("#resetBtn"),
   inventoryNotificationBtn: document.querySelector("#inventoryNotificationBtn"),
+  inventoryNotificationPrompt: document.querySelector("#inventoryNotificationPrompt"),
+  inventoryNotificationPromptTitle: document.querySelector("#inventoryNotificationPromptTitle"),
+  inventoryNotificationPromptMessage: document.querySelector("#inventoryNotificationPromptMessage"),
+  inventoryNotificationPromptStatus: document.querySelector("#inventoryNotificationPromptStatus"),
+  inventoryNotificationAccept: document.querySelector("#inventoryNotificationAccept"),
+  inventoryNotificationLater: document.querySelector("#inventoryNotificationLater"),
   scenarioButtons: document.querySelectorAll(".segmented button"),
   filterTower: document.querySelector("#filterTower"),
   filterType: document.querySelector("#filterType"),
@@ -1790,8 +1796,43 @@ function inventoryNotificationSupported() {
 
 function inventoryNotificationsEnabled() {
   return inventoryNotificationSupported()
-    && Notification.permission === "granted"
-    && localStorage.getItem(INVENTORY_NOTIFICATIONS_KEY) === "true";
+    && Notification.permission === "granted";
+}
+
+function hideInventoryNotificationPrompt() {
+  if (els.inventoryNotificationPrompt) els.inventoryNotificationPrompt.hidden = true;
+}
+
+function showInventoryNotificationPrompt() {
+  const prompt = els.inventoryNotificationPrompt;
+  if (!prompt || !inventoryNotificationSupported()) return;
+  updateInventoryNotificationButton();
+  if (Notification.permission === "granted") {
+    localStorage.setItem(INVENTORY_NOTIFICATIONS_KEY, "true");
+    hideInventoryNotificationPrompt();
+    return;
+  }
+
+  const blocked = Notification.permission === "denied";
+  if (els.inventoryNotificationPromptTitle) {
+    els.inventoryNotificationPromptTitle.textContent = blocked
+      ? "Thông báo đang bị chặn"
+      : "Bật thông báo biến động";
+  }
+  if (els.inventoryNotificationPromptMessage) {
+    els.inventoryNotificationPromptMessage.textContent = blocked
+      ? "Hãy mở cài đặt của trình duyệt, chọn Quyền thông báo và chuyển sang Cho phép để nhận tin bảng hàng."
+      : "Cho phép thiết bị nhận thông báo khi có căn mới hoặc căn vừa bán khỏi bảng hàng.";
+  }
+  if (els.inventoryNotificationPromptStatus) {
+    els.inventoryNotificationPromptStatus.textContent = blocked
+      ? "Thiết bị đã chặn yêu cầu. Web không thể tự thay đổi quyền này."
+      : "Sau khi bấm, hãy chọn Cho phép trong thông báo của thiết bị.";
+  }
+  if (els.inventoryNotificationAccept) {
+    els.inventoryNotificationAccept.textContent = blocked ? "Đã hiểu" : "Bật thông báo ngay";
+  }
+  prompt.hidden = false;
 }
 
 function updateInventoryNotificationButton() {
@@ -1815,7 +1856,7 @@ function updateInventoryNotificationButton() {
   }
   if (inventoryNotificationsEnabled()) {
     if (label) label.textContent = "Đang bật";
-    button.title = "Thông báo biến động bảng hàng đang bật. Bấm để tắt";
+    button.title = "Thông báo biến động bảng hàng luôn bật";
     button.classList.add("is-enabled");
     return;
   }
@@ -1843,13 +1884,15 @@ async function enableInventoryNotifications() {
     return;
   }
   if (inventoryNotificationsEnabled()) {
-    localStorage.removeItem(INVENTORY_NOTIFICATIONS_KEY);
+    localStorage.setItem(INVENTORY_NOTIFICATIONS_KEY, "true");
     updateInventoryNotificationButton();
-    showToast("Đã tắt thông báo biến động bảng hàng");
+    hideInventoryNotificationPrompt();
+    showToast("Thông báo biến động bảng hàng đang luôn bật");
     return;
   }
   if (Notification.permission === "denied") {
     updateInventoryNotificationButton();
+    showInventoryNotificationPrompt();
     showToast("Thông báo đang bị chặn. Hãy bật lại trong cài đặt trình duyệt");
     return;
   }
@@ -1859,17 +1902,25 @@ async function enableInventoryNotifications() {
   if (permission !== "granted") {
     localStorage.removeItem(INVENTORY_NOTIFICATIONS_KEY);
     updateInventoryNotificationButton();
+    if (els.inventoryNotificationPromptStatus) {
+      els.inventoryNotificationPromptStatus.textContent = "Bạn chưa cấp quyền. Yêu cầu sẽ hiện lại khi truy cập lần sau.";
+    }
     showToast("Bạn chưa cấp quyền thông báo");
     return;
   }
   localStorage.setItem(INVENTORY_NOTIFICATIONS_KEY, "true");
   updateInventoryNotificationButton();
+  hideInventoryNotificationPrompt();
   showToast("Đã bật thông báo biến động bảng hàng");
   await showInventorySystemNotification(
     "Đã bật thông báo bảng hàng",
     "Bạn sẽ được báo khi có căn mới hoặc căn biến mất khỏi bảng hàng.",
     { tag: "inventory-notifications-enabled" }
   ).catch(() => {});
+}
+
+function requestInventoryNotificationPermissionOnEntry() {
+  window.setTimeout(showInventoryNotificationPrompt, 450);
 }
 
 function readInventorySnapshot() {
@@ -4019,7 +4070,34 @@ els.scenarioButtons.forEach((button) => {
 
 els.resetBtn.addEventListener("click", resetDefaults);
 els.inventoryNotificationBtn?.addEventListener("click", () => {
+  if (!inventoryNotificationSupported()) {
+    showToast("Trình duyệt này chưa hỗ trợ thông báo web");
+    return;
+  }
+  if (Notification.permission === "denied") {
+    showInventoryNotificationPrompt();
+    return;
+  }
   enableInventoryNotifications().catch(() => showToast("Không bật được thông báo trên thiết bị này"));
+});
+els.inventoryNotificationAccept?.addEventListener("click", () => {
+  if (!inventoryNotificationSupported()) {
+    hideInventoryNotificationPrompt();
+    showToast("Trình duyệt này chưa hỗ trợ thông báo web");
+    return;
+  }
+  if (Notification.permission === "denied") {
+    hideInventoryNotificationPrompt();
+    showToast("Hãy cho phép thông báo trong cài đặt trình duyệt");
+    return;
+  }
+  enableInventoryNotifications().catch(() => {
+    showToast("Không bật được thông báo trên thiết bị này");
+  });
+});
+els.inventoryNotificationLater?.addEventListener("click", () => {
+  hideInventoryNotificationPrompt();
+  showToast("Yêu cầu bật thông báo sẽ hiện lại ở lần truy cập sau");
 });
 
 els.loanScheduleBtn?.addEventListener("click", openLoanScheduleCalculator);
@@ -4138,7 +4216,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=86", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=87", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
@@ -4163,6 +4241,10 @@ function installServiceWorkerUpdates() {
 
 installServiceWorkerUpdates();
 updateInventoryNotificationButton();
+window.addEventListener("ptgsub:app-unlocked", requestInventoryNotificationPermissionOnEntry);
+if (!document.body.classList.contains("auth-locked") && !document.querySelector("#appContent")?.hidden) {
+  requestInventoryNotificationPermissionOnEntry();
+}
 startInventoryMonitoring();
 applyAppUrlParams();
 syncBaseFromGross();
