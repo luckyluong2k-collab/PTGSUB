@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v154-lowrise-map-fix";
+const CACHE_NAME = "park-pricing-v155-flora-main-image";
 const ASSETS = [
   "./",
   "./index.html",
@@ -24,6 +24,7 @@ const ASSETS = [
   "./apple-touch-icon.png",
   "./sun-group-icon.png",
   "./sun-group-logo.png",
+  "./flora-avenue-main.png",
   "./payment-qr.png",
   "./lowrise-map-sharp.jpg",
 ];
