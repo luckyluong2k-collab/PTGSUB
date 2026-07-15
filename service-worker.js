@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v160-inventory-notifications";
+const CACHE_NAME = "park-pricing-v161-mobile-header";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,7 +6,7 @@ const ASSETS = [
   "./quote.html",
   "./quote-admin-demo.html",
   "./quote-demo.css?v=2",
-  "./styles.css?v=113",
+  "./styles.css?v=114",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=106",
   "./quote-demo.js?v=2",

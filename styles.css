@@ -7534,3 +7534,136 @@ body:not(.auth-locked) .summary-band {
   body:not(.auth-locked) .summary-band { top:0 !important; }
   .dashboard-rail-right > .panel > .result-list { grid-auto-rows:auto; }
 }
+
+/* Compact mobile header: use the same top hamburger menu as desktop. */
+@media (max-width:767px) {
+  .topbar.brand-hero {
+    display:grid !important;
+    grid-template-columns:42px 44px minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    align-items:start !important;
+    gap:8px !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin-bottom:8px !important;
+    padding:10px !important;
+    border-radius:16px !important;
+  }
+
+  body:not(.auth-locked) .account-tab {
+    position:static !important;
+    inset:auto !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
+    display:grid !important;
+    width:42px !important;
+    min-width:42px !important;
+    height:42px !important;
+    padding:0 !important;
+    place-items:center !important;
+    border:1px solid rgba(228,194,115,.62) !important;
+    border-radius:12px !important;
+    background:linear-gradient(145deg,#147f77,#0a4f4a) !important;
+    color:#fff !important;
+    box-shadow:0 6px 0 #073a37,0 12px 20px rgba(0,0,0,.25) !important;
+    writing-mode:horizontal-tb !important;
+  }
+  body:not(.auth-locked) .account-tab span { font-size:0 !important; }
+  body:not(.auth-locked) .account-tab span::before {
+    content:"☰" !important;
+    font-size:23px !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+  }
+  body:not(.auth-locked).menu-expanded .account-tab span::before {
+    content:"✕" !important;
+    font-size:18px !important;
+  }
+
+  .topbar .brand-logo {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:44px !important;
+    height:44px !important;
+    margin:0 !important;
+    border-radius:11px !important;
+  }
+  .topbar .brand-copy {
+    grid-column:3 !important;
+    grid-row:1 !important;
+    display:block !important;
+    min-width:0 !important;
+  }
+  .topbar .brand-copy > .eyebrow {
+    display:block !important;
+    margin:0 0 2px !important;
+    color:#e4c273 !important;
+    font-size:.64rem !important;
+    line-height:1.1 !important;
+    letter-spacing:.08em !important;
+  }
+  .topbar .brand-copy h1 {
+    display:grid !important;
+    gap:1px !important;
+    margin:0 !important;
+    white-space:normal !important;
+  }
+  .topbar .brand-copy h1 span {
+    color:#e4c273 !important;
+    font-size:.62rem !important;
+    line-height:1.1 !important;
+    letter-spacing:.06em !important;
+  }
+  .topbar .brand-copy h1 strong {
+    color:#fff !important;
+    font-size:1.03rem !important;
+    line-height:1.1 !important;
+    white-space:nowrap !important;
+  }
+  .topbar .social-links {
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+    margin-top:7px !important;
+  }
+  .topbar .social-chip {
+    min-width:0 !important;
+    min-height:27px !important;
+    padding:3px 6px !important;
+    gap:4px !important;
+    border-radius:9px !important;
+    font-size:.61rem !important;
+    line-height:1.05 !important;
+  }
+  .topbar .social-chip svg {
+    width:18px !important;
+    height:18px !important;
+    flex-basis:18px !important;
+  }
+  .topbar .social-chip span {
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  .topbar-actions {
+    grid-column:2 / 4 !important;
+    grid-row:2 !important;
+    justify-self:end !important;
+    margin:0 !important;
+    gap:7px !important;
+  }
+  .topbar .theme-toggle {
+    width:82px !important;
+    height:36px !important;
+    flex-basis:82px !important;
+  }
+  .topbar .inventory-notification-button,
+  .topbar .icon-button {
+    width:36px !important;
+    min-width:36px !important;
+    height:36px !important;
+    flex-basis:36px !important;
+    padding:0 !important;
+  }
+}
