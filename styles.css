@@ -6533,32 +6533,6 @@ body.announcement-open { overflow:hidden; }
   background:#061f27;
 }
 .kuula-tour-frame iframe { display:block; width:100%; height:100%; border:0; }
-.kuula-tour-image {
-  display:block;
-  min-height:0;
-  aspect-ratio:auto;
-  color:#fff;
-  text-decoration:none;
-}
-.kuula-tour-image img {
-  display:block;
-  width:100%;
-  height:auto;
-}
-.kuula-tour-image span {
-  position:absolute;
-  right:16px;
-  bottom:16px;
-  padding:10px 14px;
-  border:1px solid rgba(255,255,255,.6);
-  border-radius:999px;
-  background:rgba(6,31,39,.86);
-  box-shadow:0 8px 24px rgba(0,0,0,.28);
-  color:#fff;
-  font-size:.86rem;
-  font-weight:900;
-  backdrop-filter:blur(8px);
-}
 body.theme-dark .kuula-tour-section {
   border-color:rgba(228,194,115,.34);
   background:linear-gradient(145deg,#10343d,#09252d);
@@ -6572,8 +6546,6 @@ body.theme-dark .kuula-tour-head a { border-color:#e4c273; color:#f4dea6; }
   .kuula-tour-head { align-items:center; }
   .kuula-tour-head a { padding:8px 10px; font-size:.76rem; }
   .kuula-tour-frame { aspect-ratio:4 / 5; min-height:520px; border-radius:10px; }
-  .kuula-tour-image { aspect-ratio:auto; min-height:0; }
-  .kuula-tour-image span { right:10px; bottom:10px; padding:8px 11px; font-size:.74rem; }
 }
 
 /* High-contrast history cards inside the account menu */

@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v155-flora-main-image";
+const CACHE_NAME = "park-pricing-v157-forum-notifications";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,7 +9,7 @@ const ASSETS = [
   "./styles.css?v=113",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=105",
-  "./forum.js?v=1",
+  "./forum.js?v=2",
   "./quote-demo.js?v=2",
   "./quote-admin-demo.js?v=2",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
@@ -24,7 +24,6 @@ const ASSETS = [
   "./apple-touch-icon.png",
   "./sun-group-icon.png",
   "./sun-group-logo.png",
-  "./flora-avenue-main.png",
   "./payment-qr.png",
   "./lowrise-map-sharp.jpg",
 ];

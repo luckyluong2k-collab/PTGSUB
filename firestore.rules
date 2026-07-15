@@ -120,6 +120,9 @@ service cloud.firestore {
         "email",
         "displayName",
         "body",
+        "featured",
+        "featuredAt",
+        "featuredBy",
         "createdAt",
         "updatedAt"
       ]);
@@ -137,6 +140,9 @@ service cloud.firestore {
         && request.resource.data.email is string
         && request.resource.data.displayName is string
         && validForumBody()
+        && request.resource.data.featured == false
+        && request.resource.data.featuredAt == null
+        && request.resource.data.featuredBy == ""
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
     }
@@ -148,6 +154,12 @@ service cloud.firestore {
         && request.resource.data.displayName == resource.data.displayName
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time
+        && request.resource.data.featured is bool
+        && request.resource.data.featuredBy is string
+        && (
+          request.resource.data.featuredAt == null
+          || request.resource.data.featuredAt is timestamp
+        )
         && validForumBody();
     }
 
@@ -156,9 +168,125 @@ service cloud.firestore {
       allow create: if isApprovedMember() && validForumPostCreate();
       allow update: if isApprovedMember()
         && (resource.data.uid == request.auth.uid || isAdmin())
+        && (
+          isAdmin()
+          || (
+            request.resource.data.featured == resource.data.featured
+            && request.resource.data.featuredAt == resource.data.featuredAt
+            && request.resource.data.featuredBy == resource.data.featuredBy
+          )
+        )
         && validForumPostUpdate();
       allow delete: if isApprovedMember()
         && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    function forumCommentFields() {
+      return request.resource.data.keys().hasOnly([
+        "postId",
+        "uid",
+        "email",
+        "displayName",
+        "body",
+        "createdAt",
+        "updatedAt"
+      ]);
+    }
+
+    function validForumCommentBody() {
+      return request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 500;
+    }
+
+    match /forumComments/{commentId} {
+      allow get, list: if isApprovedMember();
+      allow create: if isApprovedMember()
+        && forumCommentFields()
+        && request.resource.data.postId is string
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email is string
+        && request.resource.data.displayName is string
+        && validForumCommentBody()
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isApprovedMember()
+        && (resource.data.uid == request.auth.uid || isAdmin())
+        && forumCommentFields()
+        && request.resource.data.postId == resource.data.postId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.displayName == resource.data.displayName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && validForumCommentBody();
+      allow delete: if isApprovedMember()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    function forumLikeFields() {
+      return request.resource.data.keys().hasOnly([
+        "postId",
+        "targetType",
+        "targetId",
+        "targetOwnerUid",
+        "uid",
+        "displayName",
+        "createdAt"
+      ]);
+    }
+
+    match /forumLikes/{likeId} {
+      allow get, list: if isApprovedMember();
+      allow create: if isApprovedMember()
+        && forumLikeFields()
+        && request.resource.data.postId is string
+        && request.resource.data.targetType in ["post", "comment"]
+        && request.resource.data.targetId is string
+        && request.resource.data.targetOwnerUid is string
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.displayName is string
+        && request.resource.data.createdAt == request.time;
+      allow delete: if isApprovedMember()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    function forumNotificationFields() {
+      return request.resource.data.keys().hasOnly([
+        "recipientUid",
+        "actorUid",
+        "actorName",
+        "type",
+        "postId",
+        "commentId",
+        "message",
+        "read",
+        "createdAt"
+      ]);
+    }
+
+    match /forumNotifications/{notificationId} {
+      allow get, list: if isApprovedMember()
+        && (resource.data.recipientUid == request.auth.uid || isAdmin());
+      allow create: if isApprovedMember()
+        && forumNotificationFields()
+        && request.resource.data.recipientUid is string
+        && request.resource.data.recipientUid != request.auth.uid
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorName is string
+        && request.resource.data.type in ["like_post", "like_comment", "comment_post"]
+        && request.resource.data.postId is string
+        && request.resource.data.commentId is string
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.read == false
+        && request.resource.data.createdAt == request.time;
+      allow update: if isApprovedMember()
+        && resource.data.recipientUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["read"])
+        && request.resource.data.read is bool;
+      allow delete: if isApprovedMember()
+        && (resource.data.recipientUid == request.auth.uid || isAdmin());
     }
   }
 }
