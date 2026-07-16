@@ -191,6 +191,27 @@ body:not(.auth-locked) .account-tab::after {
   box-shadow: 0 0 10px rgba(242, 202, 108, .55);
 }
 
+/* The menu floats over the viewport; the application must not reserve an empty rail. */
+body:not(.auth-locked),
+body:not(.auth-locked).menu-expanded {
+  padding-left: 0 !important;
+}
+
+body:not(.auth-locked) .app-shell {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 768px) {
+  body:not(.auth-locked) .account-tab {
+    left: -16px !important;
+  }
+  body:not(.auth-locked) .topbar.brand-hero {
+    padding-left: 72px !important;
+  }
+}
+
 @media (max-width: 767px) {
   .feng-shui-dialog { width: calc(100vw - 10px); max-height: calc(100dvh - 10px); border-radius: 16px; }
   .feng-shui-card { max-height: calc(100dvh - 10px); }
@@ -202,8 +223,14 @@ body:not(.auth-locked) .account-tab::after {
   .feng-shui-date-controls { grid-template-columns: minmax(0, 1fr) 132px; }
   .feng-shui-result { padding: 0 14px 16px; }
   .feng-shui-result-grid { grid-template-columns: minmax(0, 1fr); }
-  .topbar.brand-hero { padding-left: 0 !important; grid-template-columns: 44px 44px minmax(0, 1fr) !important; }
-  body:not(.auth-locked) .account-tab { position: relative !important; transform: translateX(-7px); }
+  body:not(.auth-locked) .app-shell { padding-inline: 8px !important; }
+  body:not(.auth-locked) .topbar.brand-hero {
+    width: calc(100% + 16px) !important;
+    margin-inline: -8px !important;
+    padding-left: 0 !important;
+    grid-template-columns: 52px 44px minmax(0, 1fr) !important;
+  }
+  body:not(.auth-locked) .account-tab { position: relative !important; transform: none !important; }
   body:not(.auth-locked) .account-tab::after { top: 7px; height: 28px; }
   .topbar .social-links { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .topbar .feng-shui-trigger { grid-column: 1 / -1; }
