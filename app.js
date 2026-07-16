@@ -2709,6 +2709,29 @@ function calculate(options = {}) {
   };
 }
 
+function advisoryMapSnapshot(rawCode) {
+  const code = normalizeUnitCode(rawCode);
+  const location = resolveUnitMapLocation(code);
+  if (!location) return null;
+  const usesLienKePreview = location.image === lienKeMapImage;
+  const scaleX = usesLienKePreview ? 1596 / LIEN_KE_BASE_WIDTH : 1;
+  const scaleY = usesLienKePreview ? 1000 / LIEN_KE_BASE_HEIGHT : 1;
+  const rect = (value) => value ? {
+    x: Math.round((Number(value.x) || 0) * scaleX),
+    y: Math.round((Number(value.y) || 0) * scaleY),
+    width: Math.max(1, Math.round((Number(value.width) || 0) * scaleX)),
+    height: Math.max(1, Math.round((Number(value.height) || 0) * scaleY)),
+  } : null;
+  const map = {
+    image: usesLienKePreview ? "lienke-preview.png" : String(location.image || "").replace(/^\/+/, ""),
+    crop: rect(location.crop),
+    unitRect: rect(location.unitRect),
+  };
+  const towerRect = rect(location.towerRect);
+  if (towerRect) map.towerRect = towerRect;
+  return map.image && map.crop && map.unitRect ? map : null;
+}
+
 function advisoryPricingSnapshot(rawCode, requestedScenario = "loan") {
   const code = normalizeUnitCode(rawCode);
   const unit = unitCatalog[code];
@@ -2750,6 +2773,7 @@ function advisoryPricingSnapshot(rawCode, requestedScenario = "loan") {
       upfrontPrice,
       scenario: scenarioLabel(result.scenario, result.policy),
       scenarioKey: result.scenario,
+      map: advisoryMapSnapshot(code),
       at: Date.now(),
     };
   } finally {
@@ -2759,6 +2783,7 @@ function advisoryPricingSnapshot(rawCode, requestedScenario = "loan") {
 
 window.ptgsubAdvisoryPricing = {
   snapshot: advisoryPricingSnapshot,
+  map: advisoryMapSnapshot,
   scenarios(rawCode) {
     const code = normalizeUnitCode(rawCode);
     const unit = unitCatalog[code] || {};

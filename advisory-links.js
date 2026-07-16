@@ -218,7 +218,7 @@ function candidateSnapshot(entry) {
   const current = currentUnitSnapshot();
   const source = current?.code === code && !entry?.scenarioKey ? { ...entry, ...current } : entry || {};
   const area = safeText(source.area ?? catalog.area ?? catalog.landArea, 80);
-  return {
+  const snapshot = {
     code,
     unitType: safeText(source.unitType || catalog.unitType, 80),
     areaText: area ? (/m²|m2/i.test(area) ? area : `${area} m²`) : "Chưa cập nhật",
@@ -233,6 +233,9 @@ function candidateSnapshot(entry) {
     catalogBaseNet: Number(catalog.baseNet) || 0,
     catalogSalesPolicy: safeText(catalog.salesPolicy, 240),
   };
+  const map = source.map || window.ptgsubAdvisoryPricing?.map?.(code);
+  if (map?.image && map?.crop && map?.unitRect) snapshot.map = map;
+  return snapshot;
 }
 
 async function loadCandidates() {
@@ -481,7 +484,11 @@ async function handleRowAction(button) {
     await updateDoc(doc(db, "advisoryLinks", item.id), { expiresAt: Timestamp.fromMillis(expires), revoked: false, updatedAt: serverTimestamp() });
     notify("Đã gia hạn link thêm 3 ngày");
   } else if (action === "duplicate") {
-    const created = await createLinkFromUnits({ customerAlias: item.customerAlias, days: 3, units: item.units || [], source: item });
+    const units = (item.units || []).map((unit) => {
+      const map = unit.map || window.ptgsubAdvisoryPricing?.map?.(unit.code);
+      return map ? { ...unit, map } : unit;
+    });
+    const created = await createLinkFromUnits({ customerAlias: item.customerAlias, days: 3, units, source: item });
     await copyText(created.url);
     notify("Đã tạo phiên bản mới và sao chép link");
   } else if (action === "revoke") {

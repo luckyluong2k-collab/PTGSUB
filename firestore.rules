@@ -375,6 +375,26 @@ service cloud.firestore {
         && (uid == request.auth.uid || isAdmin());
     }
 
+    function validAdvisoryMapRect(rect) {
+      return rect is map
+        && rect.keys().hasOnly(["x", "y", "width", "height"])
+        && rect.x is number && rect.x >= 0 && rect.x <= 10000
+        && rect.y is number && rect.y >= 0 && rect.y <= 10000
+        && rect.width is number && rect.width > 0 && rect.width <= 10000
+        && rect.height is number && rect.height > 0 && rect.height <= 10000;
+    }
+
+    function validAdvisoryMap(unit) {
+      return !("map" in unit) || (
+        unit.map is map
+        && unit.map.keys().hasOnly(["image", "crop", "unitRect", "towerRect"])
+        && unit.map.image in ["phankhupark-map.png", "lowrise-map-sharp.jpg", "lienke-preview.png"]
+        && validAdvisoryMapRect(unit.map.crop)
+        && validAdvisoryMapRect(unit.map.unitRect)
+        && (!("towerRect" in unit.map) || validAdvisoryMapRect(unit.map.towerRect))
+      );
+    }
+
     function validAdvisoryUnit(unit) {
       return unit is map
         && unit.keys().hasOnly([
@@ -390,7 +410,8 @@ service cloud.firestore {
           "direction",
           "catalogListedGross",
           "catalogBaseNet",
-          "catalogSalesPolicy"
+          "catalogSalesPolicy",
+          "map"
         ])
         && unit.code is string
         && unit.code.size() > 0
@@ -418,7 +439,8 @@ service cloud.firestore {
         && unit.catalogBaseNet is number
         && unit.catalogBaseNet >= 0
         && unit.catalogSalesPolicy is string
-        && unit.catalogSalesPolicy.size() <= 240;
+        && unit.catalogSalesPolicy.size() <= 240
+        && validAdvisoryMap(unit);
     }
 
     function validAdvisoryUnits() {
