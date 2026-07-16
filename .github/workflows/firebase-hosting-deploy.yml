@@ -10,6 +10,9 @@ on:
       - "ui-unit-lookup.js"
       - "service-worker.js"
       - "styles.css"
+      - "feng-shui.css"
+      - "feng-shui.js"
+      - "firebase-index.html"
       - "firebase-auth.js"
       - "unit-data.js"
       - "lowrise-map-sharp.jpg"
@@ -29,8 +32,7 @@ jobs:
 
       - name: Prepare Firebase version of index
         run: |
-          git show 297406399a1ffdd7d0eeb6ada28a977e1f766a2b:index.html > index.html
-          sed -i 's/ui-unit-lookup.js?v=1/ui-unit-lookup.js?v=2/g' index.html
+          cp firebase-index.html index.html
 
       - name: Deploy live hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
