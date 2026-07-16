@@ -476,3 +476,18 @@ body:not(.auth-locked) .app-shell {
   body:not(.auth-locked) .auth-drawer,
   body:not(.auth-locked) .app-shell { transition-duration: .01ms !important; }
 }
+
+/* Keep the fixed mobile Menu control in its own lane when the sticky price bar reaches the top. */
+@media (max-width: 767px) {
+  body:not(.auth-locked):not(.menu-expanded) .summary-band > div:first-child {
+    box-sizing: border-box;
+    min-height: 70px !important;
+    padding-left: 76px !important;
+  }
+
+  body:not(.auth-locked):not(.menu-expanded) .summary-band > div:first-child .label,
+  body:not(.auth-locked):not(.menu-expanded) .summary-band > div:first-child strong {
+    position: relative;
+    z-index: 1;
+  }
+}
