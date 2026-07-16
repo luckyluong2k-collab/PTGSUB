@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v171-desktop-menu-rail";
+const CACHE_NAME = "park-pricing-v172-compact-menu-rail";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=116",
-  "./feng-shui.css?v=7",
+  "./feng-shui.css?v=8",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=108",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
