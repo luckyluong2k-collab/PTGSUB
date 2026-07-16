@@ -1,0 +1,211 @@
+.feng-shui-trigger {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  border-color: rgba(215, 180, 106, .72) !important;
+  background: linear-gradient(145deg, #fff9e8, #f2dfac) !important;
+  color: #6e3b08 !important;
+  box-shadow: 0 5px 0 #b8862d, 0 13px 24px rgba(90, 55, 4, .2) !important;
+}
+
+.feng-shui-trigger > span:first-child {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.feng-shui-dialog {
+  width: min(960px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(228, 194, 115, .75);
+  border-radius: 22px;
+  background: #f7fbfa;
+  color: #102522;
+  box-shadow: 0 30px 90px rgba(2, 20, 25, .42);
+}
+
+.feng-shui-dialog::backdrop {
+  background: rgba(2, 17, 22, .72);
+  backdrop-filter: blur(5px);
+}
+
+.feng-shui-card {
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  background:
+    radial-gradient(circle at 100% 0, rgba(228, 194, 115, .2), transparent 32%),
+    linear-gradient(160deg, #fafffe, #e8f3f1);
+}
+
+.feng-shui-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(228, 194, 115, .5);
+  background: linear-gradient(135deg, rgba(6, 31, 40, .98), rgba(12, 61, 65, .98));
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(2, 25, 31, .16);
+}
+
+.feng-shui-head p,
+.feng-shui-head h2 { margin: 0; }
+.feng-shui-head p { color: #f5d994; font-size: .74rem; font-weight: 900; letter-spacing: .13em; }
+.feng-shui-head h2 { margin-top: 4px; font-size: clamp(1.2rem, 3vw, 1.7rem); line-height: 1.25; }
+
+.feng-shui-close {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid #e4c273;
+  border-radius: 14px;
+  background: #0c4c4a;
+  color: #ffe39a;
+  cursor: pointer;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.feng-shui-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 22px;
+}
+
+.feng-shui-form > label,
+.feng-shui-form fieldset {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.feng-shui-form label > span:first-child,
+.feng-shui-form legend {
+  color: #17443f;
+  font-size: .83rem;
+  font-weight: 900;
+}
+
+.feng-shui-form small { color: #60736f; font-weight: 650; }
+.feng-shui-form fieldset { grid-template-columns: auto 1fr 1fr; align-items: center; }
+.feng-shui-form fieldset legend { grid-column: 1 / -1; }
+.feng-shui-form fieldset label { display: flex; align-items: center; gap: 7px; min-height: 46px; padding: 8px 13px; border: 1px solid #a8c8c3; border-radius: 11px; background: #fff; font-weight: 800; }
+
+.feng-shui-form input[type="text"],
+.feng-shui-form input[type="date"],
+.feng-shui-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #8bb6b0;
+  border-radius: 11px;
+  background: #fff;
+  color: #102522;
+  font: inherit;
+  font-weight: 750;
+}
+
+.feng-shui-form input[readonly] { background: #eaf2f0; color: #31534e; }
+.feng-shui-date-controls { display: grid; grid-template-columns: minmax(0, 1fr) 154px; gap: 8px; }
+.feng-shui-error { grid-column: 1 / -1; min-height: 20px; margin: 0; color: #a3251b; font-weight: 800; }
+.feng-shui-submit { grid-column: 1 / -1; min-height: 50px; border: 1px solid #b68b31; border-radius: 13px; background: linear-gradient(135deg, #0f766e, #07564f); color: #fff; cursor: pointer; font-size: 1rem; font-weight: 900; box-shadow: 0 6px 0 #073d39; }
+
+.feng-shui-result { display: grid; gap: 14px; padding: 0 22px 24px; }
+.feng-shui-lunar { padding: 13px 15px; border: 1px solid #d1ab58; border-radius: 13px; background: #fff5d8; color: #6c3d06; font-weight: 850; text-align: center; }
+.feng-shui-result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.feng-shui-result-grid article,
+.feng-shui-advice,
+.feng-shui-script { padding: 15px; border: 1px solid #b6d0cc; border-radius: 14px; background: rgba(255, 255, 255, .92); box-shadow: 0 10px 25px rgba(15, 56, 51, .08); }
+.feng-shui-result-grid article { display: grid; gap: 8px; }
+.feng-shui-result-grid span { color: #58706b; font-size: .76rem; font-weight: 850; text-transform: uppercase; }
+.feng-shui-result-grid strong { color: #08675f; font-size: 1.06rem; line-height: 1.35; }
+.feng-shui-advice h3,
+.feng-shui-script h3 { margin: 0; color: #17443f; font-size: 1rem; }
+.feng-shui-advice p,
+.feng-shui-script p { margin: 8px 0 0; line-height: 1.65; }
+.feng-shui-script { border-color: #d1ab58; background: #fffaf0; }
+.feng-shui-script > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.feng-shui-script button { min-height: 38px; padding: 7px 12px; border: 1px solid #0f766e; border-radius: 10px; background: #0f766e; color: #fff; cursor: pointer; font-weight: 900; }
+.feng-shui-disclaimer { margin: 0; padding: 12px 14px; border-left: 4px solid #c59a42; background: rgba(255, 255, 255, .72); color: #546963; font-size: .82rem; line-height: 1.55; }
+
+body.theme-dark .feng-shui-card { background: radial-gradient(circle at 100% 0, rgba(228,194,115,.15), transparent 32%), linear-gradient(155deg,#0b2b35,#061d27); color: #f7fbfa; }
+body.theme-dark .feng-shui-form label > span:first-child,
+body.theme-dark .feng-shui-form legend,
+body.theme-dark .feng-shui-advice h3,
+body.theme-dark .feng-shui-script h3 { color: #f5d994; }
+body.theme-dark .feng-shui-form small { color: #bdd0cc; }
+body.theme-dark .feng-shui-form input[type="text"],
+body.theme-dark .feng-shui-form input[type="date"],
+body.theme-dark .feng-shui-form select,
+body.theme-dark .feng-shui-form fieldset label { border-color: #638b85; background: #0b3038; color: #fff; }
+body.theme-dark .feng-shui-form input[readonly] { background: #163d44; color: #d9e8e5; }
+body.theme-dark .feng-shui-result-grid article,
+body.theme-dark .feng-shui-advice { border-color: #527b75; background: #0e343d; }
+body.theme-dark .feng-shui-result-grid span { color: #bdd0cc; }
+body.theme-dark .feng-shui-result-grid strong { color: #7ce0d4; }
+body.theme-dark .feng-shui-script { background: #332b16; color: #fff; }
+body.theme-dark .feng-shui-disclaimer { background: #12343b; color: #d6e4e1; }
+
+/* The account drawer close control remains visible while its content scrolls. */
+body:not(.auth-locked).menu-expanded .auth-close {
+  position: sticky !important;
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 999 !important;
+  display: grid !important;
+  float: right;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+/* Keep the hamburger tight to the left edge, with a slim gold guide rail. */
+body:not(.auth-locked) .account-tab {
+  left: 0 !important;
+  border-left: 0 !important;
+  border-radius: 0 12px 12px 0 !important;
+}
+
+body:not(.auth-locked) .account-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 4px;
+  height: 30px;
+  border-radius: 0 4px 4px 0;
+  background: #f2ca6c;
+  box-shadow: 0 0 10px rgba(242, 202, 108, .55);
+}
+
+@media (max-width: 767px) {
+  .feng-shui-dialog { width: calc(100vw - 10px); max-height: calc(100dvh - 10px); border-radius: 16px; }
+  .feng-shui-card { max-height: calc(100dvh - 10px); }
+  .feng-shui-head { padding: 14px; }
+  .feng-shui-head h2 { font-size: 1.08rem; }
+  .feng-shui-close { flex-basis: 42px; width: 42px; height: 42px; }
+  .feng-shui-form { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+  .feng-shui-form > *, .feng-shui-error, .feng-shui-submit { grid-column: 1; }
+  .feng-shui-date-controls { grid-template-columns: minmax(0, 1fr) 132px; }
+  .feng-shui-result { padding: 0 14px 16px; }
+  .feng-shui-result-grid { grid-template-columns: minmax(0, 1fr); }
+  .topbar.brand-hero { padding-left: 0 !important; grid-template-columns: 44px 44px minmax(0, 1fr) !important; }
+  body:not(.auth-locked) .account-tab { position: relative !important; transform: translateX(-7px); }
+  body:not(.auth-locked) .account-tab::after { top: 7px; height: 28px; }
+  .topbar .social-links { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .topbar .feng-shui-trigger { grid-column: 1 / -1; }
+  body:not(.auth-locked).menu-expanded .auth-drawer { padding-top: 8px !important; }
+}

@@ -15,7 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=115">
+  <link rel="stylesheet" href="styles.css?v=116">
+  <link rel="stylesheet" href="feng-shui.css?v=1">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -95,11 +96,6 @@
           <summary class="history-panel-summary">Lịch sử căn đã tra</summary>
           <div id="myHistoryList" class="history-list"></div>
         </details>
-
-        <a class="menu-3d-button" id="customerQuoteDemoLink" data-auth-menu hidden href="quote-admin-demo.html?code=AB7K29&amp;seed=1">
-          <span class="menu-3d-icon" aria-hidden="true">BG</span>
-          <span>B&#225;o gi&#225; cho kh&#225;ch</span>
-        </a>
 
         <a class="model-home-link menu-3d-button" id="modelHomeSection" data-auth-menu hidden href="https://drive.google.com/drive/folders/11zfFpF3DPZksh8a5A3my-rQjCDn1I9AO" target="_blank" rel="noopener noreferrer" aria-label="Mở ảnh nhà mẫu trong cửa sổ mới">
           <span class="menu-3d-icon" aria-hidden="true">&#127968;</span>
@@ -297,6 +293,10 @@
             </svg>
             <span>Forum</span>
           </a>
+          <button class="social-chip feng-shui-trigger" id="fengShuiOpenBtn" data-auth-menu type="button" aria-haspopup="dialog" aria-controls="fengShuiDialog" hidden>
+            <span aria-hidden="true">&#9775;</span>
+            <span>B&#225;t tr&#7841;ch - Phong th&#7911;y</span>
+          </button>
         </div>
       </div>
       <div class="topbar-actions">
@@ -598,14 +598,80 @@
     </div>
   </dialog>
 
+  <dialog class="feng-shui-dialog" id="fengShuiDialog" aria-labelledby="fengShuiTitle">
+    <div class="feng-shui-card">
+      <header class="feng-shui-head">
+        <div>
+          <p>B&#193;T TR&#7840;CH &#183; PHONG TH&#7910;Y</p>
+          <h2 id="fengShuiTitle">T&#432; v&#7845;n h&#432;&#7899;ng c&#259;n theo cung m&#7879;nh</h2>
+        </div>
+        <button class="feng-shui-close" id="fengShuiCloseBtn" type="button" aria-label="&#272;&#243;ng B&#225;t tr&#7841;ch - Phong th&#7911;y">&times;</button>
+      </header>
+
+      <form class="feng-shui-form" id="fengShuiForm">
+        <label>
+          <span>T&#234;n kh&#225;ch <small>(kh&#244;ng b&#7855;t bu&#7897;c)</small></span>
+          <input id="fengShuiCustomerName" type="text" autocomplete="name" placeholder="V&#237; d&#7909;: Anh Minh">
+        </label>
+        <label class="feng-shui-date-field">
+          <span>Ng&#224;y sinh d&#432;&#417;ng l&#7883;ch</span>
+          <span class="feng-shui-date-controls">
+            <input id="fengShuiBirthText" type="text" inputmode="numeric" autocomplete="bday" placeholder="dd/mm/yyyy" maxlength="10" required>
+            <input id="fengShuiBirthPicker" type="date" min="1900-01-01" max="2099-12-31" aria-label="Ch&#7885;n ng&#224;y sinh b&#7857;ng l&#7883;ch">
+          </span>
+        </label>
+        <fieldset>
+          <legend>Gi&#7899;i t&#237;nh</legend>
+          <label><input type="radio" name="fengShuiGender" value="male" checked> Nam</label>
+          <label><input type="radio" name="fengShuiGender" value="female"> N&#7919;</label>
+        </fieldset>
+        <label>
+          <span>M&#227; c&#259;n &#273;ang tra</span>
+          <input id="fengShuiUnitCode" type="text" readonly>
+        </label>
+        <label>
+          <span>H&#432;&#7899;ng c&#259;n</span>
+          <input id="fengShuiUnitDirection" type="text" readonly>
+          <select id="fengShuiManualDirection" aria-label="Ch&#7885;n h&#432;&#7899;ng c&#259;n th&#7911; c&#244;ng" hidden>
+            <option value="">Ch&#7885;n h&#432;&#7899;ng...</option>
+            <option>B&#7855;c</option><option>&#272;&#244;ng B&#7855;c</option><option>&#272;&#244;ng</option><option>&#272;&#244;ng Nam</option>
+            <option>Nam</option><option>T&#226;y Nam</option><option>T&#226;y</option><option>T&#226;y B&#7855;c</option>
+          </select>
+          <small id="fengShuiDirectionHelp"></small>
+        </label>
+        <p class="feng-shui-error" id="fengShuiError" role="alert"></p>
+        <button class="feng-shui-submit" type="submit">Xem t&#432; v&#7845;n B&#225;t tr&#7841;ch</button>
+      </form>
+
+      <section class="feng-shui-result" id="fengShuiResult" aria-live="polite" hidden>
+        <div class="feng-shui-lunar" id="fengShuiLunar"></div>
+        <div class="feng-shui-result-grid">
+          <article><span>Cung m&#7879;nh / ng&#361; h&#224;nh</span><strong id="fengShuiDestiny"></strong></article>
+          <article><span>H&#432;&#7899;ng Sinh Kh&#237; t&#7889;t nh&#7845;t</span><strong id="fengShuiBestDirection"></strong></article>
+          <article><span>&#272;&#225;nh gi&#225; h&#432;&#7899;ng c&#259;n</span><strong id="fengShuiDirectionVerdict"></strong></article>
+        </div>
+        <article class="feng-shui-advice">
+          <h3>&#272;i&#7875;m t&#432; v&#7845;n cho c&#259;n n&#224;y</h3>
+          <p id="fengShuiAdvice"></p>
+        </article>
+        <article class="feng-shui-script">
+          <div><h3>C&#226;u n&#243;i &#273;&#7875; t&#432; v&#7845;n kh&#225;ch</h3><button id="fengShuiCopyBtn" type="button">Sao ch&#233;p</button></div>
+          <p id="fengShuiSalesScript"></p>
+        </article>
+        <p class="feng-shui-disclaimer">Phong th&#7911;y ch&#7881; &#273;&#7875; tham kh&#7843;o. Quy&#7871;t &#273;&#7883;nh mua &#432;u ti&#234;n ph&#225;p l&#253;, gi&#225;, d&#242;ng ti&#7873;n, v&#7883; tr&#237; v&#224; nhu c&#7847;u th&#7921;c t&#7871;; kh&#244;ng c&#243; b&#7843;o &#273;&#7843;m v&#7873; gi&#225; tr&#7883; hay t&#224;i ch&#237;nh.</p>
+      </section>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="app.js?v=107"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=85"></script>
   <script src="ui-admin-search.js?v=1"></script>
-  <script src="ui-menu.js?v=2"></script>
+  <script src="ui-menu.js?v=3"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=4"></script>
+  <script src="feng-shui.js?v=1"></script>
 </body>
 </html>
