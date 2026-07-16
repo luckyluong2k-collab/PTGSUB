@@ -1,17 +1,17 @@
-const CACHE_NAME = "park-pricing-v176-advisory-state-visibility";
+const CACHE_NAME = "park-pricing-v177-advisory-manual-unit";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=117",
   "./feng-shui.css?v=8",
-  "./advisory-links.css?v=1",
-  "./advisory-links.js?v=1",
+  "./advisory-links.css?v=2",
+  "./advisory-links.js?v=2",
   "./tu-van.html",
   "./tu-van.css?v=2",
   "./tu-van.js?v=2",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=108",
+  "./app.js?v=109",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",

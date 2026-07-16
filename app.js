@@ -2709,6 +2709,64 @@ function calculate(options = {}) {
   };
 }
 
+function advisoryPricingSnapshot(rawCode, requestedScenario = "loan") {
+  const code = normalizeUnitCode(rawCode);
+  const unit = unitCatalog[code];
+  if (!code || !unit) throw new Error("Mã căn không có trong bảng hàng hiện tại.");
+  const scenario = quoteScenarios.includes(requestedScenario) ? requestedScenario : "loan";
+  const policyKey = unit.policyGroup && policies[unit.policyGroup] ? unit.policyGroup : els.policyGroup.value;
+  const saved = {
+    policyGroup: els.policyGroup.value,
+    unitType: els.unitType.value,
+    area: els.area.value,
+    constructionArea: els.constructionArea.value,
+    listedGross: els.listedGross.value,
+    baseNet: els.baseNet.value,
+  };
+
+  try {
+    els.policyGroup.value = policyKey;
+    if (unit.unitType) ensureUnitTypeOption(unit.unitType);
+    els.unitType.value = unit.unitType || saved.unitType;
+    const isLowRise = policyKey === "LOWRISE_LK" || policyKey === "LOWRISE_BT";
+    const area = isLowRise ? unit.landArea ?? unit.area : unit.area;
+    els.area.value = area ? String(area) : "";
+    els.constructionArea.value = isLowRise && unit.constructionArea ? String(unit.constructionArea) : "";
+    els.listedGross.value = unit.listedGross ? inputMoney(unit.listedGross) : "";
+    if (grossDividedPolicyKeys.has(policyKey)) syncBaseFromGross();
+    else els.baseNet.value = unit.baseNet ? inputMoney(unit.baseNet) : "";
+
+    const result = calculate({ scenario });
+    let upfrontPrice = "Theo tiến độ thanh toán";
+    if (scenario === "loan") upfrontPrice = money(result.upfront);
+    else if (["tts50", "tts70", "tts95"].includes(scenario)) {
+      upfrontPrice = result.schedule.slice(0, 2).map((item) => `${item[0]}: ${money(item[1])}`).join(" · ");
+    }
+    return {
+      code,
+      unitType: result.unitType,
+      area: result.area,
+      totalPrice: money(result.total),
+      upfrontPrice,
+      scenario: scenarioLabel(result.scenario, result.policy),
+      scenarioKey: result.scenario,
+      at: Date.now(),
+    };
+  } finally {
+    Object.entries(saved).forEach(([key, value]) => { els[key].value = value; });
+  }
+}
+
+window.ptgsubAdvisoryPricing = {
+  snapshot: advisoryPricingSnapshot,
+  scenarios(rawCode) {
+    const code = normalizeUnitCode(rawCode);
+    const unit = unitCatalog[code] || {};
+    const policy = policies[unit.policyGroup] || policies[els.policyGroup.value] || policies.P3P9;
+    return quoteScenarios.map((value) => ({ value, label: scenarioLabel(value, policy) }));
+  },
+};
+
 function row(label, value, className = "") {
   const markPercent = shouldEmphasizePercent(label);
   return `<div class="row ${className}"><span>${emphasizePercentText(label, markPercent)}</span><strong>${emphasizePercentText(value, markPercent)}</strong></div>`;

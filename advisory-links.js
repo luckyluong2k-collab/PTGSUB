@@ -149,6 +149,15 @@ function createInterface() {
           <label><span>Tên khách / tên gợi nhớ</span><input id="advisoryCustomerAlias" maxlength="80" placeholder="Ví dụ: Anh Minh" required></label>
           <label><span>Thời hạn link</span><select id="advisoryExpiry"><option value="1">24 giờ</option><option value="3" selected>3 ngày</option><option value="7">7 ngày</option><option value="14">14 ngày</option><option value="30">30 ngày</option></select></label>
         </div>
+        <section class="advisory-manual-unit" aria-labelledby="advisoryManualUnitTitle">
+          <div><strong id="advisoryManualUnitTitle">Thêm căn chưa có trong danh sách</strong><span>Nhập đúng mã trong bảng hàng, chọn phương án rồi thêm vào link.</span></div>
+          <div class="advisory-manual-unit-controls">
+            <label><span>Mã căn</span><input id="advisoryManualUnitCode" maxlength="30" autocomplete="off" placeholder="Ví dụ: P250932"></label>
+            <label><span>Phương án thanh toán</span><select id="advisoryManualScenario"></select></label>
+            <button class="advisory-primary" id="advisoryManualAddBtn" type="button">+ Thêm căn</button>
+          </div>
+          <p id="advisoryManualStatus" role="status"></p>
+        </section>
         <div class="advisory-candidate-head"><strong>Căn đưa vào link</strong><span>Căn đánh dấu chính sẽ xuất hiện đầu tiên.</span></div>
         <div class="advisory-candidates" id="advisoryCandidates"></div>
         <p class="advisory-form-error" id="advisoryFormError" role="alert"></p>
@@ -191,7 +200,7 @@ function candidateSnapshot(entry) {
   const code = unitCode(entry?.code);
   const catalog = window.unitCatalog?.[code] || {};
   const current = currentUnitSnapshot();
-  const source = current?.code === code ? { ...entry, ...current } : entry || {};
+  const source = current?.code === code && !entry?.scenarioKey ? { ...entry, ...current } : entry || {};
   const area = safeText(source.area ?? catalog.area ?? catalog.landArea, 80);
   return {
     code,
@@ -228,9 +237,11 @@ async function loadCandidates() {
   renderCandidates();
 }
 
-function renderCandidates() {
+function renderCandidates({ selectedCodes = null, primaryCode = "" } = {}) {
   const container = document.getElementById("advisoryCandidates");
   if (!container) return;
+  const selected = selectedCodes instanceof Set ? selectedCodes : new Set(currentCandidates[0]?.code ? [currentCandidates[0].code] : []);
+  const primary = primaryCode || currentCandidates.find((item) => selected.has(item.code))?.code || "";
   container.textContent = "";
   if (!currentCandidates.length) {
     container.innerHTML = '<p class="advisory-empty">Chưa có căn để tạo link. Hãy tra và tính giá một căn trước.</p>';
@@ -239,15 +250,67 @@ function renderCandidates() {
   currentCandidates.forEach((item, index) => {
     const row = document.createElement("div");
     row.className = "advisory-candidate";
+    const checked = selected.has(item.code);
     row.innerHTML = `
       <label class="advisory-candidate-select">
-        <input type="checkbox" data-advisory-unit value="${escapeHtml(item.code)}" ${index === 0 ? "checked" : ""}>
-        <span><strong>${escapeHtml(item.code)}</strong><small>${escapeHtml(item.unitType || "Chưa rõ loại")} · ${escapeHtml(item.areaText)}<br>${escapeHtml(item.totalPrice)}</small></span>
+        <input type="checkbox" data-advisory-unit value="${escapeHtml(item.code)}" ${checked ? "checked" : ""}>
+        <span><strong>${escapeHtml(item.code)}</strong><small>${escapeHtml(item.unitType || "Chưa rõ loại")} · ${escapeHtml(item.areaText)}<br>${escapeHtml(item.totalPrice)}${item.scenario ? `<br>Phương án: ${escapeHtml(item.scenario)}` : ""}</small></span>
       </label>
-      <label class="advisory-primary-choice"><input type="radio" name="advisoryPrimary" value="${escapeHtml(item.code)}" ${index === 0 ? "checked" : ""} ${index === 0 ? "" : "disabled"}> Căn chính</label>
+      <label class="advisory-primary-choice"><input type="radio" name="advisoryPrimary" value="${escapeHtml(item.code)}" ${item.code === primary ? "checked" : ""} ${checked ? "" : "disabled"}> Căn chính</label>
     `;
     container.appendChild(row);
   });
+}
+
+function selectedCandidateState() {
+  return {
+    selectedCodes: new Set(Array.from(document.querySelectorAll("[data-advisory-unit]:checked"), (input) => input.value)),
+    primaryCode: document.querySelector('input[name="advisoryPrimary"]:checked')?.value || "",
+  };
+}
+
+function syncManualScenarioOptions() {
+  const input = document.getElementById("advisoryManualUnitCode");
+  const select = document.getElementById("advisoryManualScenario");
+  if (!select) return;
+  const previous = select.value || "loan";
+  const scenarios = window.ptgsubAdvisoryPricing?.scenarios?.(input?.value) || [
+    { value: "loan", label: "Có vay" },
+    { value: "standard", label: "Không vay" },
+    { value: "tts50", label: "TTS 50%" },
+    { value: "tts70", label: "TTS 70%" },
+    { value: "tts95", label: "TTS 100%" },
+  ];
+  select.textContent = "";
+  scenarios.forEach((item) => select.add(new Option(item.label, item.value)));
+  select.value = scenarios.some((item) => item.value === previous) ? previous : "loan";
+}
+
+function addManualCandidate() {
+  const codeInput = document.getElementById("advisoryManualUnitCode");
+  const scenarioSelect = document.getElementById("advisoryManualScenario");
+  const status = document.getElementById("advisoryManualStatus");
+  const code = unitCode(codeInput?.value);
+  if (!code) { status.textContent = "Vui lòng nhập mã căn."; return; }
+  if (!window.unitCatalog?.[code]) { status.textContent = `Không tìm thấy căn ${code} trong bảng hàng hiện tại.`; return; }
+  if (!window.ptgsubAdvisoryPricing?.snapshot) { status.textContent = "Bộ tính giá chưa sẵn sàng, vui lòng thử lại."; return; }
+  try {
+    const state = selectedCandidateState();
+    const snapshot = candidateSnapshot(window.ptgsubAdvisoryPricing.snapshot(code, scenarioSelect?.value || "loan"));
+    const existingIndex = currentCandidates.findIndex((item) => item.code === code);
+    if (existingIndex >= 0) currentCandidates.splice(existingIndex, 1, snapshot);
+    else currentCandidates.unshift(snapshot);
+    if (state.selectedCodes.size < MAX_LINKS || state.selectedCodes.has(code)) state.selectedCodes.add(code);
+    if (!state.primaryCode) state.primaryCode = code;
+    renderCandidates(state);
+    status.textContent = state.selectedCodes.has(code)
+      ? `Đã thêm ${code} · ${snapshot.scenario} vào link.`
+      : `Đã thêm ${code} vào danh sách. Link đã chọn đủ 3 căn, hãy bỏ chọn một căn để chọn căn này.`;
+    codeInput.value = "";
+    syncManualScenarioOptions();
+  } catch (error) {
+    status.textContent = error?.message || "Không tính được giá căn này.";
+  }
 }
 
 function selectedUnits() {
@@ -432,6 +495,9 @@ async function openManager() {
 async function openCreate() {
   document.getElementById("advisoryFormError").textContent = "";
   document.getElementById("advisoryCustomerAlias").value = "";
+  document.getElementById("advisoryManualUnitCode").value = "";
+  document.getElementById("advisoryManualStatus").textContent = "";
+  syncManualScenarioOptions();
   openDialog(createDialog());
   try {
     await loadCandidates();
@@ -445,6 +511,11 @@ function bindInterface() {
   menuButton?.addEventListener("click", openManager);
   document.getElementById("advisoryCreateOpenBtn")?.addEventListener("click", openCreate);
   document.getElementById("advisoryRefreshBtn")?.addEventListener("click", () => loadLinks());
+  document.getElementById("advisoryManualUnitCode")?.addEventListener("input", syncManualScenarioOptions);
+  document.getElementById("advisoryManualUnitCode")?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") { event.preventDefault(); addManualCandidate(); }
+  });
+  document.getElementById("advisoryManualAddBtn")?.addEventListener("click", addManualCandidate);
   document.querySelectorAll('[data-advisory-close="manager"]').forEach((button) => button.addEventListener("click", () => closeDialog(managerDialog())));
   document.querySelectorAll('[data-advisory-close="create"]').forEach((button) => button.addEventListener("click", () => closeDialog(createDialog())));
   managerDialog()?.addEventListener("click", (event) => { if (event.target === managerDialog()) closeDialog(managerDialog()); });
