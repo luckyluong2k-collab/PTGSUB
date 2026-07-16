@@ -1,18 +1,18 @@
-const CACHE_NAME = "park-pricing-v167-client-advisor";
+const CACHE_NAME = "park-pricing-v168-smooth-menu";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=116",
-  "./feng-shui.css?v=3",
+  "./feng-shui.css?v=4",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=108",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
-  "./firebase-auth.js?v=85",
+  "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",
   "./ui-unit-lookup.js?v=1",
   "./ui-admin-search.js?v=1",
-  "./ui-menu.js?v=3",
+  "./ui-menu.js?v=4",
   "./ui-payment.js?v=1",
   "./ui-theme.js?v=4",
   "./feng-shui.js?v=2",

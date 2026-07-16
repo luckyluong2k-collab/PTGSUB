@@ -10,7 +10,8 @@
 
   function applyState(expanded) {
     document.body.classList.toggle("menu-expanded", expanded);
-    drawer.hidden = !expanded;
+    drawer.hidden = false;
+    drawer.setAttribute("aria-hidden", String(!expanded && !document.body.classList.contains("auth-locked")));
     toggle.setAttribute("aria-expanded", String(expanded));
     toggle.setAttribute("aria-label", expanded ? "Thu gon menu" : "Mo menu");
     toggle.title = expanded ? "Thu gon menu" : "Mo menu";

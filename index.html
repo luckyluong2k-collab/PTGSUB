@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=116">
-  <link rel="stylesheet" href="feng-shui.css?v=3">
+  <link rel="stylesheet" href="feng-shui.css?v=4">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -237,11 +237,12 @@
     </div>
   </section>
 
+  <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="false" hidden>
+    <span>Menu</span>
+  </button>
+
   <main class="app-shell" id="appContent" hidden>
     <header class="topbar brand-hero">
-      <button class="account-tab" id="accountTab" type="button" aria-controls="authGate" aria-expanded="false">
-        <span>Menu</span>
-      </button>
       <div class="mid-autumn-banner-art" aria-hidden="true" data-html2canvas-ignore="true">
         <span class="mid-autumn-banner-moon"></span>
         <span class="mid-autumn-banner-cloud banner-cloud-one"></span>
@@ -698,9 +699,9 @@
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="app.js?v=108"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
-  <script type="module" src="firebase-auth.js?v=85"></script>
+  <script type="module" src="firebase-auth.js?v=86"></script>
   <script src="ui-admin-search.js?v=1"></script>
-  <script src="ui-menu.js?v=3"></script>
+  <script src="ui-menu.js?v=4"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=4"></script>
   <script src="feng-shui.js?v=2"></script>

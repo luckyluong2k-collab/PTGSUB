@@ -332,12 +332,14 @@ async function openAdminPanel() {
 
 function openDrawer() {
   if (authGate) authGate.hidden = false;
+  if (authGate) authGate.setAttribute("aria-hidden", "false");
   document.body.classList.add("menu-expanded");
   if (accountTab) accountTab.setAttribute("aria-expanded", "true");
 }
 
 function closeDrawer() {
-  if (authGate) authGate.hidden = true;
+  if (authGate) authGate.hidden = false;
+  if (authGate) authGate.setAttribute("aria-hidden", String(!document.body.classList.contains("auth-locked")));
   document.body.classList.remove("menu-expanded");
   if (accountTab) accountTab.setAttribute("aria-expanded", "false");
 }

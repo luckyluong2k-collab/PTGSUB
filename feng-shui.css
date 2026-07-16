@@ -349,3 +349,122 @@ body.theme-dark .feng-shui-compass-item.is-favorable { border-color:#3fa99c; bac
   .feng-shui-dialog.is-presenting .feng-shui-head small { display:none; }
   .feng-shui-dialog.is-presenting .feng-shui-head { padding-block:10px; }
 }
+
+/* Smooth off-canvas account menu. The toggle lives outside the clipped header. */
+:root {
+  --account-drawer-width: 370px;
+  --account-menu-ease: 360ms cubic-bezier(.22, .78, .18, 1);
+}
+
+body:not(.auth-locked) .account-tab {
+  position: fixed !important;
+  inset: 10px auto auto 8px !important;
+  z-index: 1602 !important;
+  overflow: visible !important;
+  border: 1px solid #e4c273 !important;
+  border-radius: 13px !important;
+  transform: none !important;
+  transition: transform var(--account-menu-ease), box-shadow var(--account-menu-ease), background var(--account-menu-ease) !important;
+}
+
+body:not(.auth-locked) .account-tab::after {
+  left: -8px !important;
+  border-radius: 0 4px 4px 0;
+}
+
+body:not(.auth-locked).menu-expanded .account-tab {
+  transform: rotate(90deg) scale(1.04) !important;
+  background: linear-gradient(145deg, #0f766e, #073f3b) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .34) !important;
+}
+
+body:not(.auth-locked) .auth-drawer,
+body:not(.auth-locked) .auth-drawer[hidden] {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: var(--account-drawer-width) !important;
+  max-width: calc(100vw - 70px) !important;
+  transform: translate3d(-104%, 0, 0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+  will-change: transform;
+  transition: transform var(--account-menu-ease), opacity 220ms ease, visibility 0s linear 360ms !important;
+}
+
+body:not(.auth-locked):not(.menu-expanded) .auth-drawer,
+body:not(.auth-locked):not(.menu-expanded) .auth-drawer[hidden] {
+  display: block !important;
+  width: var(--account-drawer-width) !important;
+  max-width: calc(100vw - 70px) !important;
+  transform: translate3d(-104%, 0, 0) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-drawer,
+body:not(.auth-locked).menu-expanded .auth-drawer[hidden],
+body:not(.auth-locked).menu-expanded .auth-drawer:hover {
+  display: block !important;
+  width: var(--account-drawer-width) !important;
+  max-width: calc(100vw - 70px) !important;
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto !important;
+  transition: transform var(--account-menu-ease), opacity 220ms ease, visibility 0s !important;
+}
+
+body:not(.auth-locked) .app-shell {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translate3d(0, 0, 0);
+  transform-origin: top left;
+  transition: width var(--account-menu-ease), margin-left var(--account-menu-ease), transform var(--account-menu-ease), filter var(--account-menu-ease) !important;
+}
+
+@media (min-width: 768px) {
+  body:not(.auth-locked).menu-expanded .app-shell {
+    width: calc(100% - var(--account-drawer-width)) !important;
+    margin-left: var(--account-drawer-width) !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1050px) {
+  :root { --account-drawer-width: min(38vw, 320px); }
+}
+
+@media (max-width: 767px) {
+  :root { --account-drawer-width: min(72vw, 292px); }
+  body:not(.auth-locked) .account-tab {
+    inset: 8px auto auto 8px !important;
+    border-radius: 12px !important;
+  }
+  body:not(.auth-locked) .auth-drawer,
+  body:not(.auth-locked) .auth-drawer[hidden],
+  body:not(.auth-locked).menu-expanded .auth-drawer,
+  body:not(.auth-locked).menu-expanded .auth-drawer[hidden] {
+    width: var(--account-drawer-width) !important;
+    max-width: var(--account-drawer-width) !important;
+  }
+  body:not(.auth-locked).menu-expanded {
+    overflow-x: hidden;
+  }
+  body:not(.auth-locked).menu-expanded .app-shell {
+    width: 100% !important;
+    margin-left: var(--account-drawer-width) !important;
+    transform: scale(.28);
+    filter: saturate(.75) brightness(.88);
+  }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  body:not(.auth-locked).menu-expanded .app-shell { transform: scale(.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(.auth-locked) .account-tab,
+  body:not(.auth-locked) .auth-drawer,
+  body:not(.auth-locked) .app-shell { transition-duration: .01ms !important; }
+}
