@@ -3572,6 +3572,29 @@ body, body.auth-locked { background: var(--bg); color: var(--ink); }
   font-size:.72rem;
   font-weight:950;
 }
+
+/* Account menu: let every gold pictogram fill its teal tile consistently. */
+body:not(.auth-locked).menu-expanded .auth-actions .menu-3d-icon,
+body:not(.auth-locked).menu-expanded .auth-actions .history-panel-summary::before,
+body:not(.auth-locked).menu-expanded .auth-actions .drawer-tool-summary::before,
+body:not(.auth-locked).menu-expanded .auth-actions .logout-menu-button::before {
+  font-size:2.2rem !important;
+  line-height:1 !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-actions .history-panel-summary::before,
+body:not(.auth-locked).menu-expanded .auth-actions .drawer-tool-summary::before,
+body:not(.auth-locked).menu-expanded .auth-actions .logout-menu-button::before {
+  font-size:2.3rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-actions .advisory-links-menu-button .menu-3d-icon {
+  font-size:2.35rem !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-actions .free-version-link .menu-3d-icon {
+  font-size:1rem !important;
+}
 .inventory-notification-button.is-enabled {
   border-color:#0f8f84;
   background:#dff8ef;

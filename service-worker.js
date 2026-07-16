@@ -1,9 +1,9 @@
-const CACHE_NAME = "park-pricing-v174-advisory-public-load";
+const CACHE_NAME = "park-pricing-v175-larger-menu-glyphs";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
-  "./styles.css?v=116",
+  "./styles.css?v=117",
   "./feng-shui.css?v=8",
   "./advisory-links.css?v=1",
   "./advisory-links.js?v=1",
