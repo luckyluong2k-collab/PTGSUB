@@ -1,0 +1,32 @@
+import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { doc, getDoc, getFirestore, increment, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = { apiKey:"AIzaSyAZ1CS05a7rCubn5AtDvTnh6pATMUN0agI",authDomain:"ptg-sub.firebaseapp.com",projectId:"ptg-sub",storageBucket:"ptg-sub.firebasestorage.app",messagingSenderId:"32845891728",appId:"1:32845891728:web:8d166bcb2ba2eaccb3b015",measurementId:"G-HJYWPVSERF" };
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const loading = document.getElementById("adviceLoading");
+const errorBox = document.getElementById("adviceError");
+const content = document.getElementById("adviceContent");
+
+function text(value, fallback = "Chưa cập nhật") { const result=String(value??"").trim(); return result||fallback; }
+function timestampMs(value){return value?.toMillis?.()||Number(value?.seconds||0)*1000||0}
+function dateTime(value){const ms=timestampMs(value);return ms?new Date(ms).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}):"—"}
+function tokenFromUrl(){const path=decodeURIComponent(location.pathname).split("/").filter(Boolean);const value=path[0]==="tu-van"?path[1]:new URLSearchParams(location.search).get("id");return /^[A-Za-z0-9_-]{32,80}$/.test(value||"")?value:""}
+function setText(id,value){const node=document.getElementById(id);if(node)node.textContent=value}
+function showError(message){loading.hidden=true;content.hidden=true;errorBox.hidden=false;setText("adviceErrorText",message)}
+
+function fact(label,value){const item=document.createElement("div");item.className="advice-fact";const span=document.createElement("span");const strong=document.createElement("strong");span.textContent=label;strong.textContent=text(value);item.append(span,strong);return item}
+function renderUnit(unit,index){const card=document.createElement("article");card.className=`advice-unit${index===0?" primary":""}`;const head=document.createElement("div");head.className="advice-unit-head";const title=document.createElement("div");const label=document.createElement("span");const code=document.createElement("h3");label.textContent=index===0?"Căn đề xuất chính":`Phương án ${index+1}`;code.textContent=text(unit.code);title.append(label,code);head.appendChild(title);if(index===0){const badge=document.createElement("b");badge.textContent="ƯU TIÊN";head.appendChild(badge)}
+  const price=document.createElement("div");price.className="advice-price";const priceLabel=document.createElement("span");const priceValue=document.createElement("strong");priceLabel.textContent="Giá tại thời điểm tạo link";priceValue.textContent=text(unit.totalPrice,"Liên hệ sale cập nhật");price.append(priceLabel,priceValue);
+  const upfront=document.createElement("p");upfront.className="advice-upfront";const upfrontLabel=document.createElement("strong");upfrontLabel.textContent="Trả trước: ";upfront.append(upfrontLabel,document.createTextNode(text(unit.upfrontPrice,"Theo phương án thanh toán")));
+  const facts=document.createElement("div");facts.className="advice-facts";facts.append(fact("Loại căn",unit.unitType),fact("Diện tích",unit.areaText),fact("Tầng",unit.floor),fact("View",unit.view),fact("Hướng",unit.direction),fact("Phương án",unit.scenario));card.append(head,price,upfront,facts);return card}
+
+function render(data){setText("adviceCustomer",text(data.customerAlias,"Khách hàng"));setText("adviceOwner",text(data.ownerName,"Đức Lương Sun Group"));setText("adviceMeta",`Tạo lúc ${dateTime(data.createdAt)} · Hết hạn ${dateTime(data.expiresAt)}`);const change=document.getElementById("adviceChange");change.className="advice-change";let title="Thông tin đang còn hiệu lực";let message=text(data.changeMessage,"Thông tin được ghi nhận tại thời điểm tạo link.");if(data.revoked){change.classList.add("danger");title="Link này đã được thu hồi";message="Chỉ chủ link đang đăng nhập mới xem được bản lưu này."}else if(timestampMs(data.expiresAt)<=Date.now()){change.classList.add("danger");title="Link này đã hết hạn";message="Chỉ chủ link đang đăng nhập mới xem được bản lưu này."}else if(data.changeState==="price_changed"){change.classList.add("warning");title="Giá hoặc chính sách đã thay đổi"}else if(data.changeState==="unit_unavailable"){change.classList.add("danger");title="Tình trạng căn cần được kiểm tra lại"}else if(data.changeState==="unchecked"){change.classList.add("warning");title="Đang chờ đối chiếu bảng hàng"}setText("adviceChangeTitle",title);setText("adviceChangeMessage",message);const units=document.getElementById("adviceUnits");units.textContent="";(Array.isArray(data.units)?data.units:[]).slice(0,3).forEach((unit,index)=>units.appendChild(renderUnit(unit,index)));loading.hidden=true;errorBox.hidden=true;content.hidden=false;document.title=`${text(data.customerAlias,"Hồ sơ tư vấn")} · ${text(data.primaryUnitCode,"")}`}
+
+async function registerView(id){const key=`ptgsub-advisory-view-${id}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");try{await updateDoc(doc(db,"advisoryLinks",id),{viewCount:increment(1),lastViewedAt:serverTimestamp(),updatedAt:serverTimestamp()})}catch{sessionStorage.removeItem(key)}}
+
+function waitForAuth(){return new Promise((resolve)=>{const stop=onAuthStateChanged(auth,()=>{stop();resolve()})})}
+async function start(){const id=tokenFromUrl();if(!id){showError("Đường dẫn tư vấn không hợp lệ.");return}try{await waitForAuth();const snap=await getDoc(doc(db,"advisoryLinks",id));if(!snap.exists()){showError("Link có thể đã hết hạn hoặc được sale thu hồi.");return}const data=snap.data()||{};render(data);if(!data.revoked&&timestampMs(data.expiresAt)>Date.now())registerView(id)}catch(error){showError(error?.code==="permission-denied"?"Link đã hết hạn, được thu hồi hoặc không còn quyền truy cập.":"Không tải được hồ sơ. Vui lòng kiểm tra kết nối và thử lại.")}}
+start();

@@ -17,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=116">
   <link rel="stylesheet" href="feng-shui.css?v=8">
+  <link rel="stylesheet" href="advisory-links.css?v=1">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -96,6 +97,11 @@
           <summary class="history-panel-summary">Lịch sử căn đã tra</summary>
           <div id="myHistoryList" class="history-list"></div>
         </details>
+
+        <button class="menu-3d-button advisory-links-menu-button" id="advisoryLinksOpenBtn" data-auth-menu type="button" hidden>
+          <span class="menu-3d-icon" aria-hidden="true">&#128279;</span>
+          <span>Link &#273;&#227; g&#7917;i kh&#225;ch</span>
+        </button>
 
         <a class="model-home-link menu-3d-button" id="modelHomeSection" data-auth-menu hidden href="https://drive.google.com/drive/folders/11zfFpF3DPZksh8a5A3my-rQjCDn1I9AO" target="_blank" rel="noopener noreferrer" aria-label="Mở ảnh nhà mẫu trong cửa sổ mới">
           <span class="menu-3d-icon" aria-hidden="true">&#127968;</span>
@@ -704,6 +710,7 @@
   <script src="app.js?v=108"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=86"></script>
+  <script type="module" src="advisory-links.js?v=1"></script>
   <script src="ui-admin-search.js?v=1"></script>
   <script src="ui-menu.js?v=4"></script>
   <script src="ui-payment.js?v=1"></script>

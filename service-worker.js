@@ -1,10 +1,15 @@
-const CACHE_NAME = "park-pricing-v172-compact-menu-rail";
+const CACHE_NAME = "park-pricing-v173-advisory-links";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=116",
   "./feng-shui.css?v=8",
+  "./advisory-links.css?v=1",
+  "./advisory-links.js?v=1",
+  "./tu-van.html",
+  "./tu-van.css?v=1",
+  "./tu-van.js?v=1",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=108",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
@@ -83,7 +88,8 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     const requestUrl = new URL(event.request.url);
     const isForumPage = requestUrl.pathname.endsWith("/forum.html");
-    const cacheKey = isForumPage ? "./forum.html" : "./index.html";
+    const isAdvisoryPage = requestUrl.pathname.endsWith("/tu-van.html") || requestUrl.pathname.startsWith("/tu-van/");
+    const cacheKey = isForumPage ? "./forum.html" : isAdvisoryPage ? "./tu-van.html" : "./index.html";
     event.respondWith(
       fetch(event.request)
         .then((response) => {
