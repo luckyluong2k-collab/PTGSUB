@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=116">
-  <link rel="stylesheet" href="feng-shui.css?v=2">
+  <link rel="stylesheet" href="feng-shui.css?v=3">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -604,74 +604,105 @@
         <div>
           <p>B&#193;T TR&#7840;CH &#183; PHONG TH&#7910;Y</p>
           <h2 id="fengShuiTitle">T&#432; v&#7845;n h&#432;&#7899;ng c&#259;n theo cung m&#7879;nh</h2>
+          <small>C&#259;n v&#7915;a t&#237;nh &#273;&#432;&#7907;c &#273;&#7891;ng b&#7897; t&#7921; &#273;&#7897;ng</small>
         </div>
         <button class="feng-shui-close" id="fengShuiCloseBtn" type="button" aria-label="&#272;&#243;ng B&#225;t tr&#7841;ch - Phong th&#7911;y">&times;</button>
       </header>
 
       <form class="feng-shui-form" id="fengShuiForm">
-        <label>
-          <span>T&#234;n kh&#225;ch <small>(kh&#244;ng b&#7855;t bu&#7897;c)</small></span>
-          <input id="fengShuiCustomerName" type="text" autocomplete="name" placeholder="V&#237; d&#7909;: Anh Minh">
-        </label>
-        <label class="feng-shui-date-field">
-          <span>Ng&#224;y sinh d&#432;&#417;ng l&#7883;ch</span>
-          <span class="feng-shui-date-controls">
-            <input id="fengShuiBirthText" type="text" inputmode="numeric" autocomplete="bday" placeholder="dd/mm/yyyy" maxlength="10" required>
-            <input id="fengShuiBirthPicker" type="date" min="1900-01-01" max="2099-12-31" aria-label="Ch&#7885;n ng&#224;y sinh b&#7857;ng l&#7883;ch">
-          </span>
-        </label>
-        <fieldset>
-          <legend>Gi&#7899;i t&#237;nh</legend>
-          <label><input type="radio" name="fengShuiGender" value="male" checked> Nam</label>
-          <label><input type="radio" name="fengShuiGender" value="female"> N&#7919;</label>
-        </fieldset>
-        <label>
-          <span>M&#227; c&#259;n &#273;ang tra</span>
-          <input id="fengShuiUnitCode" type="text" readonly>
-        </label>
-        <label>
-          <span>H&#432;&#7899;ng c&#259;n</span>
-          <input id="fengShuiUnitDirection" type="text" readonly>
-          <select id="fengShuiManualDirection" aria-label="Ch&#7885;n h&#432;&#7899;ng c&#259;n th&#7911; c&#244;ng" hidden>
-            <option value="">Ch&#7885;n h&#432;&#7899;ng...</option>
-            <option>B&#7855;c</option><option>&#272;&#244;ng B&#7855;c</option><option>&#272;&#244;ng</option><option>&#272;&#244;ng Nam</option>
-            <option>Nam</option><option>T&#226;y Nam</option><option>T&#226;y</option><option>T&#226;y B&#7855;c</option>
-          </select>
-          <small id="fengShuiDirectionHelp"></small>
-        </label>
+        <section class="feng-shui-step feng-shui-customer-step">
+          <header><b>1</b><div><h3>Thông tin khách hàng</h3><p>Chỉ cần ngày sinh và giới tính để tính cung mệnh.</p></div></header>
+          <div class="feng-shui-customer-grid">
+            <label>
+              <span>Tên khách <small>(không bắt buộc)</small></span>
+              <input id="fengShuiCustomerName" type="text" autocomplete="name" placeholder="Ví dụ: Anh Minh">
+            </label>
+            <label class="feng-shui-date-field">
+              <span>Ngày sinh dương lịch</span>
+              <span class="feng-shui-date-controls">
+                <input id="fengShuiBirthText" type="text" inputmode="numeric" autocomplete="bday" placeholder="dd/mm/yyyy" maxlength="10" required>
+                <input id="fengShuiBirthPicker" type="date" min="1900-01-01" max="2099-12-31" aria-label="Chọn ngày sinh bằng lịch">
+              </span>
+            </label>
+            <fieldset>
+              <legend>Giới tính</legend>
+              <label><input type="radio" name="fengShuiGender" value="male" checked> Nam</label>
+              <label><input type="radio" name="fengShuiGender" value="female"> Nữ</label>
+            </fieldset>
+          </div>
+        </section>
+
+        <section class="feng-shui-step feng-shui-unit-step">
+          <header><b>2</b><div><h3>Căn đang tư vấn</h3><p id="fengShuiSyncStatus">Đang đồng bộ từ bảng tính giá...</p></div><span class="feng-shui-live-badge">● LIVE</span></header>
+          <div class="feng-shui-unit-card">
+            <label class="feng-shui-unit-code"><span>Mã căn</span><input id="fengShuiUnitCode" type="text" readonly></label>
+            <div><span>Loại căn</span><strong id="fengShuiUnitType">—</strong></div>
+            <div><span>Diện tích</span><strong id="fengShuiUnitArea">—</strong></div>
+            <div><span>Giá cuối</span><strong id="fengShuiUnitPrice">—</strong></div>
+            <div><span>View</span><strong id="fengShuiUnitView">—</strong></div>
+          </div>
+          <div class="feng-shui-direction-box">
+            <div><span>Hướng căn</span><input id="fengShuiUnitDirection" type="text" readonly><small id="fengShuiDirectionHelp"></small></div>
+            <div class="feng-shui-direction-picker" id="fengShuiDirectionPicker" hidden tabindex="-1" aria-label="Chọn hướng căn thủ công">
+              <span>Chọn nhanh hướng thực tế của căn</span>
+              <div>
+                <button type="button" data-feng-direction="Bắc">Bắc</button><button type="button" data-feng-direction="Đông Bắc">Đông Bắc</button>
+                <button type="button" data-feng-direction="Đông">Đông</button><button type="button" data-feng-direction="Đông Nam">Đông Nam</button>
+                <button type="button" data-feng-direction="Nam">Nam</button><button type="button" data-feng-direction="Tây Nam">Tây Nam</button>
+                <button type="button" data-feng-direction="Tây">Tây</button><button type="button" data-feng-direction="Tây Bắc">Tây Bắc</button>
+              </div>
+            </div>
+            <select id="fengShuiManualDirection" aria-label="Chọn hướng căn thủ công" hidden>
+              <option value="">Chọn hướng...</option><option>Bắc</option><option>Đông Bắc</option><option>Đông</option><option>Đông Nam</option>
+              <option>Nam</option><option>Tây Nam</option><option>Tây</option><option>Tây Bắc</option>
+            </select>
+          </div>
+        </section>
         <p class="feng-shui-error" id="fengShuiError" role="alert"></p>
-        <button class="feng-shui-submit" type="submit">Xem t&#432; v&#7845;n B&#225;t tr&#7841;ch</button>
+        <button class="feng-shui-submit" type="submit">Phân tích căn đang tư vấn</button>
       </form>
 
       <section class="feng-shui-result" id="fengShuiResult" aria-live="polite" hidden>
-        <div class="feng-shui-lunar" id="fengShuiLunar"></div>
+        <div class="feng-shui-result-hero">
+          <div><span id="fengShuiResultCustomer">HỒ SƠ TƯ VẤN</span><h3 id="fengShuiResultHeadline" tabindex="-1"></h3><p id="fengShuiLunar"></p></div>
+          <strong id="fengShuiFitBadge"></strong>
+        </div>
         <div class="feng-shui-result-grid">
           <article><span>Cung m&#7879;nh / ng&#361; h&#224;nh</span><strong id="fengShuiDestiny"></strong></article>
           <article><span>H&#432;&#7899;ng Sinh Kh&#237; t&#7889;t nh&#7845;t</span><strong id="fengShuiBestDirection"></strong></article>
           <article><span>&#272;&#225;nh gi&#225; h&#432;&#7899;ng c&#259;n</span><strong id="fengShuiDirectionVerdict"></strong></article>
         </div>
+        <article class="feng-shui-compass-card">
+          <div><h3>Bản đồ 8 hướng theo cung mệnh</h3><p>Hướng căn được viền vàng; bốn hướng phù hợp được tô xanh.</p></div>
+          <div class="feng-shui-compass" id="fengShuiCompass"></div>
+        </article>
         <article class="feng-shui-advice">
           <h3>&#272;i&#7875;m t&#432; v&#7845;n cho c&#259;n n&#224;y</h3>
           <p id="fengShuiAdvice"></p>
         </article>
         <article class="feng-shui-script">
-          <div><h3>C&#226;u n&#243;i &#273;&#7875; t&#432; v&#7845;n kh&#225;ch</h3><button id="fengShuiCopyBtn" type="button">Sao ch&#233;p</button></div>
+          <div><h3>C&#226;u n&#243;i &#273;&#7875; t&#432; v&#7845;n kh&#225;ch</h3></div>
           <p id="fengShuiSalesScript"></p>
         </article>
-        <p class="feng-shui-disclaimer">Phong th&#7911;y ch&#7881; &#273;&#7875; tham kh&#7843;o. Quy&#7871;t &#273;&#7883;nh mua &#432;u ti&#234;n ph&#225;p l&#253;, gi&#225;, d&#242;ng ti&#7873;n, v&#7883; tr&#237; v&#224; nhu c&#7847;u th&#7921;c t&#7871;; kh&#244;ng c&#243; b&#7843;o &#273;&#7843;m v&#7873; gi&#225; tr&#7883; hay t&#224;i ch&#237;nh.</p>
+        <div class="feng-shui-result-actions">
+          <button id="fengShuiCopyBtn" type="button">Sao chép câu tư vấn</button>
+          <button id="fengShuiPresentBtn" type="button">Trình bày cho khách</button>
+          <button id="fengShuiEditBtn" type="button" hidden>Sửa thông tin</button>
+        </div>
+        <p class="feng-shui-disclaimer">Kết quả đối chiếu cung phi cá nhân với hướng căn trong bảng hàng, không thay thế khảo sát tọa–hướng thực địa. Phong thủy chỉ để tham khảo; quyết định mua ưu tiên pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế, không có bảo đảm về giá trị hay tài chính.</p>
       </section>
     </div>
   </dialog>
 
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
-  <script src="app.js?v=107"></script>
+  <script src="app.js?v=108"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=85"></script>
   <script src="ui-admin-search.js?v=1"></script>
   <script src="ui-menu.js?v=3"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=4"></script>
-  <script src="feng-shui.js?v=1"></script>
+  <script src="feng-shui.js?v=2"></script>
 </body>
 </html>

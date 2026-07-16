@@ -188,12 +188,14 @@
     return "Hướng " + direction + " không nằm trong bốn hướng ưu tiên của cung " + palace.name + ", nhưng không phải yếu tố loại trừ căn. Có thể bố trí bàn làm việc hoặc khu sinh hoạt chính quay về " + assessment.best + " để tăng cảm giác phù hợp; quyết định vẫn nên ưu tiên pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế.";
   }
 
-  function buildSalesScript(name, palace, direction, assessment) {
+  function buildSalesScript(name, palace, direction, assessment, unitLabel, priceText) {
     var salutation = name ? name.trim() : "anh/chị";
+    var subject = unitLabel ? "Căn " + unitLabel : "Căn này";
     var fit = assessment.favorable
-      ? "Căn này hướng " + direction + " thuộc " + assessment.category + " của cung " + palace.name + ", là một điểm cộng phù hợp để " + salutation + " tham khảo."
-      : "Căn này hướng " + direction + " chưa thuộc nhóm hướng ưu tiên của cung " + palace.name + ", nhưng mình có thể bố trí bàn làm việc hoặc khu sinh hoạt theo hướng " + assessment.best + " để hài hòa hơn.";
-    return fit + " Phong thủy chỉ là phần tham khảo; mình vẫn ưu tiên kiểm tra pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế. Nếu các điều kiện đó đã phù hợp, ngày hôm nay là ngày tốt nhất để chốt căn này.";
+      ? subject + " hướng " + direction + " thuộc " + assessment.category + " của cung " + palace.name + ", là một điểm cộng phù hợp để " + salutation + " tham khảo."
+      : subject + " hướng " + direction + " chưa thuộc nhóm hướng ưu tiên của cung " + palace.name + ", nhưng mình có thể bố trí bàn làm việc hoặc khu sinh hoạt theo hướng " + assessment.best + " để hài hòa hơn.";
+    var price = priceText && priceText !== "0" ? " Mức giá đang tính là " + priceText + "." : "";
+    return fit + price + " Phong thủy chỉ là phần tham khảo; mình vẫn ưu tiên kiểm tra pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế. Nếu các điều kiện đó đã phù hợp, ngày hôm nay là ngày tốt nhất để chốt căn này.";
   }
 
   var api = {
@@ -220,43 +222,163 @@
   var unitCode = document.getElementById("fengShuiUnitCode");
   var unitDirection = document.getElementById("fengShuiUnitDirection");
   var manualDirection = document.getElementById("fengShuiManualDirection");
+  var directionPicker = document.getElementById("fengShuiDirectionPicker");
   var directionHelp = document.getElementById("fengShuiDirectionHelp");
   var error = document.getElementById("fengShuiError");
   var result = document.getElementById("fengShuiResult");
   var salesScript = document.getElementById("fengShuiSalesScript");
+  var presentButton = document.getElementById("fengShuiPresentBtn");
+  var editButton = document.getElementById("fengShuiEditBtn");
+  var pricingState = {};
+  var manualDirections = {};
   var lastFocus = null;
 
-  function syncUnit() {
+  function fieldValue(id) {
+    var field = document.getElementById(id);
+    return field ? String(field.value || field.textContent || "").trim() : "";
+  }
+
+  function formatArea(value) {
+    var number = Number(String(value || "").replace(",", "."));
+    return Number.isFinite(number) && number > 0 ? number.toLocaleString("vi-VN", { maximumFractionDigits: 2 }) + " m²" : "Chưa cập nhật";
+  }
+
+  function readPricingState(detail) {
     var source = document.getElementById("unitCode");
-    var code = String(source && source.value || "").trim().toUpperCase();
+    var code = String(detail && detail.unitCode || source && source.value || "").trim().toUpperCase();
     var catalog = root.unitCatalog || {};
-    var rawDirection = catalog[code] && catalog[code].direction || "";
-    var normalized = normalizeDirection(rawDirection);
-    unitCode.value = code || "Chưa chọn căn";
-    unitDirection.value = normalized || "Chưa có hướng trong bảng hàng";
-    manualDirection.hidden = Boolean(normalized);
-    manualDirection.required = !normalized;
-    directionHelp.textContent = normalized ? "Tự động lấy từ bảng hàng." : "Bảng hàng chưa có hướng; vui lòng chọn một trong 8 hướng.";
+    var unit = catalog[code] || {};
+    return {
+      unitCode: code,
+      unitType: String(detail && detail.unitType || fieldValue("unitType") || unit.unitType || ""),
+      area: detail && detail.area || fieldValue("area") || unit.area || unit.landArea || "",
+      totalText: String(detail && detail.totalText || fieldValue("totalPrice") || ""),
+      direction: String(detail && detail.direction || unit.direction || ""),
+      view: String(detail && detail.view || unit.view || ""),
+      scenarioText: String(detail && detail.scenarioText || "")
+    };
+  }
+
+  function selectedDirection() {
+    return normalizeDirection(pricingState.direction) || normalizeDirection(manualDirections[pricingState.unitCode]);
+  }
+
+  function syncDirectionButtons(direction) {
+    directionPicker.querySelectorAll("[data-feng-direction]").forEach(function (button) {
+      button.classList.toggle("is-selected", button.dataset.fengDirection === direction);
+      button.setAttribute("aria-pressed", String(button.dataset.fengDirection === direction));
+    });
+  }
+
+  function syncUnit(detail) {
+    pricingState = readPricingState(detail);
+    var catalogDirection = normalizeDirection(pricingState.direction);
+    var chosenDirection = catalogDirection || normalizeDirection(manualDirections[pricingState.unitCode]);
+    unitCode.value = pricingState.unitCode || "Chưa chọn căn";
+    document.getElementById("fengShuiUnitType").textContent = pricingState.unitType || "Chưa cập nhật";
+    document.getElementById("fengShuiUnitArea").textContent = formatArea(pricingState.area);
+    document.getElementById("fengShuiUnitPrice").textContent = pricingState.totalText && pricingState.totalText !== "0" ? pricingState.totalText : "Đang tính";
+    document.getElementById("fengShuiUnitView").textContent = pricingState.view || "Chưa cập nhật";
+    unitDirection.value = chosenDirection || "Chưa có hướng trong bảng hàng";
+    manualDirection.value = chosenDirection || "";
+    directionPicker.hidden = Boolean(catalogDirection);
+    directionHelp.textContent = catalogDirection
+      ? "Đã lấy tự động từ bảng hàng; nên xác nhận quy ước hướng với mặt bằng."
+      : chosenDirection
+        ? "Hướng do sale chọn thủ công cho căn này."
+        : "Bảng hàng chưa có hướng — chọn một trong 8 hướng bên dưới.";
+    document.getElementById("fengShuiSyncStatus").textContent = pricingState.unitCode
+      ? "Đã liên kết với kết quả tính giá hiện tại"
+      : "Hãy chọn căn ở bảng tính giá";
+    syncDirectionButtons(chosenDirection);
+    if (!result.hidden && parseSolarDate(birthText.value) && chosenDirection) analyze(false);
   }
 
   function openDialog() {
     lastFocus = document.activeElement;
+    dialog.classList.remove("is-presenting");
+    presentButton.hidden = false;
+    editButton.hidden = true;
     syncUnit();
     error.textContent = "";
     if (typeof dialog.showModal === "function") dialog.showModal();
     else dialog.setAttribute("open", "");
     setTimeout(function () { birthText.focus(); }, 0);
   }
+
   function closeDialog() {
+    dialog.classList.remove("is-presenting");
     if (dialog.open && typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
     if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+  }
+
+  function renderCompass(palace, currentDirection) {
+    var compass = document.getElementById("fengShuiCompass");
+    var entries = AUSPICIOUS[palace.name];
+    compass.innerHTML = "";
+    DIRECTIONS.forEach(function (direction) {
+      var item = document.createElement("div");
+      var category = entries[direction] || "Không ưu tiên";
+      item.className = "feng-shui-compass-item" + (entries[direction] ? " is-favorable" : "") + (direction === currentDirection ? " is-current" : "");
+      var name = document.createElement("strong");
+      var note = document.createElement("span");
+      name.textContent = direction;
+      note.textContent = category;
+      item.append(name, note);
+      compass.appendChild(item);
+    });
+  }
+
+  function analyze(shouldScroll) {
+    error.textContent = "";
+    var solar = parseSolarDate(birthText.value);
+    if (!solar) { error.textContent = "Vui lòng nhập ngày sinh hợp lệ theo định dạng dd/mm/yyyy (1900–2099)."; birthText.focus(); return false; }
+    var direction = selectedDirection();
+    if (!direction) { error.textContent = "Vui lòng chọn hướng thực tế của căn."; directionPicker.focus(); return false; }
+    var gender = form.querySelector('input[name="fengShuiGender"]:checked').value;
+    var lunar = api.solarToLunar(solar.day, solar.month, solar.year);
+    var palace = calculatePalace(lunar.year, gender);
+    var assessment = directionAssessment(palace, direction);
+    var name = document.getElementById("fengShuiCustomerName").value;
+    var customerLabel = name.trim() || "Khách hàng";
+    var unitLabel = pricingState.unitCode || "căn đang tư vấn";
+    document.getElementById("fengShuiResultCustomer").textContent = customerLabel.toUpperCase() + " · " + unitLabel;
+    document.getElementById("fengShuiResultHeadline").textContent = unitLabel + " · hướng " + direction;
+    document.getElementById("fengShuiFitBadge").textContent = assessment.favorable
+      ? (assessment.category === "Sinh Khí" || assessment.category === "Thiên Y" ? "RẤT PHÙ HỢP" : "PHÙ HỢP")
+      : "CÓ THỂ CÂN BẰNG";
+    document.getElementById("fengShuiFitBadge").classList.toggle("is-balanced", !assessment.favorable);
+    document.getElementById("fengShuiLunar").textContent = "Âm lịch Việt Nam (UTC+7): " + String(lunar.day).padStart(2, "0") + "/" + String(lunar.month).padStart(2, "0") + "/" + lunar.year + (lunar.leap ? " · tháng nhuận" : "");
+    document.getElementById("fengShuiDestiny").textContent = "Cung " + palace.name + " · hành " + palace.element;
+    document.getElementById("fengShuiBestDirection").textContent = assessment.best;
+    document.getElementById("fengShuiDirectionVerdict").textContent = direction + " · " + assessment.category;
+    document.getElementById("fengShuiAdvice").textContent = buildAdvice(name, palace, direction, assessment);
+    salesScript.textContent = buildSalesScript(name, palace, direction, assessment, unitLabel, pricingState.totalText);
+    renderCompass(palace, direction);
+    result.hidden = false;
+    if (shouldScroll !== false) result.scrollIntoView({ behavior: "smooth", block: "start" });
+    return true;
   }
 
   openButton.addEventListener("click", openDialog);
   closeButton.addEventListener("click", closeDialog);
   dialog.addEventListener("click", function (event) { if (event.target === dialog) closeDialog(); });
   dialog.addEventListener("cancel", function (event) { event.preventDefault(); closeDialog(); });
+  root.addEventListener("ptgsub:pricing-updated", function (event) { syncUnit(event.detail || {}); });
+  ["unitCode", "unitType", "area"].forEach(function (id) {
+    var source = document.getElementById(id);
+    if (!source) return;
+    source.addEventListener("input", function () { syncUnit(); });
+    source.addEventListener("change", function () { syncUnit(); });
+  });
+
+  directionPicker.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-feng-direction]");
+    if (!button) return;
+    manualDirections[pricingState.unitCode] = button.dataset.fengDirection;
+    syncUnit();
+  });
 
   birthText.addEventListener("input", function () {
     var digits = birthText.value.replace(/\D/g, "").slice(0, 8);
@@ -268,32 +390,27 @@
     birthText.value = parts[2] + "/" + parts[1] + "/" + parts[0];
   });
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    error.textContent = "";
-    var solar = parseSolarDate(birthText.value);
-    if (!solar) { error.textContent = "Vui lòng nhập ngày sinh hợp lệ theo định dạng dd/mm/yyyy (1900–2099)."; birthText.focus(); return; }
-    var direction = normalizeDirection(unitDirection.value) || normalizeDirection(manualDirection.value);
-    if (!direction) { error.textContent = "Vui lòng chọn hướng căn."; manualDirection.focus(); return; }
-    var gender = form.querySelector('input[name="fengShuiGender"]:checked').value;
-    var lunar = api.solarToLunar(solar.day, solar.month, solar.year);
-    var palace = calculatePalace(lunar.year, gender);
-    var assessment = directionAssessment(palace, direction);
-    var name = document.getElementById("fengShuiCustomerName").value;
-    document.getElementById("fengShuiLunar").textContent = "Âm lịch Việt Nam (UTC+7): " + String(lunar.day).padStart(2, "0") + "/" + String(lunar.month).padStart(2, "0") + "/" + lunar.year + (lunar.leap ? " · tháng nhuận" : "");
-    document.getElementById("fengShuiDestiny").textContent = "Cung " + palace.name + " · hành " + palace.element;
-    document.getElementById("fengShuiBestDirection").textContent = assessment.best;
-    document.getElementById("fengShuiDirectionVerdict").textContent = direction + " · " + assessment.category;
-    document.getElementById("fengShuiAdvice").textContent = buildAdvice(name, palace, direction, assessment);
-    salesScript.textContent = buildSalesScript(name, palace, direction, assessment);
-    result.hidden = false;
-    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  form.addEventListener("submit", function (event) { event.preventDefault(); analyze(true); });
+
+  presentButton.addEventListener("click", function () {
+    dialog.classList.add("is-presenting");
+    presentButton.hidden = true;
+    editButton.hidden = false;
+    var card = dialog.querySelector(".feng-shui-card");
+    if (card) card.scrollTo({ top: 0, behavior: "auto" });
+    document.getElementById("fengShuiResultHeadline").focus({ preventScroll: true });
+  });
+  editButton.addEventListener("click", function () {
+    dialog.classList.remove("is-presenting");
+    presentButton.hidden = false;
+    editButton.hidden = true;
+    birthText.focus();
   });
 
   document.getElementById("fengShuiCopyBtn").addEventListener("click", function () {
     var text = salesScript.textContent;
-    var done = function () { var button = document.getElementById("fengShuiCopyBtn"); button.textContent = "Đã sao chép"; setTimeout(function () { button.textContent = "Sao chép"; }, 1600); };
-    if (navigator.clipboard && root.isSecureContext) navigator.clipboard.writeText(text).then(done);
+    var done = function () { var button = document.getElementById("fengShuiCopyBtn"); button.textContent = "Đã sao chép"; setTimeout(function () { button.textContent = "Sao chép câu tư vấn"; }, 1600); };
+    if (navigator.clipboard && root.isSecureContext) navigator.clipboard.writeText(text).then(done).catch(function () {});
     else {
       var area = document.createElement("textarea"); area.value = text; document.body.appendChild(area); area.select(); document.execCommand("copy"); area.remove(); done();
     }

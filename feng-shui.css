@@ -236,3 +236,116 @@ body:not(.auth-locked) .app-shell {
   .topbar .feng-shui-trigger { grid-column: 1 / -1; }
   body:not(.auth-locked).menu-expanded .auth-drawer { padding-top: 8px !important; }
 }
+
+/* Client advisor workspace */
+.feng-shui-dialog { width: min(1120px, calc(100vw - 24px)); }
+.feng-shui-head small { display:block; margin-top:5px; color:#c8dcd8; font-size:.78rem; font-weight:700; }
+.feng-shui-form { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); align-items:start; }
+.feng-shui-step {
+  display:grid;
+  gap:16px;
+  min-width:0;
+  padding:18px;
+  border:1px solid #b6d0cc;
+  border-radius:17px;
+  background:rgba(255,255,255,.84);
+  box-shadow:0 12px 28px rgba(15,56,51,.08);
+}
+.feng-shui-step > header { display:flex; align-items:flex-start; gap:11px; }
+.feng-shui-step > header > b {
+  display:grid;
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  place-items:center;
+  border-radius:10px;
+  background:#0f766e;
+  color:#fff;
+  box-shadow:0 4px 0 #07564f;
+}
+.feng-shui-step > header h3,
+.feng-shui-step > header p { margin:0; }
+.feng-shui-step > header h3 { color:#17443f; font-size:1rem; }
+.feng-shui-step > header p { margin-top:2px; color:#60736f; font-size:.76rem; line-height:1.4; }
+.feng-shui-live-badge { margin-left:auto; padding:5px 8px; border-radius:999px; background:#dcf8ef; color:#087267; font-size:.65rem; font-weight:950; letter-spacing:.06em; white-space:nowrap; }
+.feng-shui-customer-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:13px; }
+.feng-shui-customer-grid > label { display:grid; gap:7px; }
+.feng-shui-customer-grid fieldset { grid-template-columns:1fr 1fr; }
+.feng-shui-customer-grid fieldset legend { grid-column:1 / -1; }
+.feng-shui-unit-card { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.feng-shui-unit-card > div,
+.feng-shui-unit-code { display:grid; gap:4px; min-width:0; padding:11px 12px; border:1px solid #c3d8d4; border-radius:12px; background:#f7fbfa; }
+.feng-shui-unit-card > div > span,
+.feng-shui-unit-code > span { color:#60736f; font-size:.68rem; font-weight:850; text-transform:uppercase; }
+.feng-shui-unit-card strong { color:#0b5f58; overflow-wrap:anywhere; }
+.feng-shui-unit-code { grid-column:1 / -1; }
+.feng-shui-unit-code input { min-height:32px !important; padding:0 !important; border:0 !important; background:transparent !important; color:#0b5f58 !important; font-size:1.24rem !important; font-weight:950 !important; }
+.feng-shui-direction-box { display:grid; gap:10px; padding-top:2px; }
+.feng-shui-direction-box > div:first-child { display:grid; gap:6px; }
+.feng-shui-direction-box > div:first-child > span { color:#17443f; font-size:.82rem; font-weight:900; }
+.feng-shui-direction-picker { display:grid; gap:8px; }
+.feng-shui-direction-picker > span { color:#76500d; font-size:.75rem; font-weight:850; }
+.feng-shui-direction-picker > div { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.feng-shui-direction-picker button { min-height:38px; padding:6px; border:1px solid #b99750; border-radius:9px; background:#fffaf0; color:#65430a; cursor:pointer; font:inherit; font-size:.72rem; font-weight:850; }
+.feng-shui-direction-picker button.is-selected { border-color:#0f766e; background:#0f766e; color:#fff; box-shadow:0 3px 0 #07564f; }
+.feng-shui-form > .feng-shui-error,
+.feng-shui-form > .feng-shui-submit { grid-column:1 / -1; }
+.feng-shui-form > .feng-shui-error { min-height:0; }
+
+.feng-shui-result-hero { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px; border:1px solid #d1ab58; border-radius:16px; background:linear-gradient(135deg,#0b635c,#123e46); color:#fff; box-shadow:0 12px 28px rgba(8,63,60,.2); }
+.feng-shui-result-hero span { color:#f5d994; font-size:.7rem; font-weight:950; letter-spacing:.1em; }
+.feng-shui-result-hero h3 { margin:3px 0; font-size:clamp(1.22rem,3vw,1.65rem); }
+.feng-shui-result-hero p { margin:0; color:#d7e7e4; font-size:.8rem; }
+.feng-shui-result-hero > strong { flex:0 0 auto; max-width:180px; padding:10px 12px; border:1px solid #9ce2d8; border-radius:12px; background:#dff9f3; color:#087267; font-size:.78rem; text-align:center; }
+.feng-shui-result-hero > strong.is-balanced { border-color:#e4c273; background:#fff5d8; color:#76500d; }
+.feng-shui-compass-card { display:grid; grid-template-columns:minmax(190px,.38fr) minmax(0,1fr); gap:14px; padding:15px; border:1px solid #b6d0cc; border-radius:14px; background:rgba(255,255,255,.92); }
+.feng-shui-compass-card h3,
+.feng-shui-compass-card p { margin:0; }
+.feng-shui-compass-card h3 { color:#17443f; font-size:1rem; }
+.feng-shui-compass-card p { margin-top:5px; color:#60736f; font-size:.76rem; line-height:1.45; }
+.feng-shui-compass { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.feng-shui-compass-item { display:grid; gap:2px; min-width:0; padding:9px; border:1px solid #cbd8d5; border-radius:10px; background:#f3f6f5; color:#61726e; text-align:center; }
+.feng-shui-compass-item strong { font-size:.78rem; }
+.feng-shui-compass-item span { font-size:.62rem; font-weight:750; }
+.feng-shui-compass-item.is-favorable { border-color:#75bdb3; background:#e6f7f3; color:#08675f; }
+.feng-shui-compass-item.is-current { outline:3px solid #d7b46a; outline-offset:1px; box-shadow:0 6px 14px rgba(109,75,11,.18); }
+.feng-shui-result-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.feng-shui-result-actions button { min-height:45px; padding:9px 12px; border:1px solid #0f766e; border-radius:11px; background:#0f766e; color:#fff; cursor:pointer; font:inherit; font-weight:900; }
+.feng-shui-result-actions button:nth-child(2),
+.feng-shui-result-actions button:nth-child(3) { border-color:#b68b31; background:#fff5d8; color:#6c3d06; }
+.feng-shui-dialog.is-presenting { width:min(1040px,calc(100vw - 20px)); }
+.feng-shui-dialog.is-presenting .feng-shui-form { display:none; }
+.feng-shui-dialog.is-presenting .feng-shui-result { padding-top:20px; }
+.feng-shui-dialog.is-presenting .feng-shui-result-hero { padding:24px; }
+.feng-shui-dialog.is-presenting .feng-shui-result-hero h3 { font-size:clamp(1.5rem,4vw,2.1rem); }
+
+body.theme-dark .feng-shui-step,
+body.theme-dark .feng-shui-compass-card { border-color:#527b75; background:#0e343d; color:#fff; }
+body.theme-dark .feng-shui-step > header h3,
+body.theme-dark .feng-shui-compass-card h3,
+body.theme-dark .feng-shui-direction-box > div:first-child > span { color:#f5d994; }
+body.theme-dark .feng-shui-step > header p,
+body.theme-dark .feng-shui-compass-card p { color:#bdd0cc; }
+body.theme-dark .feng-shui-unit-card > div,
+body.theme-dark .feng-shui-unit-code { border-color:#527b75; background:#09262e; }
+body.theme-dark .feng-shui-unit-card strong,
+body.theme-dark .feng-shui-unit-code input { color:#7ce0d4 !important; }
+body.theme-dark .feng-shui-compass-item { border-color:#49676a; background:#102c34; color:#b7c8c5; }
+body.theme-dark .feng-shui-compass-item.is-favorable { border-color:#3fa99c; background:#103f43; color:#8be5da; }
+
+@media (max-width: 760px) {
+  .feng-shui-dialog { width:calc(100vw - 8px); max-height:calc(100dvh - 8px); }
+  .feng-shui-card { max-height:calc(100dvh - 8px); }
+  .feng-shui-form { grid-template-columns:minmax(0,1fr); padding:12px; }
+  .feng-shui-step { padding:14px; }
+  .feng-shui-direction-picker > div { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .feng-shui-result { padding:0 12px 14px; }
+  .feng-shui-result-hero { align-items:flex-start; padding:15px; }
+  .feng-shui-result-hero > strong { max-width:122px; padding:8px; font-size:.66rem; }
+  .feng-shui-compass-card { grid-template-columns:minmax(0,1fr); }
+  .feng-shui-compass { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .feng-shui-result-actions { grid-template-columns:minmax(0,1fr); }
+  .feng-shui-dialog.is-presenting .feng-shui-head p,
+  .feng-shui-dialog.is-presenting .feng-shui-head small { display:none; }
+  .feng-shui-dialog.is-presenting .feng-shui-head { padding-block:10px; }
+}

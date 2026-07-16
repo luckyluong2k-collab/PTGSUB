@@ -3881,6 +3881,23 @@ function render() {
   renderTtsChart();
 
   lastQuoteText = makeQuoteText(result);
+  const currentUnitCode = normalizeUnitCode(els.unitCode.value);
+  const currentCatalogUnit = unitCatalog[currentUnitCode] || {};
+  window.dispatchEvent(new CustomEvent("ptgsub:pricing-updated", {
+    detail: {
+      unitCode: currentUnitCode,
+      unitType: result.unitType,
+      area: result.area,
+      total: result.total,
+      totalText: money(result.total),
+      scenario: result.scenario,
+      scenarioText: scenarioLabel(result.scenario, result.policy),
+      direction: currentCatalogUnit.direction || "",
+      view: currentCatalogUnit.view || "",
+      tower: unitTower(currentCatalogUnit, currentUnitCode),
+      floor: unitFloor(currentCatalogUnit, currentUnitCode),
+    },
+  }));
 }
 
 function makeQuoteText(result) {
