@@ -7505,3 +7505,37 @@ body:not(.auth-locked) .summary-band {
   body:not(.auth-locked) .summary-band { top:0 !important; }
   .dashboard-rail-right > .panel > .result-list { grid-auto-rows:auto; }
 }
+
+
+/* Keep a clear, tappable close control inside the expanded account menu. */
+body:not(.auth-locked).menu-expanded .auth-card > .auth-close {
+  position:absolute !important;
+  top:13px !important;
+  right:13px !important;
+  z-index:5 !important;
+  display:grid !important;
+  width:42px !important;
+  height:42px !important;
+  padding:0 !important;
+  place-items:center !important;
+  border:1px solid #c9a753 !important;
+  border-radius:12px !important;
+  background:linear-gradient(145deg,#0f766e,#09554f) !important;
+  color:#ffe39a !important;
+  -webkit-text-fill-color:#ffe39a !important;
+  box-shadow:0 7px 16px rgba(0,0,0,.2) !important;
+  font-size:1.7rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+body:not(.auth-locked).menu-expanded .auth-card > h1 {
+  padding-right:52px !important;
+}
+
+/* Keep the right-hand tables compact and grouped at the top. */
+@media (min-width:1051px) {
+  .dashboard-rail-right {
+    grid-template-rows:auto auto !important;
+    align-content:start !important;
+    align-self:start !important;
