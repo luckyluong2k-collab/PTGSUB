@@ -528,7 +528,7 @@ service cloud.firestore {
       allow list: if signedIn() && (isAdmin() || resource.data.ownerUid == request.auth.uid);
 
       allow create: if hasActiveForumAccess()
-        && linkId.size() >= 32
+        && linkId.size() >= 8
         && linkId.size() <= 80
         && validAdvisoryLinkShape()
         && request.resource.data.ownerUid == request.auth.uid
