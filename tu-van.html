@@ -11,7 +11,7 @@
   <meta property="og:description" content="Thông tin căn, phương án thanh toán và liên hệ sale.">
   <meta property="og:type" content="website">
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/tu-van.css?v=5">
+  <link rel="stylesheet" href="/tu-van.css?v=6">
 </head>
 <body>
   <main class="advice-page">
@@ -33,8 +33,8 @@
       <div class="advice-offer-layout">
         <div class="advice-units" id="adviceUnits"></div>
         <section class="advice-visuals" id="adviceVisuals" aria-label="Hình ảnh vị trí căn" hidden>
-          <article><div><strong>Ảnh tổng thể</strong><span>Vị trí căn trong toàn khu</span></div><canvas id="adviceOverviewMap"></canvas></article>
-          <article><div><strong>Ảnh chỉ căn</strong><span>Phóng lớn đúng vị trí căn</span></div><canvas id="adviceUnitMap"></canvas></article>
+          <article class="advice-visual-card" id="adviceOverviewCard" hidden><div><strong>Ảnh tổng thể</strong><span>Vị trí căn trong toàn khu</span></div><canvas id="adviceOverviewMap"></canvas></article>
+          <article class="advice-visual-card" id="adviceUnitCard" hidden><div><strong>Ảnh chỉ căn</strong><span id="adviceUnitImageNote">Ảnh đúng mã căn từ bảng hàng</span></div><img id="adviceUnitImage" alt="" loading="lazy" hidden><canvas id="adviceUnitMap" hidden></canvas></article>
         </section>
         <p class="advice-map-empty" id="adviceMapEmpty" hidden>Chưa có tọa độ mặt bằng cho căn này.</p>
       </div>
@@ -55,6 +55,7 @@
       <p class="advice-disclaimer">Giá và tình trạng căn được ghi nhận tại thời điểm tạo link, có thể thay đổi theo bảng hàng và chính sách. Thông tin phong thủy nếu có chỉ để tham khảo; quyết định mua ưu tiên pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế. Nội dung này không phải cam kết giữ căn hoặc bảo đảm tài chính.</p>
     </section>
   </main>
-  <script type="module" src="/tu-van.js?v=5"></script>
+  <script src="/unit-image-data.js?v=1"></script>
+  <script type="module" src="/tu-van.js?v=6"></script>
 </body>
 </html>

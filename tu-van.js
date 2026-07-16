@@ -27,8 +27,74 @@ function renderUnit(unit,index){const card=document.createElement("article");car
 function drawMapRect(ctx,rect,scaleX,scaleY,offsetX=0,offsetY=0,{fill="rgba(255,230,0,.5)",stroke="#e32626",lineWidth=5}={}){if(!rect)return;const x=(rect.x-offsetX)*scaleX;const y=(rect.y-offsetY)*scaleY;const width=Math.max(5,rect.width*scaleX);const height=Math.max(5,rect.height*scaleY);ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.fillRect(x,y,width,height);ctx.strokeRect(x,y,width,height);return{x,y,width,height}}
 function drawUnitBadge(ctx,code,mark){if(!mark)return;const label=text(code,"Căn");ctx.save();ctx.font="800 22px system-ui,sans-serif";const width=Math.min(260,Math.max(105,ctx.measureText(label).width+32));const x=Math.max(8,Math.min(mark.x+mark.width+10,ctx.canvas.width-width-8));const y=Math.max(8,Math.min(mark.y-42,ctx.canvas.height-42));ctx.fillStyle="rgba(5,75,72,.94)";ctx.fillRect(x,y,width,34);ctx.fillStyle="#ffe07b";ctx.fillText(label,x+16,y+24);ctx.restore()}
 function loadMapImage(src){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=src})}
-async function renderPrimaryUnitMaps(unit){const visuals=document.getElementById("adviceVisuals");const empty=document.getElementById("adviceMapEmpty");visuals.hidden=true;empty.hidden=true;const map=unit?.map;const allowed=new Set(["phankhupark-map.png","lowrise-map-sharp.jpg","lienke-preview.png"]);if(!map||!allowed.has(map.image)||!map.crop||!map.unitRect){empty.hidden=false;return}try{const image=await loadMapImage(`/${map.image}`);const overview=document.getElementById("adviceOverviewMap");const overviewScale=Math.min(1,1100/image.width);overview.width=Math.max(1,Math.round(image.width*overviewScale));overview.height=Math.max(1,Math.round(image.height*overviewScale));const overviewCtx=overview.getContext("2d");overviewCtx.drawImage(image,0,0,overview.width,overview.height);if(map.towerRect)drawMapRect(overviewCtx,map.towerRect,overview.width/image.width,overview.height/image.height,0,0,{fill:"rgba(255,55,45,.14)",stroke:"#e32626",lineWidth:4});const overviewMark=drawMapRect(overviewCtx,map.unitRect,overview.width/image.width,overview.height/image.height,0,0,{lineWidth:4});drawUnitBadge(overviewCtx,unit.code,overviewMark);
-  const crop={x:Math.max(0,map.crop.x),y:Math.max(0,map.crop.y),width:Math.min(map.crop.width,image.width-map.crop.x),height:Math.min(map.crop.height,image.height-map.crop.y)};if(crop.width<=0||crop.height<=0)throw new Error("invalid crop");const detail=document.getElementById("adviceUnitMap");const detailScale=Math.min(1,1200/crop.width);detail.width=Math.max(1,Math.round(crop.width*detailScale));detail.height=Math.max(1,Math.round(crop.height*detailScale));const detailCtx=detail.getContext("2d");detailCtx.drawImage(image,crop.x,crop.y,crop.width,crop.height,0,0,detail.width,detail.height);if(map.towerRect)drawMapRect(detailCtx,map.towerRect,detail.width/crop.width,detail.height/crop.height,crop.x,crop.y,{fill:"rgba(255,55,45,.10)",stroke:"#e32626",lineWidth:4});const detailMark=drawMapRect(detailCtx,map.unitRect,detail.width/crop.width,detail.height/crop.height,crop.x,crop.y,{lineWidth:5});drawUnitBadge(detailCtx,unit.code,detailMark);visuals.hidden=false}catch{empty.hidden=false}}
+async function renderPrimaryUnitMaps(unit) {
+  const visuals = document.getElementById("adviceVisuals");
+  const empty = document.getElementById("adviceMapEmpty");
+  const overviewCard = document.getElementById("adviceOverviewCard");
+  const unitCard = document.getElementById("adviceUnitCard");
+  const unitImage = document.getElementById("adviceUnitImage");
+  const unitMap = document.getElementById("adviceUnitMap");
+  const imageNote = document.getElementById("adviceUnitImageNote");
+  visuals.hidden = true;
+  empty.hidden = true;
+  overviewCard.hidden = true;
+  unitCard.hidden = true;
+  unitImage.hidden = true;
+  unitMap.hidden = true;
+
+  const code = String(unit?.code || "").trim().toUpperCase();
+  const driveId = window.PTG_SUB_UNIT_IMAGES?.[code] || "";
+  const map = unit?.map;
+  const allowed = new Set(["phankhupark-map.png", "lowrise-map-sharp.jpg", "lienke-preview.png"]);
+  const hasMap = Boolean(map && allowed.has(map.image) && map.crop && map.unitRect);
+  const [sheetImageResult, mapImageResult] = await Promise.allSettled([
+    driveId ? loadMapImage(`https://lh3.googleusercontent.com/d/${driveId}=w1600`) : Promise.reject(new Error("no sheet image")),
+    hasMap ? loadMapImage(`/${map.image}`) : Promise.reject(new Error("no map")),
+  ]);
+
+  const hasSheetImage = sheetImageResult.status === "fulfilled";
+  if (hasSheetImage) {
+    unitImage.src = sheetImageResult.value.src;
+    unitImage.alt = `Ảnh chỉ căn ${code} từ bảng hàng`;
+    unitImage.hidden = false;
+    unitCard.hidden = false;
+    imageNote.textContent = `Ảnh ${code}.jpg lấy từ cột CHỈ CĂN trong bảng hàng`;
+  }
+
+  if (mapImageResult.status === "fulfilled") {
+    const image = mapImageResult.value;
+    const overview = document.getElementById("adviceOverviewMap");
+    const overviewScale = Math.min(1, 1100 / image.width);
+    overview.width = Math.max(1, Math.round(image.width * overviewScale));
+    overview.height = Math.max(1, Math.round(image.height * overviewScale));
+    const overviewCtx = overview.getContext("2d");
+    overviewCtx.drawImage(image, 0, 0, overview.width, overview.height);
+    if (map.towerRect) drawMapRect(overviewCtx, map.towerRect, overview.width / image.width, overview.height / image.height, 0, 0, { fill:"rgba(255,55,45,.14)", stroke:"#e32626", lineWidth:4 });
+    const overviewMark = drawMapRect(overviewCtx, map.unitRect, overview.width / image.width, overview.height / image.height, 0, 0, { lineWidth:4 });
+    drawUnitBadge(overviewCtx, code, overviewMark);
+    overviewCard.hidden = false;
+
+    if (!hasSheetImage) {
+      const crop = { x:Math.max(0,map.crop.x), y:Math.max(0,map.crop.y), width:Math.min(map.crop.width,image.width-map.crop.x), height:Math.min(map.crop.height,image.height-map.crop.y) };
+      if (crop.width > 0 && crop.height > 0) {
+        const detailScale = Math.min(1, 1200 / crop.width);
+        unitMap.width = Math.max(1, Math.round(crop.width * detailScale));
+        unitMap.height = Math.max(1, Math.round(crop.height * detailScale));
+        const detailCtx = unitMap.getContext("2d");
+        detailCtx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, unitMap.width, unitMap.height);
+        if (map.towerRect) drawMapRect(detailCtx, map.towerRect, unitMap.width / crop.width, unitMap.height / crop.height, crop.x, crop.y, { fill:"rgba(255,55,45,.10)", stroke:"#e32626", lineWidth:4 });
+        const detailMark = drawMapRect(detailCtx, map.unitRect, unitMap.width / crop.width, unitMap.height / crop.height, crop.x, crop.y, { lineWidth:5 });
+        drawUnitBadge(detailCtx, code, detailMark);
+        unitMap.hidden = false;
+        unitCard.hidden = false;
+        imageNote.textContent = "Ảnh phóng vị trí căn từ mặt bằng";
+      }
+    }
+  }
+
+  if (!overviewCard.hidden || !unitCard.hidden) visuals.hidden = false;
+  else empty.hidden = false;
+}
 
 function render(data){setText("adviceCustomer",text(data.customerAlias,"Khách hàng"));setText("adviceOwner",text(data.ownerName,DEFAULT_SALE_NAME));const phone=salePhone(data.ownerPhone);const ownerPhone=document.getElementById("adviceOwnerPhone");const call=document.getElementById("adviceCall");const zalo=document.getElementById("adviceZalo");if(ownerPhone){ownerPhone.textContent=phone;ownerPhone.href=`tel:${phone}`}if(call)call.href=`tel:${phone}`;if(zalo)zalo.href=`https://zalo.me/${phone}`;setText("adviceMeta",`Tạo lúc ${dateTime(data.createdAt)} · Hết hạn ${dateTime(data.expiresAt)}`);const change=document.getElementById("adviceChange");change.className="advice-change";let title="Thông tin đang còn hiệu lực";let message=text(data.changeMessage,"Thông tin được ghi nhận tại thời điểm tạo link.");if(data.revoked){change.classList.add("danger");title="Link này đã được thu hồi";message="Chỉ chủ link đang đăng nhập mới xem được bản lưu này."}else if(timestampMs(data.expiresAt)<=Date.now()){change.classList.add("danger");title="Link này đã hết hạn";message="Chỉ chủ link đang đăng nhập mới xem được bản lưu này."}else if(data.changeState==="price_changed"){change.classList.add("warning");title="Giá hoặc chính sách đã thay đổi"}else if(data.changeState==="unit_unavailable"){change.classList.add("danger");title="Tình trạng căn cần được kiểm tra lại"}else if(data.changeState==="unchecked"){change.classList.add("warning");title="Đang chờ đối chiếu bảng hàng"}setText("adviceChangeTitle",title);setText("adviceChangeMessage",message);const units=document.getElementById("adviceUnits");units.textContent="";(Array.isArray(data.units)?data.units:[]).slice(0,3).forEach((unit,index)=>units.appendChild(renderUnit(unit,index)));loading.hidden=true;errorBox.hidden=true;content.hidden=false;document.title=`Báo giá · ${text(data.customerAlias,"Khách hàng")} · ${text(data.primaryUnitCode,"Căn đề xuất")} · SUBC`}
 

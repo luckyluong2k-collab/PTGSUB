@@ -8,7 +8,7 @@ body { min-height:100vh; margin:0; background:radial-gradient(circle at 90% 0,rg
 .advice-brand h1 { margin:2px 0; font-size:clamp(1.35rem,4vw,2rem); }
 .advice-brand p { margin:0; color:#cce0dd; font-size:.82rem; }
 .advice-state { display:grid; min-height:280px; margin-top:16px; place-items:center; align-content:center; gap:12px; border:1px solid #b8d2cd; border-radius:18px; background:rgba(255,255,255,.86); text-align:center; }
-.advice-state[hidden], #adviceContent[hidden], .advice-visuals[hidden], .advice-map-empty[hidden] { display:none !important; }
+.advice-state[hidden], #adviceContent[hidden], .advice-visuals[hidden], .advice-map-empty[hidden], .advice-visual-card[hidden], .advice-visuals img[hidden], .advice-visuals canvas[hidden] { display:none !important; }
 .advice-spinner { width:40px; height:40px; border:4px solid #c8dcd8; border-top-color:var(--teal); border-radius:50%; animation:advice-spin .8s linear infinite; }
 @keyframes advice-spin { to { transform:rotate(360deg); } }
 .advice-error strong { color:#9b3024; font-size:1.15rem; }.advice-error p{margin:0;color:var(--muted)}.advice-error a{padding:10px 14px;border-radius:10px;background:var(--teal);color:#fff;text-decoration:none;font-weight:850}
@@ -22,7 +22,8 @@ body { min-height:100vh; margin:0; background:radial-gradient(circle at 90% 0,rg
 .advice-visuals article { display:grid; align-content:start; gap:10px; min-width:0; padding:13px; border:1px solid #b8d2cd; border-radius:17px; background:rgba(255,255,255,.92); box-shadow:0 12px 30px rgba(14,63,58,.08); }
 .advice-visuals article > div strong { display:block; color:#0a655c; font-size:.88rem; }
 .advice-visuals article > div span { display:block; margin-top:2px; color:#687d79; font-size:.68rem; }
-.advice-visuals canvas { display:block; width:100%; height:auto; max-height:355px; object-fit:contain; border:1px solid #d5e4e1; border-radius:12px; background:#edf5f3; }
+.advice-visuals canvas,.advice-visuals img { display:block; width:100%; height:auto; max-height:430px; object-fit:contain; border:1px solid #d5e4e1; border-radius:12px; background:#edf5f3; }
+.advice-visuals img { min-height:220px; background:#fff; }
 .advice-map-empty { grid-column:2; margin:0; padding:18px; border:1px dashed #b8d2cd; border-radius:14px; background:rgba(255,255,255,.72); color:#657b77; text-align:center; }
 .advice-flora-tour { overflow:hidden; border:1px solid #b8d2cd; border-radius:18px; background:rgba(255,255,255,.92); box-shadow:0 12px 30px rgba(14,63,58,.08); }
 .advice-flora-tour header { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:15px 17px; border-bottom:1px solid #d5e4e1; background:linear-gradient(135deg,#07363d,#0c5b56); color:#fff; }
