@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=116">
-  <link rel="stylesheet" href="feng-shui.css?v=4">
+  <link rel="stylesheet" href="feng-shui.css?v=5">
   <link rel="stylesheet" href="mid-autumn-theme.css?v=6">
 </head>
 <body class="auth-locked">
@@ -678,15 +678,19 @@
           <div class="feng-shui-compass" id="fengShuiCompass"></div>
         </article>
         <article class="feng-shui-advice">
-          <h3>&#272;i&#7875;m t&#432; v&#7845;n cho c&#259;n n&#224;y</h3>
+          <h3>Kết luận cho căn này</h3>
           <p id="fengShuiAdvice"></p>
         </article>
-        <article class="feng-shui-script">
-          <div><h3>C&#226;u n&#243;i &#273;&#7875; t&#432; v&#7845;n kh&#225;ch</h3></div>
-          <p id="fengShuiSalesScript"></p>
+        <article class="feng-shui-decision">
+          <div><h3>Phân tích ưu tiên để ra quyết định</h3><p>Phong thủy là điểm cộng sau các điều kiện giao dịch cốt lõi.</p></div>
+          <div class="feng-shui-decision-grid">
+            <section><span>1 · Lợi thế của căn</span><p id="fengShuiDecisionStrength"></p></section>
+            <section><span>2 · Bố trí sử dụng</span><p id="fengShuiDecisionLayout"></p></section>
+            <section><span>3 · Thứ tự ưu tiên</span><p id="fengShuiDecisionPriority"></p></section>
+          </div>
+          <strong class="feng-shui-recommendation" id="fengShuiRecommendation"></strong>
         </article>
         <div class="feng-shui-result-actions">
-          <button id="fengShuiCopyBtn" type="button">Sao chép câu tư vấn</button>
           <button id="fengShuiPresentBtn" type="button">Trình bày cho khách</button>
           <button id="fengShuiEditBtn" type="button" hidden>Sửa thông tin</button>
         </div>
@@ -704,6 +708,6 @@
   <script src="ui-menu.js?v=4"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=4"></script>
-  <script src="feng-shui.js?v=2"></script>
+  <script src="feng-shui.js?v=3"></script>
 </body>
 </html>

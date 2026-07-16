@@ -188,14 +188,26 @@
     return "Hướng " + direction + " không nằm trong bốn hướng ưu tiên của cung " + palace.name + ", nhưng không phải yếu tố loại trừ căn. Có thể bố trí bàn làm việc hoặc khu sinh hoạt chính quay về " + assessment.best + " để tăng cảm giác phù hợp; quyết định vẫn nên ưu tiên pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế.";
   }
 
-  function buildSalesScript(name, palace, direction, assessment, unitLabel, priceText) {
-    var salutation = name ? name.trim() : "anh/chị";
-    var subject = unitLabel ? "Căn " + unitLabel : "Căn này";
-    var fit = assessment.favorable
-      ? subject + " hướng " + direction + " thuộc " + assessment.category + " của cung " + palace.name + ", là một điểm cộng phù hợp để " + salutation + " tham khảo."
-      : subject + " hướng " + direction + " chưa thuộc nhóm hướng ưu tiên của cung " + palace.name + ", nhưng mình có thể bố trí bàn làm việc hoặc khu sinh hoạt theo hướng " + assessment.best + " để hài hòa hơn.";
-    var price = priceText && priceText !== "0" ? " Mức giá đang tính là " + priceText + "." : "";
-    return fit + price + " Phong thủy chỉ là phần tham khảo; mình vẫn ưu tiên kiểm tra pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế. Nếu các điều kiện đó đã phù hợp, ngày hôm nay là ngày tốt nhất để chốt căn này.";
+  function buildDecisionAnalysis(palace, direction, assessment, unitLabel, priceText) {
+    var subject = unitLabel ? "Căn " + unitLabel : "Căn đang tư vấn";
+    var benefits = {
+      "Sinh Khí": "nổi bật về cảm giác chủ động, phát triển và sức sống của không gian",
+      "Thiên Y": "có lợi thế tham khảo về sự ổn định, nghỉ ngơi và cân bằng sinh hoạt",
+      "Diên Niên": "có lợi thế tham khảo về sự hài hòa, gắn kết và ổn định lâu dài",
+      "Phục Vị": "có lợi thế tham khảo về sự yên ổn, tập trung và vững tâm"
+    };
+    var strength = assessment.favorable
+      ? subject + " hướng " + direction + " thuộc " + assessment.category + " của cung " + palace.name + "; " + benefits[assessment.category] + ". Đây là điểm cộng khi so sánh với các căn có pháp lý, giá và công năng tương đương."
+      : subject + " hướng " + direction + " không thuộc bốn hướng ưu tiên của cung " + palace.name + ". Điều này không phải lý do loại căn nếu pháp lý, tổng giá, dòng tiền, vị trí và công năng đang phù hợp hơn các lựa chọn khác.";
+    var layout = assessment.favorable
+      ? "Giữ bố cục sử dụng thuận tiện; khi điều kiện mặt bằng cho phép, có thể ưu tiên bàn làm việc hoặc khu sinh hoạt chính nhìn về " + assessment.best + ". Không cần thay đổi kết cấu chỉ để chạy theo hướng."
+      : "Có thể cân bằng bằng cách đặt bàn làm việc, vị trí ngồi lâu hoặc khu sinh hoạt chính nhìn về " + assessment.best + " khi mặt bằng cho phép. Ưu tiên thông thoáng, ánh sáng và công năng thực tế; không cần sửa kết cấu căn hộ.";
+    var price = priceText && priceText !== "0" ? " Tổng giá đang tính: " + priceText + "." : "";
+    var priority = "Kiểm tra theo thứ tự: (1) pháp lý và tình trạng căn; (2) tổng giá, tiến độ thanh toán và khả năng dòng tiền; (3) vị trí, diện tích, tầng, view và nhu cầu sử dụng; (4) dùng phong thủy làm điểm cộng hoặc tiêu chí phân định cuối cùng." + price;
+    var recommendation = assessment.favorable
+      ? "Khuyến nghị: ưu tiên giữ " + subject.toLowerCase() + " nếu ba nhóm điều kiện cốt lõi đều đạt; hướng " + direction + " · " + assessment.category + " là lợi thế bổ sung rõ ràng."
+      : "Khuyến nghị: vẫn có thể ưu tiên giữ " + subject.toLowerCase() + " nếu pháp lý, giá, dòng tiền và nhu cầu thực tế tốt; phần hướng được cân bằng bằng bố trí sử dụng theo " + assessment.best + ".";
+    return { strength: strength, layout: layout, priority: priority, recommendation: recommendation };
   }
 
   var api = {
@@ -226,7 +238,6 @@
   var directionHelp = document.getElementById("fengShuiDirectionHelp");
   var error = document.getElementById("fengShuiError");
   var result = document.getElementById("fengShuiResult");
-  var salesScript = document.getElementById("fengShuiSalesScript");
   var presentButton = document.getElementById("fengShuiPresentBtn");
   var editButton = document.getElementById("fengShuiEditBtn");
   var pricingState = {};
@@ -354,7 +365,11 @@
     document.getElementById("fengShuiBestDirection").textContent = assessment.best;
     document.getElementById("fengShuiDirectionVerdict").textContent = direction + " · " + assessment.category;
     document.getElementById("fengShuiAdvice").textContent = buildAdvice(name, palace, direction, assessment);
-    salesScript.textContent = buildSalesScript(name, palace, direction, assessment, unitLabel, pricingState.totalText);
+    var decision = buildDecisionAnalysis(palace, direction, assessment, unitLabel, pricingState.totalText);
+    document.getElementById("fengShuiDecisionStrength").textContent = decision.strength;
+    document.getElementById("fengShuiDecisionLayout").textContent = decision.layout;
+    document.getElementById("fengShuiDecisionPriority").textContent = decision.priority;
+    document.getElementById("fengShuiRecommendation").textContent = decision.recommendation;
     renderCompass(palace, direction);
     result.hidden = false;
     if (shouldScroll !== false) result.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -407,12 +422,4 @@
     birthText.focus();
   });
 
-  document.getElementById("fengShuiCopyBtn").addEventListener("click", function () {
-    var text = salesScript.textContent;
-    var done = function () { var button = document.getElementById("fengShuiCopyBtn"); button.textContent = "Đã sao chép"; setTimeout(function () { button.textContent = "Sao chép câu tư vấn"; }, 1600); };
-    if (navigator.clipboard && root.isSecureContext) navigator.clipboard.writeText(text).then(done).catch(function () {});
-    else {
-      var area = document.createElement("textarea"); area.value = text; document.body.appendChild(area); area.select(); document.execCommand("copy"); area.remove(); done();
-    }
-  });
 }(typeof globalThis !== "undefined" ? globalThis : this));

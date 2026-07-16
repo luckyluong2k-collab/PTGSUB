@@ -128,25 +128,28 @@
 .feng-shui-lunar { padding: 13px 15px; border: 1px solid #d1ab58; border-radius: 13px; background: #fff5d8; color: #6c3d06; font-weight: 850; text-align: center; }
 .feng-shui-result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .feng-shui-result-grid article,
-.feng-shui-advice,
-.feng-shui-script { padding: 15px; border: 1px solid #b6d0cc; border-radius: 14px; background: rgba(255, 255, 255, .92); box-shadow: 0 10px 25px rgba(15, 56, 51, .08); }
+.feng-shui-advice { padding: 15px; border: 1px solid #b6d0cc; border-radius: 14px; background: rgba(255, 255, 255, .92); box-shadow: 0 10px 25px rgba(15, 56, 51, .08); }
 .feng-shui-result-grid article { display: grid; gap: 8px; }
 .feng-shui-result-grid span { color: #58706b; font-size: .76rem; font-weight: 850; text-transform: uppercase; }
 .feng-shui-result-grid strong { color: #08675f; font-size: 1.06rem; line-height: 1.35; }
-.feng-shui-advice h3,
-.feng-shui-script h3 { margin: 0; color: #17443f; font-size: 1rem; }
-.feng-shui-advice p,
-.feng-shui-script p { margin: 8px 0 0; line-height: 1.65; }
-.feng-shui-script { border-color: #d1ab58; background: #fffaf0; }
-.feng-shui-script > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.feng-shui-script button { min-height: 38px; padding: 7px 12px; border: 1px solid #0f766e; border-radius: 10px; background: #0f766e; color: #fff; cursor: pointer; font-weight: 900; }
+.feng-shui-advice h3 { margin: 0; color: #17443f; font-size: 1rem; }
+.feng-shui-advice p { margin: 8px 0 0; line-height: 1.65; }
+.feng-shui-decision { display:grid; gap:14px; padding:17px; border:1px solid #d1ab58; border-radius:15px; background:linear-gradient(145deg,#fffaf0,#f4fbf9); box-shadow:0 10px 25px rgba(15,56,51,.08); }
+.feng-shui-decision h3, .feng-shui-decision p { margin:0; }
+.feng-shui-decision > div:first-child h3 { color:#17443f; font-size:1.05rem; }
+.feng-shui-decision > div:first-child p { margin-top:4px; color:#60736f; font-size:.78rem; }
+.feng-shui-decision-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.feng-shui-decision-grid section { padding:13px; border:1px solid #c8dad6; border-radius:12px; background:rgba(255,255,255,.82); }
+.feng-shui-decision-grid span { color:#087267; font-size:.72rem; font-weight:950; letter-spacing:.03em; text-transform:uppercase; }
+.feng-shui-decision-grid p { margin-top:7px; color:#304d48; font-size:.88rem; line-height:1.55; }
+.feng-shui-recommendation { display:block; padding:13px 15px; border-left:5px solid #0f766e; border-radius:10px; background:#dff9f3; color:#07564f; line-height:1.55; }
 .feng-shui-disclaimer { margin: 0; padding: 12px 14px; border-left: 4px solid #c59a42; background: rgba(255, 255, 255, .72); color: #546963; font-size: .82rem; line-height: 1.55; }
 
 body.theme-dark .feng-shui-card { background: radial-gradient(circle at 100% 0, rgba(228,194,115,.15), transparent 32%), linear-gradient(155deg,#0b2b35,#061d27); color: #f7fbfa; }
 body.theme-dark .feng-shui-form label > span:first-child,
 body.theme-dark .feng-shui-form legend,
 body.theme-dark .feng-shui-advice h3,
-body.theme-dark .feng-shui-script h3 { color: #f5d994; }
+body.theme-dark .feng-shui-decision > div:first-child h3 { color: #f5d994; }
 body.theme-dark .feng-shui-form small { color: #bdd0cc; }
 body.theme-dark .feng-shui-form input[type="text"],
 body.theme-dark .feng-shui-form input[type="date"],
@@ -157,7 +160,12 @@ body.theme-dark .feng-shui-result-grid article,
 body.theme-dark .feng-shui-advice { border-color: #527b75; background: #0e343d; }
 body.theme-dark .feng-shui-result-grid span { color: #bdd0cc; }
 body.theme-dark .feng-shui-result-grid strong { color: #7ce0d4; }
-body.theme-dark .feng-shui-script { background: #332b16; color: #fff; }
+body.theme-dark .feng-shui-decision { border-color:#9b7a37; background:linear-gradient(145deg,#102f37,#2c291b); }
+body.theme-dark .feng-shui-decision > div:first-child p { color:#bdd0cc; }
+body.theme-dark .feng-shui-decision-grid section { border-color:#527b75; background:#0e343d; }
+body.theme-dark .feng-shui-decision-grid span { color:#7ce0d4; }
+body.theme-dark .feng-shui-decision-grid p { color:#e4efed; }
+body.theme-dark .feng-shui-recommendation { background:#103f43; color:#d9f5f0; }
 body.theme-dark .feng-shui-disclaimer { background: #12343b; color: #d6e4e1; }
 
 /* The account drawer close control remains visible while its content scrolls. */
@@ -309,10 +317,9 @@ body:not(.auth-locked) .app-shell {
 .feng-shui-compass-item span { font-size:.62rem; font-weight:750; }
 .feng-shui-compass-item.is-favorable { border-color:#75bdb3; background:#e6f7f3; color:#08675f; }
 .feng-shui-compass-item.is-current { outline:3px solid #d7b46a; outline-offset:1px; box-shadow:0 6px 14px rgba(109,75,11,.18); }
-.feng-shui-result-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.feng-shui-result-actions { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
 .feng-shui-result-actions button { min-height:45px; padding:9px 12px; border:1px solid #0f766e; border-radius:11px; background:#0f766e; color:#fff; cursor:pointer; font:inherit; font-weight:900; }
-.feng-shui-result-actions button:nth-child(2),
-.feng-shui-result-actions button:nth-child(3) { border-color:#b68b31; background:#fff5d8; color:#6c3d06; }
+#fengShuiEditBtn { border-color:#b68b31; background:#fff5d8; color:#6c3d06; }
 .feng-shui-dialog.is-presenting { width:min(1040px,calc(100vw - 20px)); }
 .feng-shui-dialog.is-presenting .feng-shui-form { display:none; }
 .feng-shui-dialog.is-presenting .feng-shui-result { padding-top:20px; }
@@ -343,6 +350,7 @@ body.theme-dark .feng-shui-compass-item.is-favorable { border-color:#3fa99c; bac
   .feng-shui-result-hero { align-items:flex-start; padding:15px; }
   .feng-shui-result-hero > strong { max-width:122px; padding:8px; font-size:.66rem; }
   .feng-shui-compass-card { grid-template-columns:minmax(0,1fr); }
+  .feng-shui-decision-grid { grid-template-columns:minmax(0,1fr); }
   .feng-shui-compass { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .feng-shui-result-actions { grid-template-columns:minmax(0,1fr); }
   .feng-shui-dialog.is-presenting .feng-shui-head p,

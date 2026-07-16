@@ -1,10 +1,10 @@
-const CACHE_NAME = "park-pricing-v168-smooth-menu";
+const CACHE_NAME = "park-pricing-v169-decision-analysis";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=116",
-  "./feng-shui.css?v=4",
+  "./feng-shui.css?v=5",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=108",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
@@ -15,7 +15,7 @@ const ASSETS = [
   "./ui-menu.js?v=4",
   "./ui-payment.js?v=1",
   "./ui-theme.js?v=4",
-  "./feng-shui.js?v=2",
+  "./feng-shui.js?v=3",
   "./manifest.webmanifest",
   "./favicon.png",
   "./apple-touch-icon.png",
