@@ -29,6 +29,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_LINKS = 3;
+const DEFAULT_SALE_NAME = "Đức Lương Sun Group";
+const DEFAULT_SALE_PHONE = "0387335227";
 const menuButton = document.getElementById("advisoryLinksOpenBtn");
 let currentUser = null;
 let currentLinks = [];
@@ -50,6 +52,16 @@ function escapeHtml(value) {
 
 function unitCode(value) {
   return safeText(value, 24).toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 24);
+}
+
+function saleName(value = "") {
+  return safeText(value, 120) || safeText(currentUser?.displayName || currentUser?.email?.split("@")[0], 120) || DEFAULT_SALE_NAME;
+}
+
+function salePhone(value = "") {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (digits.startsWith("84") && digits.length >= 11) digits = `0${digits.slice(2)}`;
+  return /^0\d{9,10}$/.test(digits) ? digits : DEFAULT_SALE_PHONE;
 }
 
 function timestampMs(value) {
@@ -142,9 +154,13 @@ function createInterface() {
     <dialog class="advisory-dialog advisory-create-dialog" id="advisoryCreateDialog" aria-labelledby="advisoryCreateTitle">
       <form class="advisory-dialog-card" id="advisoryCreateForm">
         <header class="advisory-dialog-head">
-          <div><span>TẠO LINK CÓ THỜI HẠN</span><h2 id="advisoryCreateTitle">Chọn tối đa 3 căn</h2><p>Chỉ tên gợi nhớ và thông tin căn được lưu; không lưu số điện thoại, IP hay thiết bị.</p></div>
+          <div><span>TẠO LINK CÓ THỜI HẠN</span><h2 id="advisoryCreateTitle">Chọn tối đa 3 căn</h2><p>Chỉ lưu tên gợi nhớ, liên hệ sale và thông tin căn; không lưu số điện thoại khách, IP hay thiết bị.</p></div>
           <button type="button" data-advisory-close="create" aria-label="Đóng">×</button>
         </header>
+        <div class="advisory-sale-grid">
+          <label><span>Tên sale</span><input id="advisorySaleName" maxlength="120" autocomplete="name" placeholder="Tên người tư vấn"></label>
+          <label><span>Số điện thoại sale</span><input id="advisorySalePhone" type="tel" inputmode="tel" maxlength="16" autocomplete="tel" placeholder="0387335227"></label>
+        </div>
         <div class="advisory-create-grid">
           <label><span>Tên khách / tên gợi nhớ</span><input id="advisoryCustomerAlias" maxlength="80" placeholder="Ví dụ: Anh Minh" required></label>
           <label><span>Thời hạn link</span><select id="advisoryExpiry"><option value="1">24 giờ</option><option value="3" selected>3 ngày</option><option value="7">7 ngày</option><option value="14">14 ngày</option><option value="30">30 ngày</option></select></label>
@@ -328,7 +344,7 @@ function initialChangeState(units) {
   return { state: "current", message: "Các căn còn trong bảng hàng tại thời điểm tạo link." };
 }
 
-async function createLinkFromUnits({ customerAlias, days, units, source = null }) {
+async function createLinkFromUnits({ customerAlias, days, units, ownerName = "", ownerPhone = "", source = null }) {
   currentUser = currentUser || auth.currentUser;
   if (!currentUser) throw new Error("Bạn cần đăng nhập lại.");
   const id = randomToken();
@@ -336,7 +352,8 @@ async function createLinkFromUnits({ customerAlias, days, units, source = null }
   const primaryUnitCode = units[0]?.code || "";
   await setDoc(doc(db, "advisoryLinks", id), {
     ownerUid: currentUser.uid,
-    ownerName: safeText(currentUser.displayName || currentUser.email?.split("@")[0], 120),
+    ownerName: saleName(ownerName || source?.ownerName),
+    ownerPhone: salePhone(ownerPhone || source?.ownerPhone),
     customerAlias: safeText(customerAlias, 80),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -494,6 +511,8 @@ async function openManager() {
 
 async function openCreate() {
   document.getElementById("advisoryFormError").textContent = "";
+  document.getElementById("advisorySaleName").value = saleName();
+  document.getElementById("advisorySalePhone").value = DEFAULT_SALE_PHONE;
   document.getElementById("advisoryCustomerAlias").value = "";
   document.getElementById("advisoryManualUnitCode").value = "";
   document.getElementById("advisoryManualStatus").textContent = "";
@@ -511,6 +530,8 @@ function bindInterface() {
   menuButton?.addEventListener("click", openManager);
   document.getElementById("advisoryCreateOpenBtn")?.addEventListener("click", openCreate);
   document.getElementById("advisoryRefreshBtn")?.addEventListener("click", () => loadLinks());
+  document.getElementById("advisorySaleName")?.addEventListener("blur", (event) => { event.currentTarget.value = saleName(event.currentTarget.value); });
+  document.getElementById("advisorySalePhone")?.addEventListener("blur", (event) => { event.currentTarget.value = salePhone(event.currentTarget.value); });
   document.getElementById("advisoryManualUnitCode")?.addEventListener("input", syncManualScenarioOptions);
   document.getElementById("advisoryManualUnitCode")?.addEventListener("keydown", (event) => {
     if (event.key === "Enter") { event.preventDefault(); addManualCandidate(); }
@@ -551,6 +572,8 @@ function bindInterface() {
     event.preventDefault();
     const errorBox = document.getElementById("advisoryFormError");
     const submit = document.getElementById("advisoryCreateSubmit");
+    const ownerName = saleName(document.getElementById("advisorySaleName").value);
+    const ownerPhone = salePhone(document.getElementById("advisorySalePhone").value);
     const alias = safeText(document.getElementById("advisoryCustomerAlias").value, 80);
     const units = selectedUnits();
     if (!alias) { errorBox.textContent = "Vui lòng nhập tên gợi nhớ của khách."; return; }
@@ -559,7 +582,7 @@ function bindInterface() {
     submit.textContent = "Đang tạo link…";
     try {
       const days = Number(document.getElementById("advisoryExpiry").value) || 3;
-      const created = await createLinkFromUnits({ customerAlias: alias, days, units });
+      const created = await createLinkFromUnits({ customerAlias: alias, days, units, ownerName, ownerPhone });
       await copyText(created.url);
       closeDialog(createDialog());
       notify("Đã tạo và sao chép link tư vấn");

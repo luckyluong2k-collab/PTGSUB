@@ -435,6 +435,7 @@ service cloud.firestore {
       return request.resource.data.keys().hasOnly([
           "ownerUid",
           "ownerName",
+          "ownerPhone",
           "customerAlias",
           "createdAt",
           "updatedAt",
@@ -455,6 +456,11 @@ service cloud.firestore {
         && request.resource.data.ownerUid.size() > 0
         && request.resource.data.ownerName is string
         && request.resource.data.ownerName.size() <= 120
+        && (!("ownerPhone" in request.resource.data) || (
+          request.resource.data.ownerPhone is string
+          && request.resource.data.ownerPhone.size() >= 9
+          && request.resource.data.ownerPhone.size() <= 15
+        ))
         && request.resource.data.customerAlias is string
         && request.resource.data.customerAlias.size() <= 80
         && request.resource.data.createdAt is timestamp
