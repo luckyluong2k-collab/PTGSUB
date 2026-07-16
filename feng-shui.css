@@ -491,3 +491,54 @@ body:not(.auth-locked) .app-shell {
     z-index: 1;
   }
 }
+
+/* Desktop: a permanent left rail owns the Menu button, so it never floats over the app. */
+@media (min-width: 768px) {
+  :root { --account-rail-width: 72px; }
+
+  body:not(.auth-locked)::before {
+    content: "";
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1598;
+    width: var(--account-rail-width);
+    background: linear-gradient(180deg, #08282f, #061d25);
+    border-right: 1px solid rgba(228, 194, 115, .72);
+    box-shadow: 8px 0 24px rgba(2, 15, 19, .2);
+    pointer-events: none;
+  }
+
+  body:not(.auth-locked) .account-tab {
+    inset: 8px auto auto 8px !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    height: 56px !important;
+  }
+
+  body:not(.auth-locked):not(.menu-expanded) .app-shell {
+    width: calc(100% - var(--account-rail-width)) !important;
+    margin-left: var(--account-rail-width) !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .app-shell {
+    width: calc(100% - var(--account-drawer-width)) !important;
+    margin-left: var(--account-drawer-width) !important;
+  }
+}
+
+/* Mobile: open a larger touch-friendly drawer without moving or shrinking the page. */
+@media (max-width: 767px) {
+  :root { --account-drawer-width: min(90vw, 360px); }
+
+  body:not(.auth-locked).menu-expanded .app-shell {
+    width: 100% !important;
+    margin-left: 0 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  body:not(.auth-locked).menu-expanded .auth-actions > :not([hidden]),
+  body:not(.auth-locked).menu-expanded .menu-3d-panel > summary {
+    min-height: 50px !important;
+  }
+}
