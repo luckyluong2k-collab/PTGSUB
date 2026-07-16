@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v175-larger-menu-glyphs";
+const CACHE_NAME = "park-pricing-v176-advisory-state-visibility";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,7 +8,7 @@ const ASSETS = [
   "./advisory-links.css?v=1",
   "./advisory-links.js?v=1",
   "./tu-van.html",
-  "./tu-van.css?v=1",
+  "./tu-van.css?v=2",
   "./tu-van.js?v=2",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=108",
