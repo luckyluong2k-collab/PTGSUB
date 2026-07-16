@@ -54,9 +54,26 @@
             "value": "no-referrer"
           }
         ]
+      },
+      {
+        "source": "/t/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "no-referrer"
+          }
+        ]
       }
     ],
     "rewrites": [
+      {
+        "source": "/t/**",
+        "destination": "/tu-van.html"
+      },
       {
         "source": "/tu-van/**",
         "destination": "/tu-van.html"

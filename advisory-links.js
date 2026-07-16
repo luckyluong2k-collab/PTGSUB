@@ -91,15 +91,21 @@ function linkStatus(item) {
 }
 
 function advisoryUrl(id) {
-  return `${window.location.origin}/tu-van/${encodeURIComponent(id)}`;
+  return `${window.location.origin}/t/${encodeURIComponent(id)}`;
 }
 
 function randomToken() {
-  const bytes = new Uint8Array(24);
+  const bytes = new Uint8Array(6);
   crypto.getRandomValues(bytes);
   let binary = "";
   bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function advisoryShareText(item) {
+  const customer = safeText(item?.customerAlias, 80) || "Khách hàng";
+  const unit = unitCode(item?.primaryUnitCode) || "Căn đề xuất";
+  return `Báo giá · ${customer} · ${unit} · SUBC\n${advisoryUrl(item.id)}`;
 }
 
 async function copyText(text) {
@@ -370,7 +376,7 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
     changeMessage: state.message,
     statusCheckedAt: serverTimestamp(),
   });
-  return { id, url: advisoryUrl(id) };
+  return { id, url: advisoryUrl(id), shareText: advisoryShareText({ id, customerAlias, primaryUnitCode }) };
 }
 
 async function loadLinks({ validate = true } = {}) {
@@ -471,8 +477,8 @@ async function handleRowAction(button) {
     return;
   }
   if (action === "copy") {
-    await copyText(advisoryUrl(item.id));
-    notify("Đã sao chép link tư vấn");
+    await copyText(advisoryShareText(item));
+    notify("Đã sao chép mô tả và link tư vấn");
     return;
   }
   if (action === "extend") {
@@ -482,7 +488,7 @@ async function handleRowAction(button) {
     notify("Đã gia hạn link thêm 3 ngày");
   } else if (action === "duplicate") {
     const created = await createLinkFromUnits({ customerAlias: item.customerAlias, days: 3, units: item.units || [], source: item });
-    await copyText(created.url);
+    await copyText(created.shareText);
     notify("Đã tạo phiên bản mới và sao chép link");
   } else if (action === "revoke") {
     await updateDoc(doc(db, "advisoryLinks", item.id), { revoked: true, updatedAt: serverTimestamp() });
@@ -583,7 +589,7 @@ function bindInterface() {
     try {
       const days = Number(document.getElementById("advisoryExpiry").value) || 3;
       const created = await createLinkFromUnits({ customerAlias: alias, days, units, ownerName, ownerPhone });
-      await copyText(created.url);
+      await copyText(created.shareText);
       closeDialog(createDialog());
       notify("Đã tạo và sao chép link tư vấn");
       await loadLinks();
