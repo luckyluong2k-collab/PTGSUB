@@ -1,10 +1,8 @@
 import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import { doc, getDoc, getFirestore, increment, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = { apiKey:"AIzaSyAZ1CS05a7rCubn5AtDvTnh6pATMUN0agI",authDomain:"ptg-sub.firebaseapp.com",projectId:"ptg-sub",storageBucket:"ptg-sub.firebasestorage.app",messagingSenderId:"32845891728",appId:"1:32845891728:web:8d166bcb2ba2eaccb3b015",measurementId:"G-HJYWPVSERF" };
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 const loading = document.getElementById("adviceLoading");
 const errorBox = document.getElementById("adviceError");
@@ -27,6 +25,5 @@ function render(data){setText("adviceCustomer",text(data.customerAlias,"Khách h
 
 async function registerView(id){const key=`ptgsub-advisory-view-${id}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");try{await updateDoc(doc(db,"advisoryLinks",id),{viewCount:increment(1),lastViewedAt:serverTimestamp(),updatedAt:serverTimestamp()})}catch{sessionStorage.removeItem(key)}}
 
-function waitForAuth(){return new Promise((resolve)=>{const stop=onAuthStateChanged(auth,()=>{stop();resolve()})})}
-async function start(){const id=tokenFromUrl();if(!id){showError("Đường dẫn tư vấn không hợp lệ.");return}try{await waitForAuth();const snap=await getDoc(doc(db,"advisoryLinks",id));if(!snap.exists()){showError("Link có thể đã hết hạn hoặc được sale thu hồi.");return}const data=snap.data()||{};render(data);if(!data.revoked&&timestampMs(data.expiresAt)>Date.now())registerView(id)}catch(error){showError(error?.code==="permission-denied"?"Link đã hết hạn, được thu hồi hoặc không còn quyền truy cập.":"Không tải được hồ sơ. Vui lòng kiểm tra kết nối và thử lại.")}}
+async function start(){const id=tokenFromUrl();if(!id){showError("Đường dẫn tư vấn không hợp lệ.");return}try{const snap=await getDoc(doc(db,"advisoryLinks",id));if(!snap.exists()){showError("Link có thể đã hết hạn hoặc được sale thu hồi.");return}const data=snap.data()||{};render(data);if(!data.revoked&&timestampMs(data.expiresAt)>Date.now())registerView(id)}catch(error){showError(error?.code==="permission-denied"?"Link đã hết hạn, được thu hồi hoặc không còn quyền truy cập.":"Không tải được hồ sơ. Vui lòng kiểm tra kết nối và thử lại.")}}
 start();
