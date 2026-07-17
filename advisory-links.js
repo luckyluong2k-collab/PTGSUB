@@ -208,6 +208,12 @@ function currentUnitSnapshot() {
     totalPrice: safeText(latestPricingState.totalText || document.getElementById("totalPrice")?.textContent, 80),
     upfrontPrice: safeText(document.getElementById("upfrontPrice")?.textContent, 80),
     scenario: safeText(latestPricingState.scenarioText || document.querySelector(".segmented button.active")?.textContent, 120),
+    paymentSchedule: Array.isArray(latestPricingState.paymentSchedule)
+      ? latestPricingState.paymentSchedule.slice(0, 20).map((item) => ({
+        label: safeText(item?.label, 160),
+        amount: safeText(item?.amount, 80),
+      }))
+      : [],
     at: Date.now(),
   };
 }
@@ -225,6 +231,12 @@ function candidateSnapshot(entry) {
     totalPrice: safeText(source.totalPrice, 80) || "Liên hệ sale cập nhật",
     upfrontPrice: safeText(source.upfrontPrice, 80),
     scenario: safeText(source.scenario, 120),
+    paymentSchedule: Array.isArray(source.paymentSchedule)
+      ? source.paymentSchedule.slice(0, 20).map((item) => ({
+        label: safeText(item?.label, 160),
+        amount: safeText(item?.amount, 80),
+      })).filter((item) => item.label)
+      : [],
     tower: safeText(catalog.tower, 40),
     floor: safeText(catalog.floor, 40),
     view: safeText(catalog.view, 120),

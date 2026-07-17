@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v183-advisory-unit-images";
+const CACHE_NAME = "park-pricing-v184-advisory-payment-progress";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,13 +6,13 @@ const ASSETS = [
   "./styles.css?v=117",
   "./feng-shui.css?v=8",
   "./advisory-links.css?v=3",
-  "./advisory-links.js?v=6",
+  "./advisory-links.js?v=7",
   "./tu-van.html",
-  "./tu-van.css?v=6",
-  "./tu-van.js?v=6",
+  "./tu-van.css?v=7",
+  "./tu-van.js?v=7",
   "./unit-image-data.js?v=1",
   "./mid-autumn-theme.css?v=6",
-  "./app.js?v=110",
+  "./app.js?v=111",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",

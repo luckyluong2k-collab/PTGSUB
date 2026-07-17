@@ -2771,6 +2771,10 @@ function advisoryPricingSnapshot(rawCode, requestedScenario = "loan") {
       area: result.area,
       totalPrice: money(result.total),
       upfrontPrice,
+      paymentSchedule: result.schedule.map(([label, amount]) => ({
+        label: String(label || ""),
+        amount: amount == null ? "" : money(amount),
+      })),
       scenario: scenarioLabel(result.scenario, result.policy),
       scenarioKey: result.scenario,
       map: advisoryMapSnapshot(code),
@@ -3979,6 +3983,10 @@ function render() {
       view: currentCatalogUnit.view || "",
       tower: unitTower(currentCatalogUnit, currentUnitCode),
       floor: unitFloor(currentCatalogUnit, currentUnitCode),
+      paymentSchedule: result.schedule.map(([label, amount]) => ({
+        label: String(label || ""),
+        amount: amount == null ? "" : money(amount),
+      })),
     },
   }));
 }
