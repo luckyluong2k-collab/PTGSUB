@@ -413,23 +413,6 @@ service cloud.firestore {
         && (schedule.size() < 1 || validAdvisoryPaymentRow(schedule[0]))
         && (schedule.size() < 2 || validAdvisoryPaymentRow(schedule[1]))
         && (schedule.size() < 3 || validAdvisoryPaymentRow(schedule[2]))
-        && (schedule.size() < 4 || validAdvisoryPaymentRow(schedule[3]))
-        && (schedule.size() < 5 || validAdvisoryPaymentRow(schedule[4]))
-        && (schedule.size() < 6 || validAdvisoryPaymentRow(schedule[5]))
-        && (schedule.size() < 7 || validAdvisoryPaymentRow(schedule[6]))
-        && (schedule.size() < 8 || validAdvisoryPaymentRow(schedule[7]))
-        && (schedule.size() < 9 || validAdvisoryPaymentRow(schedule[8]))
-        && (schedule.size() < 10 || validAdvisoryPaymentRow(schedule[9]))
-        && (schedule.size() < 11 || validAdvisoryPaymentRow(schedule[10]))
-        && (schedule.size() < 12 || validAdvisoryPaymentRow(schedule[11]))
-        && (schedule.size() < 13 || validAdvisoryPaymentRow(schedule[12]))
-        && (schedule.size() < 14 || validAdvisoryPaymentRow(schedule[13]))
-        && (schedule.size() < 15 || validAdvisoryPaymentRow(schedule[14]))
-        && (schedule.size() < 16 || validAdvisoryPaymentRow(schedule[15]))
-        && (schedule.size() < 17 || validAdvisoryPaymentRow(schedule[16]))
-        && (schedule.size() < 18 || validAdvisoryPaymentRow(schedule[17]))
-        && (schedule.size() < 19 || validAdvisoryPaymentRow(schedule[18]))
-        && (schedule.size() < 20 || validAdvisoryPaymentRow(schedule[19]))
       );
     }
 

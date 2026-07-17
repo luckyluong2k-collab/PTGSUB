@@ -607,7 +607,9 @@ function bindInterface() {
       notify("Đã tạo và sao chép link tư vấn");
       await loadLinks();
     } catch (error) {
-      errorBox.textContent = `Không tạo được link: ${error?.message || error}`;
+      errorBox.textContent = error?.code === "permission-denied"
+        ? "Không tạo được link do phiên đăng nhập hoặc quyền truy cập chưa hợp lệ. Vui lòng tải lại trang và thử lại."
+        : `Không tạo được link: ${error?.message || error}`;
     } finally {
       submit.disabled = false;
       submit.textContent = "Tạo link riêng";
