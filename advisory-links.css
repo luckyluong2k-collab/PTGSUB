@@ -1,4 +1,8 @@
 .advisory-links-menu-button .menu-3d-icon { font-size: 1.2rem; }
+.advisory-links-menu-button { position:relative; }
+.advisory-links-menu-button.has-customer-feedback { border-color:#f0bf4d!important; box-shadow:0 0 0 3px rgba(240,191,77,.22),0 0 22px rgba(240,191,77,.62)!important; animation:advisory-feedback-glow 1.8s ease-in-out infinite; }
+.advisory-links-menu-button.has-customer-feedback::after { content:attr(data-feedback-count); position:absolute; top:-7px; right:-7px; display:grid; min-width:22px; height:22px; padding:0 5px; place-items:center; border:2px solid #fff; border-radius:999px; background:#e24932; color:#fff; font-size:.66rem; font-weight:950; line-height:1; }
+@keyframes advisory-feedback-glow { 50% { box-shadow:0 0 0 5px rgba(240,191,77,.12),0 0 30px rgba(240,191,77,.78); } }
 
 .advisory-dialog {
   width: min(1180px, calc(100vw - 24px));
@@ -88,6 +92,10 @@
 .advisory-row-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; min-width: 218px; }
 .advisory-row-actions button { min-height: 34px; padding: 6px 8px; border: 1px solid #9dbdb7; border-radius: 8px; background: #f7fbfa; color: #15534c; cursor: pointer; font: inherit; font-size: .7rem; font-weight: 800; }
 .advisory-row-actions button.danger { border-color: #e7aea5; background: #fff4f2; color: #a33728; }
+.advisory-table tr.has-customer-feedback { background:#fff9df; box-shadow:inset 4px 0 #dfa52e; }
+.advisory-feedback-summary { margin-top:7px!important; color:#8a5904!important; font-weight:900; }
+.advisory-row-actions button.customer-feedback-alert { grid-column:1/-1; border-color:#e1a92f; background:linear-gradient(135deg,#ffe59a,#f4c451); color:#684300; box-shadow:0 0 0 3px rgba(225,169,47,.17),0 5px 16px rgba(155,103,5,.2); animation:advisory-action-glow 1.6s ease-in-out infinite; }
+@keyframes advisory-action-glow { 50% { filter:brightness(1.08); box-shadow:0 0 0 5px rgba(225,169,47,.1),0 7px 22px rgba(155,103,5,.3); } }
 .advisory-row-actions button:disabled, .advisory-toolbar button:disabled, .advisory-form-actions button:disabled { opacity: .55; cursor: wait; }
 
 .advisory-sale-grid, .advisory-create-grid { display: grid; grid-template-columns: 1fr 220px; gap: 12px; }

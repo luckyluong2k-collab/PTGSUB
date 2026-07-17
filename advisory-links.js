@@ -7,6 +7,7 @@ import {
   getDoc,
   getDocs,
   getFirestore,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -38,6 +39,9 @@ let currentUser = null;
 let currentLinks = [];
 let currentCandidates = [];
 let latestPricingState = {};
+let stopActivityListener = null;
+let activityListenerReady = false;
+const knownFeedbackTotals = new Map();
 
 function safeText(value, max = 240) {
   return String(value ?? "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -123,6 +127,71 @@ function notify(message) {
   toast.textContent = message;
   toast.classList.add("show");
   toast._advisoryTimer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function feedbackTotal(item) {
+  return Math.max(0, Number(item?.positiveFeedbackCount) || 0)
+    + Math.max(0, Number(item?.consultationInterestCount) || 0);
+}
+
+function feedbackAckKey(id) {
+  return `ptgsub-advisory-feedback-ack-${id}`;
+}
+
+function acknowledgedFeedback(item) {
+  try { return Math.max(0, Number(localStorage.getItem(feedbackAckKey(item.id))) || 0); }
+  catch { return 0; }
+}
+
+function unreadFeedback(item) {
+  return Math.max(0, feedbackTotal(item) - acknowledgedFeedback(item));
+}
+
+function acknowledgeFeedback(item) {
+  try { localStorage.setItem(feedbackAckKey(item.id), String(feedbackTotal(item))); }
+  catch {}
+}
+
+function syncMenuFeedback(items = currentLinks) {
+  if (!menuButton) return;
+  const count = items.reduce((sum, item) => sum + unreadFeedback(item), 0);
+  menuButton.classList.toggle("has-customer-feedback", count > 0);
+  if (count > 0) {
+    menuButton.dataset.feedbackCount = String(Math.min(99, count));
+    menuButton.setAttribute("aria-label", `Link đã gửi khách, có ${count} phản hồi mới`);
+  } else {
+    delete menuButton.dataset.feedbackCount;
+    menuButton.removeAttribute("aria-label");
+  }
+}
+
+function startActivityListener(user) {
+  if (stopActivityListener) stopActivityListener();
+  stopActivityListener = null;
+  activityListenerReady = false;
+  knownFeedbackTotals.clear();
+  if (!user) { syncMenuFeedback([]); return; }
+  const linksQuery = query(collection(db, "advisoryLinks"), where("ownerUid", "==", user.uid));
+  stopActivityListener = onSnapshot(linksQuery, (snap) => {
+    const items = snap.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
+    let newest = null;
+    items.forEach((item) => {
+      const total = feedbackTotal(item);
+      const previous = knownFeedbackTotals.get(item.id) ?? total;
+      if (activityListenerReady && total > previous) newest = item;
+      knownFeedbackTotals.set(item.id, total);
+    });
+    syncMenuFeedback(items);
+    if (managerDialog()?.open) {
+      currentLinks = items;
+      renderLinks();
+      const unread = items.reduce((sum, item) => sum + unreadFeedback(item), 0);
+      const status = document.getElementById("advisoryManagerStatus");
+      if (status && unread > 0) status.textContent = `Có ${unread} phản hồi khách mới cần xử lý.`;
+    }
+    if (newest) notify(`Căn ${unitCode(newest.primaryUnitCode)} vừa có phản hồi mới từ khách`);
+    activityListenerReady = true;
+  }, () => {});
 }
 
 function closeAccountDrawer() {
@@ -440,10 +509,20 @@ async function loadLinks({ validate = true } = {}) {
   if (status) status.textContent = "Đang tải link đã gửi…";
   const snap = await getDocs(query(collection(db, "advisoryLinks"), where("ownerUid", "==", currentUser.uid)));
   currentLinks = snap.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
-  await backfillDeleteTimes();
-  const deletedCount = await deleteDueLinks();
+  let maintenanceWarning = false;
+  let deletedCount = 0;
+  try { await backfillDeleteTimes(); }
+  catch { maintenanceWarning = true; }
+  try { deletedCount = await deleteDueLinks(); }
+  catch { maintenanceWarning = true; }
   renderLinks();
-  if (status) status.textContent = deletedCount
+  const unread = currentLinks.reduce((sum, item) => sum + unreadFeedback(item), 0);
+  syncMenuFeedback(currentLinks);
+  if (status) status.textContent = unread > 0
+    ? `Có ${unread} phản hồi khách mới cần xử lý.`
+    : maintenanceWarning
+    ? `${currentLinks.length} link · Danh sách đã tải; lịch xóa của một số link cũ đang chờ đồng bộ.`
+    : deletedCount
     ? `Đã tự động xóa ${deletedCount} link quá hạn · Còn ${currentLinks.length} link.`
     : currentLinks.length ? `${currentLinks.length} link · Không lưu IP hoặc thông tin thiết bị.` : "Chưa có link tư vấn nào.";
   if (validate) validateActiveLinks().catch(() => {});
@@ -469,23 +548,28 @@ function renderLinks() {
   }
   currentLinks.forEach((item) => {
     const status = linkStatus(item);
+    const unread = unreadFeedback(item);
+    const positive = Math.max(0, Number(item.positiveFeedbackCount) || 0);
+    const consultation = Math.max(0, Number(item.consultationInterestCount) || 0);
     const row = document.createElement("tr");
+    if (unread > 0) row.classList.add("has-customer-feedback");
     row.innerHTML = `
       <td data-label="Khách"><strong>${escapeHtml(safeText(item.customerAlias, 80) || "Khách hàng")}</strong>${item.interestedUnitCode ? `<small>Quan tâm: ${escapeHtml(unitCode(item.interestedUnitCode))}</small>` : ""}</td>
       <td data-label="Căn chính"><b>${escapeHtml(unitCode(item.primaryUnitCode))}</b><small>Phiên bản ${Number(item.version || 1)}</small></td>
       <td data-label="Tạo lúc">${dateTime(item.createdAt)}</td>
       <td data-label="Hết hạn">${shortDate(item.expiresAt)}</td>
       <td data-label="Lượt mở"><strong>${Number(item.viewCount || 0)}</strong>${item.lastViewedAt ? `<small>Gần nhất: ${dateTime(item.lastViewedAt)}</small>` : ""}</td>
-      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small>${item.revoked || timestampMs(item.expiresAt) <= Date.now() ? `<small>Tự động xóa: ${escapeHtml(dateTime(item.deleteAt))}</small>` : ""}</td>
+      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small>${positive || consultation ? `<small class="advisory-feedback-summary">Phản hồi khách: ${positive} phù hợp · ${consultation} cần tư vấn</small>` : ""}${item.revoked || timestampMs(item.expiresAt) <= Date.now() ? `<small>Tự động xóa: ${escapeHtml(dateTime(item.deleteAt))}</small>` : ""}</td>
       <td data-label="Thao tác"><div class="advisory-row-actions"></div></td>
     `;
     const actions = row.querySelector(".advisory-row-actions");
+    const interestButton = actionButton(unread > 0 ? `⚡ Đánh dấu quan tâm (${unread} mới)` : "Đánh dấu khách quan tâm", "interest", item.id, unread > 0 ? "customer-feedback-alert" : "");
     actions.append(
       actionButton("Mở xem", "open", item.id),
       actionButton("Sao chép", "copy", item.id),
       actionButton("Gia hạn 3 ngày", "extend", item.id),
       actionButton("Tạo phiên bản mới", "duplicate", item.id),
-      actionButton("Đánh dấu khách quan tâm", "interest", item.id),
+      interestButton,
       actionButton("Thu hồi", "revoke", item.id, "danger")
     );
     body.appendChild(row);
@@ -560,6 +644,8 @@ async function handleRowAction(button) {
     const currentIndex = Math.max(-1, codes.indexOf(item.interestedUnitCode));
     const nextCode = codes[(currentIndex + 1) % (codes.length + 1)] || "";
     await updateDoc(doc(db, "advisoryLinks", item.id), { interestedUnitCode: nextCode, updatedAt: serverTimestamp() });
+    acknowledgeFeedback(item);
+    syncMenuFeedback(currentLinks);
     notify(nextCode ? `Đã đánh dấu khách quan tâm căn ${nextCode}` : "Đã bỏ đánh dấu căn quan tâm");
   }
   await loadLinks();
@@ -674,4 +760,5 @@ onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (!user) currentLinks = [];
   else cleanupOwnedLinks().catch(() => {});
+  startActivityListener(user);
 });

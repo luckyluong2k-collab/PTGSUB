@@ -602,6 +602,17 @@ service cloud.firestore {
         );
     }
 
+    function validAdvisoryDeleteScheduleUpdate() {
+      return (advisoryOwner() || isAdmin())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["deleteAt", "updatedAt"])
+        && request.resource.data.deleteAt is timestamp
+        && request.resource.data.updatedAt == request.time
+        && (
+          (resource.data.revoked == true && request.resource.data.deleteAt <= request.time + duration.value(3, "d"))
+          || (resource.data.revoked == false && request.resource.data.deleteAt <= resource.data.expiresAt + duration.value(3, "d"))
+        );
+    }
+
     match /advisoryLinks/{linkId} {
       allow get: if isAdmin() || advisoryOwner() || activeAdvisoryLink();
       allow list: if signedIn() && (isAdmin() || resource.data.ownerUid == request.auth.uid);
@@ -623,7 +634,10 @@ service cloud.firestore {
         && request.resource.data.consultationInterestCount == 0
         && request.resource.data.lastViewedAt == null;
 
-      allow update: if validAdvisoryOwnerUpdate() || validPublicAdvisoryView() || validPublicAdvisoryFeedback();
+      allow update: if validAdvisoryOwnerUpdate()
+        || validAdvisoryDeleteScheduleUpdate()
+        || validPublicAdvisoryView()
+        || validPublicAdvisoryFeedback();
       allow delete: if (advisoryOwner() || isAdmin())
         && resource.data.deleteAt is timestamp
         && resource.data.deleteAt <= request.time;
