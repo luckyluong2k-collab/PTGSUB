@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v202-advisory-multi-scenario";
+const CACHE_NAME = "park-pricing-v203-home-link-preview";
 const ASSETS = [
   "./",
   "./index.html",
