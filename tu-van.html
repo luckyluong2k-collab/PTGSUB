@@ -11,7 +11,7 @@
   <meta property="og:description" content="Thông tin căn, phương án thanh toán và liên hệ sale.">
   <meta property="og:type" content="website">
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/tu-van.css?v=13">
+  <link rel="stylesheet" href="/tu-van.css?v=14">
 </head>
 <body>
   <main class="advice-page">
@@ -57,11 +57,16 @@
         <div class="advice-action-copy"><strong>Quan tâm căn này? Liên hệ sale ngay</strong><span>Kiểm tra tình trạng, chính sách và hỗ trợ giữ căn nhanh nhất.</span></div>
         <a id="adviceCall" href="tel:0387335227"><span aria-hidden="true">&#9742;</span> Gọi ngay cho sale</a>
         <a id="adviceZalo" href="https://zalo.me/0387335227" target="_blank" rel="noopener"><span aria-hidden="true">&#128172;</span> Nhắn Zalo ngay</a>
+        <form class="advice-lead-form" id="adviceLeadForm">
+          <label for="adviceLeadPhone"><strong>Để lại SĐT để được tư vấn</strong><span>Sale gọi lại và hỗ trợ thông tin căn nhanh nhất.</span></label>
+          <div><input id="adviceLeadPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="Nhập số điện thoại" aria-label="Số điện thoại cần tư vấn" required><button type="submit">Gửi để sale gọi lại</button></div>
+          <p id="adviceLeadStatus" role="status" aria-live="polite"></p>
+        </form>
       </div>
       <p class="advice-disclaimer">Giá và tình trạng căn được ghi nhận tại thời điểm tạo link, có thể thay đổi theo bảng hàng và chính sách. Thông tin phong thủy nếu có chỉ để tham khảo; quyết định mua ưu tiên pháp lý, giá, dòng tiền, vị trí và nhu cầu thực tế. Nội dung này không phải cam kết giữ căn hoặc bảo đảm tài chính.</p>
     </section>
   </main>
   <script src="/unit-image-data.js?v=1"></script>
-  <script type="module" src="/tu-van.js?v=13"></script>
+  <script type="module" src="/tu-van.js?v=14"></script>
 </body>
 </html>

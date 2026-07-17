@@ -521,6 +521,8 @@ service cloud.firestore {
           "viewCount",
           "positiveFeedbackCount",
           "consultationInterestCount",
+          "leadPhone",
+          "leadRequestedAt",
           "lastViewedAt",
           "changeState",
           "changeMessage",
@@ -562,6 +564,11 @@ service cloud.firestore {
           request.resource.data.consultationInterestCount is int
           && request.resource.data.consultationInterestCount >= 0
         ))
+        && (!("leadPhone" in request.resource.data) || (
+          request.resource.data.leadPhone is string
+          && request.resource.data.leadPhone.matches('^0[0-9]{9,10}$')
+        ))
+        && (!("leadRequestedAt" in request.resource.data) || request.resource.data.leadRequestedAt is timestamp)
         && (request.resource.data.lastViewedAt == null || request.resource.data.lastViewedAt is timestamp)
         && request.resource.data.changeState in [
           "unchecked",
@@ -628,6 +635,17 @@ service cloud.firestore {
         );
     }
 
+    function validPublicAdvisoryLead() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return activeAdvisoryLink()
+        && changed.hasOnly(["leadPhone", "leadRequestedAt", "consultationInterestCount", "updatedAt"])
+        && request.resource.data.leadPhone is string
+        && request.resource.data.leadPhone.matches('^0[0-9]{9,10}$')
+        && request.resource.data.leadRequestedAt == request.time
+        && request.resource.data.consultationInterestCount == (("consultationInterestCount" in resource.data) ? resource.data.consultationInterestCount + 1 : 1)
+        && request.resource.data.updatedAt == request.time;
+    }
+
     function validAdvisoryDeleteScheduleUpdate() {
       return (advisoryOwner() || isAdmin())
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["deleteAt", "updatedAt"])
@@ -651,8 +669,8 @@ service cloud.firestore {
           "createdAt", "updatedAt", "expiresAt", "deleteAt", "revoked",
           "version", "sourceLinkId", "primaryUnitCode", "interestedUnitCode",
           "units", "viewCount", "positiveFeedbackCount",
-          "consultationInterestCount", "lastViewedAt", "changeState",
-          "changeMessage", "statusCheckedAt"
+          "consultationInterestCount", "leadPhone", "leadRequestedAt",
+          "lastViewedAt", "changeState", "changeMessage", "statusCheckedAt"
         ])
         && validAdvisoryCreateUnits()
         && request.resource.data.ownerUid == request.auth.uid
@@ -683,7 +701,8 @@ service cloud.firestore {
       allow update: if validAdvisoryOwnerUpdate()
         || validAdvisoryDeleteScheduleUpdate()
         || validPublicAdvisoryView()
-        || validPublicAdvisoryFeedback();
+        || validPublicAdvisoryFeedback()
+        || validPublicAdvisoryLead();
       allow delete: if (advisoryOwner() || isAdmin())
         && resource.data.deleteAt is timestamp
         && resource.data.deleteAt <= request.time;

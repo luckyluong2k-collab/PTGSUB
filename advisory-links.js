@@ -567,7 +567,7 @@ function renderLinks() {
       <td data-label="Tạo lúc">${dateTime(item.createdAt)}</td>
       <td data-label="Hết hạn">${shortDate(item.expiresAt)}</td>
       <td data-label="Lượt mở"><strong>${Number(item.viewCount || 0)}</strong>${item.lastViewedAt ? `<small>Gần nhất: ${dateTime(item.lastViewedAt)}</small>` : ""}</td>
-      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small>${positive || consultation ? `<small class="advisory-feedback-summary">Phản hồi khách: ${positive} phù hợp · ${consultation} cần tư vấn</small>` : ""}${item.revoked || timestampMs(item.expiresAt) <= Date.now() ? `<small>Tự động xóa: ${escapeHtml(dateTime(item.deleteAt))}</small>` : ""}</td>
+      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small>${positive || consultation ? `<small class="advisory-feedback-summary">Phản hồi khách: ${positive} phù hợp · ${consultation} cần tư vấn</small>` : ""}${item.leadPhone ? `<small class="advisory-lead-phone">☎ Khách để lại SĐT: <a href="tel:${escapeHtml(safeText(item.leadPhone, 15))}">${escapeHtml(safeText(item.leadPhone, 15))}</a>${item.leadRequestedAt ? ` · ${escapeHtml(dateTime(item.leadRequestedAt))}` : ""}</small>` : ""}${item.revoked || timestampMs(item.expiresAt) <= Date.now() ? `<small>Tự động xóa: ${escapeHtml(dateTime(item.deleteAt))}</small>` : ""}</td>
       <td data-label="Thao tác"><div class="advisory-row-actions"></div></td>
     `;
     const actions = row.querySelector(".advisory-row-actions");
