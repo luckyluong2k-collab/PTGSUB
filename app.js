@@ -502,9 +502,6 @@ let lastCatalogRefreshAt = 0;
 const unitMapImage = "phankhupark-map.png";
 const lowRiseMapImage = "lowrise-map-sharp.jpg";
 const lienKeMapImage = "lienke.png";
-const LOW_RISE_BASE_WIDTH = 2048;
-const LOW_RISE_BASE_HEIGHT = 1448;
-const LOW_RISE_SOURCE_SCALE = 2;
 const LIEN_KE_BASE_WIDTH = 5854;
 const LIEN_KE_BASE_HEIGHT = 3667;
 const LOW_RISE_STREETS = Array.from(
@@ -539,120 +536,39 @@ function parseLowRiseCodeParts(value) {
   };
 }
 
-function scaleLowRiseValue(value) {
-  return Math.round(value * LOW_RISE_SOURCE_SCALE);
+function isLowRiseUnitCode(value) {
+  return /^C\d+$/.test(normalizeUnitCode(value));
 }
 
-function scaleLowRiseRect(rect) {
-  return {
-    x: scaleLowRiseValue(rect.x),
-    y: scaleLowRiseValue(rect.y),
-    width: scaleLowRiseValue(rect.width),
-    height: scaleLowRiseValue(rect.height),
-  };
+function verifiedLowRiseCoordinate(value) {
+  const unitCode = normalizeUnitCode(value);
+  const coordinate = window.lowRiseUnitCoordinates?.[unitCode];
+  if (!coordinate) return null;
+  const parsed = parseLowRiseCodeParts(unitCode);
+  if (!parsed.street || !parsed.house) return null;
+  if (![coordinate.x, coordinate.y, coordinate.width, coordinate.height, coordinate.rotation].every(Number.isFinite)) return null;
+  if (coordinate.width <= 0 || coordinate.height <= 0 || !coordinate.crop) return null;
+  return coordinate;
 }
 
-function scaleLowRisePoint(point) {
+function verifiedLowRiseMapLocation(value) {
+  const unitCode = normalizeUnitCode(value);
+  const coordinate = verifiedLowRiseCoordinate(unitCode);
+  if (!coordinate || !window.unitCatalog?.[unitCode]) return null;
   return {
-    x: scaleLowRiseValue(point.x),
-    y: scaleLowRiseValue(point.y),
-  };
-}
-
-function makeLowRiseMapLocation(x, y, options = {}) {
-  const width = options.width || 22;
-  const height = options.height || 46;
-  const cropWidth = options.cropWidth || 850;
-  const cropHeight = options.cropHeight || 430;
-  const maxCropX = Math.max(0, LOW_RISE_BASE_WIDTH - cropWidth);
-  const maxCropY = Math.max(0, LOW_RISE_BASE_HEIGHT - cropHeight);
-  const cropX = Math.min(maxCropX, Math.max(0, options.cropX ?? x - 300));
-  const cropY = Math.min(maxCropY, Math.max(0, options.cropY ?? y - 145));
-  const labelOnLeft = options.labelOnLeft ?? x > 1300;
-  const label = {
-    x: labelOnLeft ? cropX + 24 : cropX + 430,
-    y: cropY + 24,
-    width: 390,
-    height: 120,
-  };
-
-  return {
+    kind: "verified-low-rise",
     image: lowRiseMapImage,
-    scale: 0.32 * LOW_RISE_SOURCE_SCALE,
-    crop: scaleLowRiseRect({ x: cropX, y: cropY, width: cropWidth, height: cropHeight }),
-    unitRect: scaleLowRiseRect({ x, y, width, height }),
-    label: scaleLowRiseRect(label),
-    arrowStart: scaleLowRisePoint({
-      x: labelOnLeft ? label.x + label.width : label.x,
-      y: label.y + 125,
-    }),
-    arrowEnd: scaleLowRisePoint({ x: x + width / 2, y: y + height / 2 }),
-  };
-}
-
-function makeLienKeMapLocation(x, y, options = {}) {
-  const width = options.width || 42;
-  const height = options.height || 62;
-  const cropWidth = options.cropWidth || 1500;
-  const cropHeight = options.cropHeight || 900;
-  const maxCropX = Math.max(0, LIEN_KE_BASE_WIDTH - cropWidth);
-  const maxCropY = Math.max(0, LIEN_KE_BASE_HEIGHT - cropHeight);
-  const cropX = Math.min(maxCropX, Math.max(0, options.cropX ?? x - 560));
-  const cropY = Math.min(maxCropY, Math.max(0, options.cropY ?? y - 330));
-  const labelOnLeft = options.labelOnLeft ?? x > LIEN_KE_BASE_WIDTH * 0.62;
-  const label = {
-    x: labelOnLeft ? cropX + 34 : cropX + cropWidth - 760,
-    y: cropY + 34,
-    width: 700,
-    height: 145,
-  };
-
-  return {
-    image: lienKeMapImage,
     scale: 1,
-    crop: { x: cropX, y: cropY, width: cropWidth, height: cropHeight },
-    unitRect: { x, y, width, height },
-    label,
-    arrowStart: {
-      x: labelOnLeft ? label.x + label.width : label.x,
-      y: label.y + 150,
+    crop: { ...coordinate.crop },
+    unitRect: {
+      x: coordinate.x - coordinate.width / 2,
+      y: coordinate.y - coordinate.height / 2,
+      width: coordinate.width,
+      height: coordinate.height,
     },
-    arrowEnd: { x: x + width / 2, y: y + height / 2 },
+    verifiedCoordinate: { ...coordinate, code: unitCode },
   };
 }
-
-// Danh sách căn LK được duyệt để tạo ảnh chỉ căn (theo bảng hàng thấp tầng).
-const lowRiseUnitMapLocations = {
-  C6104: makeLowRiseMapLocation(1238, 366),
-  C7177: makeLowRiseMapLocation(1394, 454, { labelOnLeft: true }),
-  C1634: makeLowRiseMapLocation(702, 1000),
-  C1707: makeLowRiseMapLocation(543, 1044),
-  C1741: makeLowRiseMapLocation(766, 1044),
-  C1807: makeLowRiseMapLocation(541, 1100),
-  C1837: makeLowRiseMapLocation(742, 1100),
-  C1841: makeLowRiseMapLocation(766, 1100),
-  C1863: makeLowRiseMapLocation(1071, 1100),
-  C1955: makeLowRiseMapLocation(846, 1158),
-  C1981: makeLowRiseMapLocation(1037, 1158),
-  C19177: makeLowRiseMapLocation(1394, 1100, { labelOnLeft: true }),
-};
-
-Object.entries(window.lienKeLearnedMapSamples || {}).forEach(([code, sample]) => {
-  const unitCode = String(code || "").trim().toUpperCase().replace(/\s+/g, "");
-  if (!unitCode || !sample || typeof sample !== "object") return;
-  const x = Number(sample.x);
-  const y = Number(sample.y);
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-  lowRiseUnitMapLocations[unitCode] = makeLienKeMapLocation(x, y, {
-    width: Number(sample.width) || undefined,
-    height: Number(sample.height) || undefined,
-    cropWidth: Number(sample.cropWidth) || undefined,
-    cropHeight: Number(sample.cropHeight) || undefined,
-    cropX: Number.isFinite(Number(sample.cropX)) ? Number(sample.cropX) : undefined,
-    cropY: Number.isFinite(Number(sample.cropY)) ? Number(sample.cropY) : undefined,
-    labelOnLeft: typeof sample.labelOnLeft === "boolean" ? sample.labelOnLeft : undefined,
-  });
-});
 
 const unitMapExactLocations = {
   P90316: {
@@ -1080,170 +996,11 @@ function rectCenter(rect) {
   };
 }
 
-function lowRiseHouseNumber(code) {
-  const parsed = parseLowRiseCodeParts(code);
-  const house = Number.parseInt(parsed.house, 10);
-  return Number.isFinite(house) ? house : null;
-}
-
-function lienKeHouseSequence(start, end, exclude = []) {
-  const excluded = new Set(exclude);
-  const values = [];
-  for (let house = start; house <= end; house += 2) {
-    if (!excluded.has(house)) values.push(house);
-  }
-  return values;
-}
-
-function lienKeInterpolatedSegmentLocation(house, segment) {
-  const houses = segment.houses || lienKeHouseSequence(segment.start, segment.end, segment.exclude);
-  const index = houses.indexOf(house);
-  if (index < 0) return null;
-  const width = segment.width || 34;
-  const height = segment.height || 107;
-  const ratio = houses.length > 1 ? index / (houses.length - 1) : 0;
-  const centerX = interpolateValue(segment.xStart, segment.xEnd, ratio);
-  return makeLienKeMapLocation(Math.round(centerX - width / 2), segment.y, {
-    width,
-    height,
-    cropWidth: segment.cropWidth,
-    cropHeight: segment.cropHeight,
-    labelOnLeft: centerX > LIEN_KE_BASE_WIDTH * 0.62,
-  });
-}
-
-const LIEN_KE_FULL_LEFT_EVEN = { start: 2, end: 96, exclude: [4], xStart: 1246, xEnd: 3062 };
-const LIEN_KE_FULL_LEFT_ODD = { start: 1, end: 97, exclude: [13], xStart: 1246, xEnd: 3062 };
-const LIEN_KE_FULL_RIGHT_EVEN = { start: 98, end: 212, xStart: 3268, xEnd: 5530 };
-const LIEN_KE_FULL_RIGHT_ODD = { start: 99, end: 219, xStart: 3268, xEnd: 5530 };
-
-const lienKeStreetLayouts = {
-  C15: [
-    { start: 2, end: 52, exclude: [4, 14], xStart: 1246, xEnd: 5508, y: 1463, width: 70, height: 162 },
-    { ...LIEN_KE_FULL_LEFT_ODD, y: 1648 },
-    { start: 51, end: 97, xStart: 3300, xEnd: 5508, y: 1648 },
-  ],
-  C16: [
-    { ...LIEN_KE_FULL_LEFT_ODD, y: 1648 },
-    { start: 51, end: 97, xStart: 3300, xEnd: 5508, y: 1648 },
-    { ...LIEN_KE_FULL_LEFT_EVEN, y: 1915 },
-  ],
-  C17: [
-    { ...LIEN_KE_FULL_LEFT_ODD, y: 2062 },
-    { start: 51, end: 97, xStart: 3268, xEnd: 5530, y: 2062 },
-    { start: 2, end: 50, exclude: [4], xStart: 1246, xEnd: 2246, y: 2293 },
-    { start: 52, end: 72, xStart: 2672, xEnd: 3062, y: 2293 },
-    { start: 74, end: 120, xStart: 3268, xEnd: 4138, y: 2293 },
-    { start: 122, end: 164, xStart: 4690, xEnd: 5530, y: 2293 },
-  ],
-  C18: [
-    { start: 1, end: 47, exclude: [13], xStart: 1246, xEnd: 2246, y: 2440 },
-    { start: 51, end: 73, xStart: 2672, xEnd: 3062, y: 2440 },
-    { start: 75, end: 121, xStart: 3268, xEnd: 4138, y: 2440 },
-    { start: 123, end: 169, xStart: 4690, xEnd: 5530, y: 2440 },
-    { ...LIEN_KE_FULL_LEFT_EVEN, y: 2670 },
-    { ...LIEN_KE_FULL_RIGHT_EVEN, y: 2670 },
-  ],
-  C19: [
-    { ...LIEN_KE_FULL_LEFT_ODD, y: 2818 },
-    { ...LIEN_KE_FULL_RIGHT_ODD, y: 2818 },
-    { ...LIEN_KE_FULL_LEFT_EVEN, y: 3048 },
-    { ...LIEN_KE_FULL_RIGHT_EVEN, y: 3048 },
-  ],
-  C20: [
-    { start: 1, end: 51, exclude: [13], xStart: 1246, xEnd: 3062, y: 3194, width: 66, height: 112 },
-    { start: 55, end: 111, xStart: 3268, xEnd: 5512, y: 3194, width: 66, height: 112 },
-  ],
-};
-
-function resolveLienKeLayoutLocation(unitCode) {
-  const parsed = parseLowRiseCodeParts(unitCode);
-  const house = Number.parseInt(parsed.house, 10);
-  const segments = lienKeStreetLayouts[parsed.street];
-  if (!segments || !Number.isFinite(house)) return null;
-
-  for (const segment of segments) {
-    const location = lienKeInterpolatedSegmentLocation(house, segment);
-    if (location) return location;
-  }
-
-  return null;
-}
-
-function interpolationPair(samples, targetHouse) {
-  if (samples.length < 2) return null;
-  const sorted = samples
-    .slice()
-    .sort((a, b) => a.house - b.house);
-  const lower = sorted.filter((sample) => sample.house <= targetHouse).pop();
-  const upper = sorted.find((sample) => sample.house >= targetHouse);
-  if (lower && upper && lower !== upper) return [lower, upper];
-
-  return sorted
-    .slice()
-    .sort((a, b) => Math.abs(a.house - targetHouse) - Math.abs(b.house - targetHouse))
-    .slice(0, 2)
-    .sort((a, b) => a.house - b.house);
-}
-
-function interpolateValue(a, b, ratio) {
-  return a + (b - a) * ratio;
-}
-
-function inferLowRiseMapLocation(unitCode) {
-  const parsed = parseLowRiseCodeParts(unitCode);
-  const targetHouse = Number.parseInt(parsed.house, 10);
-  if (!parsed.street || !Number.isFinite(targetHouse)) return null;
-
-  const samples = Object.entries(lowRiseUnitMapLocations)
-    .map(([code, location]) => {
-      const sampleParsed = parseLowRiseCodeParts(code);
-      const house = Number.parseInt(sampleParsed.house, 10);
-      return {
-        code,
-        street: sampleParsed.street,
-        house,
-        location,
-      };
-    })
-    .filter((sample) => {
-      return sample.street === parsed.street
-        && Number.isFinite(sample.house)
-        && sample.location?.image === lienKeMapImage
-        && sample.location?.unitRect;
-    });
-
-  if (samples.length < 2) return null;
-
-  const sameParity = samples.filter((sample) => sample.house % 2 === targetHouse % 2);
-  const pair = interpolationPair(sameParity.length >= 2 ? sameParity : samples, targetHouse);
-  if (!pair || pair.length < 2 || pair[0].house === pair[1].house) return null;
-
-  const [start, end] = pair;
-  const ratio = (targetHouse - start.house) / (end.house - start.house);
-  const startRect = start.location.unitRect;
-  const endRect = end.location.unitRect;
-  const x = Math.round(interpolateValue(startRect.x, endRect.x, ratio));
-  const y = Math.round(interpolateValue(startRect.y, endRect.y, ratio));
-  const width = Math.round(interpolateValue(startRect.width, endRect.width, ratio));
-  const height = Math.round(interpolateValue(startRect.height, endRect.height, ratio));
-
-  return makeLienKeMapLocation(x, y, {
-    width,
-    height,
-    labelOnLeft: x > LIEN_KE_BASE_WIDTH * 0.62,
-  });
-}
-
 function resolveUnitMapLocation(code) {
   const unitCode = normalizeUnitCode(code);
-  const exactLowRiseLocation = lowRiseUnitMapLocations[unitCode];
-  if (exactLowRiseLocation?.image === lienKeMapImage) return exactLowRiseLocation;
-  const generatedLienKeLocation = resolveLienKeLayoutLocation(unitCode);
-  if (generatedLienKeLocation) return generatedLienKeLocation;
-  if (exactLowRiseLocation) return exactLowRiseLocation;
-  const inferredLowRiseLocation = inferLowRiseMapLocation(unitCode);
-  if (inferredLowRiseLocation) return inferredLowRiseLocation;
+  // Căn thấp tầng C... tuyệt đối chỉ dùng tọa độ exact trong lowrise-unit-coordinates.js.
+  // Không đi qua bảng dãy, phép nội suy hoặc mẫu gần nhất ở phía dưới.
+  if (isLowRiseUnitCode(unitCode)) return verifiedLowRiseMapLocation(unitCode);
   if (unitMapExactLocations[unitCode]) return unitMapExactLocations[unitCode];
 
   const parsed = parseUnitCodeParts(unitCode);
@@ -3464,6 +3221,14 @@ function syncMapScenarioLabels() {
 
 function openUnitMapOptions() {
   const unitCode = normalizeUnitCode(els.unitCode.value);
+  if (isLowRiseUnitCode(unitCode) && !verifiedLowRiseCoordinate(unitCode)) {
+    showToast(`Chưa có tọa độ xác thực cho căn ${unitCode || "này"}.`);
+    return;
+  }
+  if (isLowRiseUnitCode(unitCode) && !window.unitCatalog?.[unitCode]) {
+    showToast(`Không tìm thấy căn ${unitCode || "này"} trong bảng hàng hiện tại.`);
+    return;
+  }
   if (!resolveUnitMapLocation(unitCode)) {
     showToast(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
     return;
@@ -3506,6 +3271,93 @@ function drawMapRect(ctx, rect, color, lineWidth, scale = 1, glow = true) {
   ctx.lineWidth = lineWidth * scale;
   ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
   ctx.restore();
+}
+
+function roundedRectPath(ctx, x, y, width, height, radius) {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawVerifiedLowRiseMarker(ctx, coordinate) {
+  const padding = Math.max(2, Math.min(4, Number(coordinate.padding) || 2));
+  const width = Math.max(1, coordinate.width - padding * 2);
+  const height = Math.max(1, coordinate.height - padding * 2);
+  const rotation = Number(coordinate.rotation) || 0;
+  const radians = rotation * Math.PI / 180;
+
+  ctx.save();
+  ctx.translate(coordinate.x, coordinate.y);
+  ctx.rotate(radians);
+  roundedRectPath(ctx, -width / 2, -height / 2, width, height, Math.min(2, width / 3));
+  ctx.fillStyle = "rgba(255,255,255,0.01)";
+  ctx.fill();
+  ctx.strokeStyle = "#ed1c24";
+  ctx.lineWidth = 1;
+  ctx.shadowColor = "rgba(255,238,0,0.92)";
+  ctx.shadowBlur = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  const tagOffset = coordinate.tagOffset || { x: 24, y: 42 };
+  const tagX = coordinate.x + Number(tagOffset.x || 0);
+  const tagY = coordinate.y + Number(tagOffset.y || 0);
+  const tagWidth = Math.max(42, String(coordinate.code || "Căn").length * 7 + 12);
+  const tagHeight = 18;
+  const edgeX = coordinate.x - Math.sin(radians) * (height / 2);
+  const edgeY = coordinate.y + Math.cos(radians) * (height / 2);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(237,28,36,0.9)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(edgeX, edgeY);
+  ctx.lineTo(tagX, tagY + tagHeight / 2);
+  ctx.stroke();
+  roundedRectPath(ctx, tagX, tagY, tagWidth, tagHeight, 4);
+  ctx.fillStyle = "rgba(5,62,59,0.94)";
+  ctx.fill();
+  ctx.strokeStyle = "#ffe35b";
+  ctx.stroke();
+  ctx.fillStyle = "#fff4a8";
+  ctx.font = "800 10px 'Be Vietnam Pro', Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(coordinate.code || "Căn", tagX + tagWidth / 2, tagY + tagHeight / 2 + 0.5);
+  ctx.restore();
+
+  if (window.DEBUG_UNIT_COORDINATES === true) {
+    ctx.save();
+    ctx.translate(coordinate.x, coordinate.y);
+    ctx.rotate(radians);
+    ctx.setLineDash([3, 2]);
+    ctx.strokeStyle = "#00e5ff";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-coordinate.width / 2, -coordinate.height / 2, coordinate.width, coordinate.height);
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "#004cff";
+    ctx.beginPath();
+    ctx.moveTo(-4, 0);
+    ctx.lineTo(4, 0);
+    ctx.moveTo(0, -4);
+    ctx.lineTo(0, 4);
+    ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = "#004cff";
+    ctx.font = "700 9px monospace";
+    ctx.fillText(`${coordinate.code} @ ${coordinate.x},${coordinate.y}`, coordinate.x + 8, coordinate.y - coordinate.height / 2 - 5);
+    ctx.restore();
+  }
 }
 
 function drawMapArrow(ctx, start, end, scale = 1) {
@@ -3595,15 +3447,23 @@ function canvasToBlob(canvas) {
 async function buildUnitMapImage(scenarios = [activeScenario]) {
   const selected = (Array.isArray(scenarios) ? scenarios : [scenarios]).filter(Boolean);
   const unitCode = normalizeUnitCode(els.unitCode.value);
+  if (isLowRiseUnitCode(unitCode) && !verifiedLowRiseCoordinate(unitCode)) {
+    throw new Error(`Chưa có tọa độ xác thực cho căn ${unitCode || "này"}.`);
+  }
+  if (isLowRiseUnitCode(unitCode) && !window.unitCatalog?.[unitCode]) {
+    throw new Error(`Không tìm thấy căn ${unitCode || "này"} trong bảng hàng hiện tại.`);
+  }
   const location = resolveUnitMapLocation(unitCode);
   if (!location) throw new Error(`Chưa có tọa độ mặt bằng cho căn ${unitCode || "này"}`);
 
   const results = selected.map((scenario) => calculate({ scenario }));
   const image = await loadMapImage(location.image);
   const crop = location.crop;
+  const isVerifiedLowRise = location.kind === "verified-low-rise";
+  const infoHeight = isVerifiedLowRise ? 190 : 0;
   const outputCanvas = document.createElement("canvas");
   outputCanvas.width = crop.width;
-  outputCanvas.height = crop.height;
+  outputCanvas.height = crop.height + infoHeight;
   const ctx = outputCanvas.getContext("2d");
   ctx.drawImage(
     image,
@@ -3612,18 +3472,25 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
     crop.width,
     crop.height,
     0,
-    0,
+    infoHeight,
     crop.width,
     crop.height
   );
   ctx.save();
-  ctx.translate(-crop.x, -crop.y);
+  ctx.translate(-crop.x, infoHeight - crop.y);
   const scale = location.scale || 1;
-  if (location.towerRect) drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
-  drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
-  drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
-  drawMapLabel(ctx, location.label, results, scale);
+  if (isVerifiedLowRise) {
+    drawVerifiedLowRiseMarker(ctx, location.verifiedCoordinate);
+  } else {
+    if (location.towerRect) drawMapRect(ctx, location.towerRect, "#ff2d2d", 18, scale);
+    drawMapRect(ctx, location.unitRect, "#ffea00", 6, scale, false);
+    drawMapArrow(ctx, location.arrowStart, location.arrowEnd, scale);
+    drawMapLabel(ctx, location.label, results, scale);
+  }
   ctx.restore();
+  if (isVerifiedLowRise) {
+    drawMapLabel(ctx, { x: 10, y: 10, width: crop.width - 20, height: infoHeight - 20 }, results, 0.28);
+  }
 
   return {
     canvas: outputCanvas,
