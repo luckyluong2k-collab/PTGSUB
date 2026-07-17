@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v196-advisory-dashboard-alerts";
+const CACHE_NAME = "park-pricing-v197-advisory-alert-dismiss";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,7 +6,7 @@ const ASSETS = [
   "./styles.css?v=117",
   "./feng-shui.css?v=8",
   "./advisory-links.css?v=4",
-  "./advisory-links.js?v=14",
+  "./advisory-links.js?v=15",
   "./tu-van.html",
   "./tu-van.css?v=13",
   "./tu-van.js?v=13",

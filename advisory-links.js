@@ -640,12 +640,18 @@ async function handleRowAction(button) {
     await updateDoc(doc(db, "advisoryLinks", item.id), { revoked: true, deleteAt: Timestamp.fromMillis(Date.now() + DELETE_GRACE_MS), updatedAt: serverTimestamp() });
     notify("Đã thu hồi link · tự xóa sau 3 ngày");
   } else if (action === "interest") {
+    // Clicking this action means the sale has handled the customer's new feedback.
+    // Clear every visual notification immediately instead of waiting for Firestore.
+    acknowledgeFeedback(item);
+    syncMenuFeedback(currentLinks);
+    renderLinks();
+    const managerStatus = document.getElementById("advisoryManagerStatus");
+    if (managerStatus) managerStatus.textContent = "Đã ghi nhận phản hồi mới của khách.";
+
     const codes = (item.units || []).map((unit) => unit.code);
     const currentIndex = Math.max(-1, codes.indexOf(item.interestedUnitCode));
     const nextCode = codes[(currentIndex + 1) % (codes.length + 1)] || "";
     await updateDoc(doc(db, "advisoryLinks", item.id), { interestedUnitCode: nextCode, updatedAt: serverTimestamp() });
-    acknowledgeFeedback(item);
-    syncMenuFeedback(currentLinks);
     notify(nextCode ? `Đã đánh dấu khách quan tâm căn ${nextCode}` : "Đã bỏ đánh dấu căn quan tâm");
   }
   await loadLinks();
