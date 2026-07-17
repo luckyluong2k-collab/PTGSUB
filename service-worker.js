@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v206-c16-c19-coordinates";
+const CACHE_NAME = "park-pricing-v207-wide-map-side-price";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,8 +12,8 @@ const ASSETS = [
   "./tu-van.js?v=14",
   "./unit-image-data.js?v=1",
   "./mid-autumn-theme.css?v=6",
-  "./lowrise-unit-coordinates.js?v=3",
-  "./app.js?v=114",
+  "./lowrise-unit-coordinates.js?v=4",
+  "./app.js?v=115",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",

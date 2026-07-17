@@ -3464,6 +3464,27 @@ function drawMapLabel(ctx, label, results = [], scale = 1) {
   ctx.restore();
 }
 
+function drawCompactLowRisePricePanel(ctx, mapWidth, canvasHeight, results = []) {
+  const panelWidth = 240;
+  const panelPadding = 12;
+  const scale = 0.22;
+  const lines = mapLabelLines(results);
+  const contentHeight = lines.reduce((sum, line) => sum + line.size + 24, 0) * scale + 44 * scale;
+  const cardHeight = Math.min(canvasHeight - panelPadding * 2, Math.max(96, contentHeight));
+  const cardY = Math.round((canvasHeight - cardHeight) / 2);
+
+  ctx.save();
+  ctx.fillStyle = "#082934";
+  ctx.fillRect(mapWidth, 0, panelWidth, canvasHeight);
+  drawMapLabel(ctx, {
+    x: mapWidth + panelPadding,
+    y: cardY,
+    width: panelWidth - panelPadding * 2,
+    height: cardHeight,
+  }, results, scale);
+  ctx.restore();
+}
+
 function canvasToBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.94));
 }
@@ -3484,11 +3505,13 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
   const image = await loadMapImage(location.image);
   const crop = location.crop;
   const isVerifiedLowRise = location.kind === "verified-low-rise";
-  const infoHeight = isVerifiedLowRise ? 190 : 0;
+  const infoWidth = isVerifiedLowRise ? 240 : 0;
   const outputCanvas = document.createElement("canvas");
-  outputCanvas.width = crop.width;
-  outputCanvas.height = crop.height + infoHeight;
+  outputCanvas.width = crop.width + infoWidth;
+  outputCanvas.height = crop.height;
   const ctx = outputCanvas.getContext("2d");
+  ctx.fillStyle = "#082934";
+  ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
   ctx.drawImage(
     image,
     crop.x,
@@ -3496,12 +3519,12 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
     crop.width,
     crop.height,
     0,
-    infoHeight,
+    0,
     crop.width,
     crop.height
   );
   ctx.save();
-  ctx.translate(-crop.x, infoHeight - crop.y);
+  ctx.translate(-crop.x, -crop.y);
   const scale = location.scale || 1;
   if (isVerifiedLowRise) {
     drawVerifiedLowRiseMarker(ctx, location.verifiedCoordinate);
@@ -3513,7 +3536,7 @@ async function buildUnitMapImage(scenarios = [activeScenario]) {
   }
   ctx.restore();
   if (isVerifiedLowRise) {
-    drawMapLabel(ctx, { x: 10, y: 10, width: crop.width - 20, height: infoHeight - 20 }, results, 0.28);
+    drawCompactLowRisePricePanel(ctx, crop.width, crop.height, results);
   }
 
   return {

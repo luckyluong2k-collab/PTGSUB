@@ -19,7 +19,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 824, y: 1940, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 704, y: 1880, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 100, y: -45 }),
   }),
 
@@ -31,7 +31,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 685, y: 1990, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 586, y: 1920, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
   C1741: Object.freeze({
@@ -41,7 +41,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 878, y: 1990, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 758, y: 1920, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 102, y: 24 }),
   }),
 
@@ -53,7 +53,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 706, y: 2100, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 586, y: 2030, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
   C1837: Object.freeze({
@@ -63,7 +63,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 860, y: 2100, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 737, y: 2030, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 102, y: 24 }),
   }),
   C1841: Object.freeze({
@@ -73,7 +73,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 32,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 878, y: 2100, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 758, y: 2030, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 102, y: 24 }),
   }),
 
@@ -85,7 +85,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 33,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 953, y: 2205, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 833, y: 2140, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
   C1981: Object.freeze({
@@ -95,7 +95,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 33,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 1093, y: 2205, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 973, y: 2140, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
   C19177: Object.freeze({
@@ -105,7 +105,7 @@ window.lowRiseUnitCoordinates = Object.freeze({
     height: 33,
     rotation: 0,
     padding: 2,
-    crop: Object.freeze({ x: 1670, y: 2205, width: 480, height: 240 }),
+    crop: Object.freeze({ x: 1550, y: 2140, width: 720, height: 360 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
 });
