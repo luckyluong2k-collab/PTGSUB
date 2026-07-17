@@ -15,10 +15,10 @@
     },
     {
       id: "mid-autumn-red-gold",
-      name: "Trung Thu vàng-đỏ",
+      name: "Trung Thu Trăng Vàng",
       bodyClass: "theme-mid-autumn-red-gold",
-      description: "Giao diện Trung Thu Việt Nam với sắc đỏ son, vàng ánh trăng, đèn ông sao và không khí lễ hội.",
-      colors: ["#5f0614", "#8b0f23", "#b51b31", "#f5c451", "#ffd978", "#fff7e8"],
+      description: "Giao diện Trung Thu đồng bộ: sáng kem - đỏ son - vàng đồng, tối navy đêm - vàng ánh trăng.",
+      colors: ["#fff8e7", "#a52a24", "#d8a62e", "#07152d", "#0d2140", "#f1c65b"],
     },
   ];
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v210-mid-autumn-demo";
+const CACHE_NAME = "park-pricing-v211-unified-mid-autumn-theme";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,7 +11,7 @@ const ASSETS = [
   "./tu-van.css?v=14",
   "./tu-van.js?v=14",
   "./unit-image-data.js?v=1",
-  "./mid-autumn-theme.css?v=7",
+  "./mid-autumn-theme.css?v=8",
   "./lowrise-unit-coordinates.js?v=4",
   "./app.js?v=115",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
@@ -21,7 +21,7 @@ const ASSETS = [
   "./ui-admin-search.js?v=1",
   "./ui-menu.js?v=4",
   "./ui-payment.js?v=1",
-  "./ui-theme.js?v=5",
+  "./ui-theme.js?v=6",
   "./feng-shui.js?v=3",
   "./manifest.webmanifest",
   "./favicon.png",
