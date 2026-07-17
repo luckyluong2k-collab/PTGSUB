@@ -485,6 +485,7 @@ service cloud.firestore {
           "createdAt",
           "updatedAt",
           "expiresAt",
+          "deleteAt",
           "revoked",
           "version",
           "sourceLinkId",
@@ -511,6 +512,7 @@ service cloud.firestore {
         && request.resource.data.createdAt is timestamp
         && request.resource.data.updatedAt is timestamp
         && request.resource.data.expiresAt is timestamp
+        && (!("deleteAt" in request.resource.data) || request.resource.data.deleteAt is timestamp)
         && request.resource.data.revoked is bool
         && request.resource.data.version is int
         && request.resource.data.version >= 1
@@ -553,6 +555,11 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.viewCount >= resource.data.viewCount
         && request.resource.data.expiresAt <= request.time + duration.value(31, "d")
+        && request.resource.data.deleteAt is timestamp
+        && (
+          (request.resource.data.revoked == true && request.resource.data.deleteAt <= request.time + duration.value(3, "d"))
+          || (request.resource.data.revoked == false && request.resource.data.deleteAt <= request.resource.data.expiresAt + duration.value(3, "d"))
+        )
         && request.resource.data.updatedAt == request.time;
     }
 
@@ -582,12 +589,15 @@ service cloud.firestore {
         && request.resource.data.statusCheckedAt == request.time
         && request.resource.data.expiresAt > request.time
         && request.resource.data.expiresAt <= request.time + duration.value(31, "d")
+        && request.resource.data.deleteAt == request.resource.data.expiresAt + duration.value(3, "d")
         && request.resource.data.revoked == false
         && request.resource.data.viewCount == 0
         && request.resource.data.lastViewedAt == null;
 
       allow update: if validAdvisoryOwnerUpdate() || validPublicAdvisoryView();
-      allow delete: if false;
+      allow delete: if (advisoryOwner() || isAdmin())
+        && resource.data.deleteAt is timestamp
+        && resource.data.deleteAt <= request.time;
     }
 
     match /forumStats/global {

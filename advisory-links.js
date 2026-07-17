@@ -2,6 +2,7 @@ import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebase
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -28,6 +29,7 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const DAY_MS = 24 * 60 * 60 * 1000;
+const DELETE_GRACE_MS = 3 * DAY_MS;
 const MAX_LINKS = 3;
 const DEFAULT_SALE_NAME = "Đức Lương Sun Group";
 const DEFAULT_SALE_PHONE = "0387335227";
@@ -365,6 +367,7 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
   const id = randomToken();
   const state = initialChangeState(units);
   const primaryUnitCode = units[0]?.code || "";
+  const expiresAtMs = Date.now() + days * DAY_MS;
   await setDoc(doc(db, "advisoryLinks", id), {
     ownerUid: currentUser.uid,
     ownerName: saleName(ownerName || source?.ownerName),
@@ -372,7 +375,8 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
     customerAlias: safeText(customerAlias, 80),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-    expiresAt: Timestamp.fromMillis(Date.now() + days * DAY_MS),
+    expiresAt: Timestamp.fromMillis(expiresAtMs),
+    deleteAt: Timestamp.fromMillis(expiresAtMs + DELETE_GRACE_MS),
     revoked: false,
     version: Number(source?.version || 0) + 1,
     sourceLinkId: safeText(source?.id, 80),
@@ -388,6 +392,45 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
   return { id, url: advisoryUrl(id) };
 }
 
+async function backfillDeleteTimes() {
+  const missing = currentLinks.filter((item) => !timestampMs(item.deleteAt));
+  if (!missing.length) return false;
+  await Promise.all(missing.map(async (item) => {
+    const base = item.revoked
+      ? (timestampMs(item.updatedAt) || Date.now())
+      : (timestampMs(item.expiresAt) || Date.now());
+    const deleteAt = Timestamp.fromMillis(base + DELETE_GRACE_MS);
+    await updateDoc(doc(db, "advisoryLinks", item.id), { deleteAt, updatedAt: serverTimestamp() });
+    item.deleteAt = deleteAt;
+  }));
+  return true;
+}
+
+async function deleteDueLinks(items = currentLinks) {
+  const due = items.filter((item) => timestampMs(item.deleteAt) > 0 && timestampMs(item.deleteAt) <= Date.now());
+  if (!due.length) return 0;
+  await Promise.all(due.map((item) => deleteDoc(doc(db, "advisoryLinks", item.id))));
+  const ids = new Set(due.map((item) => item.id));
+  currentLinks = currentLinks.filter((item) => !ids.has(item.id));
+  return due.length;
+}
+
+async function cleanupOwnedLinks() {
+  if (!currentUser) return;
+  const snap = await getDocs(query(collection(db, "advisoryLinks"), where("ownerUid", "==", currentUser.uid)));
+  const items = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+  for (const item of items) {
+    if (timestampMs(item.deleteAt)) continue;
+    const base = item.revoked
+      ? (timestampMs(item.updatedAt) || Date.now())
+      : (timestampMs(item.expiresAt) || Date.now());
+    const deleteAt = Timestamp.fromMillis(base + DELETE_GRACE_MS);
+    await updateDoc(doc(db, "advisoryLinks", item.id), { deleteAt, updatedAt: serverTimestamp() });
+    item.deleteAt = deleteAt;
+  }
+  await deleteDueLinks(items);
+}
+
 async function loadLinks({ validate = true } = {}) {
   const status = document.getElementById("advisoryManagerStatus");
   const body = document.getElementById("advisoryLinksBody");
@@ -395,8 +438,12 @@ async function loadLinks({ validate = true } = {}) {
   if (status) status.textContent = "Đang tải link đã gửi…";
   const snap = await getDocs(query(collection(db, "advisoryLinks"), where("ownerUid", "==", currentUser.uid)));
   currentLinks = snap.docs.map((item) => ({ id: item.id, ...item.data() })).sort((a, b) => timestampMs(b.createdAt) - timestampMs(a.createdAt));
+  await backfillDeleteTimes();
+  const deletedCount = await deleteDueLinks();
   renderLinks();
-  if (status) status.textContent = currentLinks.length ? `${currentLinks.length} link · Không lưu IP hoặc thông tin thiết bị.` : "Chưa có link tư vấn nào.";
+  if (status) status.textContent = deletedCount
+    ? `Đã tự động xóa ${deletedCount} link quá hạn · Còn ${currentLinks.length} link.`
+    : currentLinks.length ? `${currentLinks.length} link · Không lưu IP hoặc thông tin thiết bị.` : "Chưa có link tư vấn nào.";
   if (validate) validateActiveLinks().catch(() => {});
 }
 
@@ -427,7 +474,7 @@ function renderLinks() {
       <td data-label="Tạo lúc">${dateTime(item.createdAt)}</td>
       <td data-label="Hết hạn">${shortDate(item.expiresAt)}</td>
       <td data-label="Lượt mở"><strong>${Number(item.viewCount || 0)}</strong>${item.lastViewedAt ? `<small>Gần nhất: ${dateTime(item.lastViewedAt)}</small>` : ""}</td>
-      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small></td>
+      <td data-label="Trạng thái"><span class="advisory-status ${status.className}">${escapeHtml(status.label)}</span><small>${escapeHtml(safeText(item.changeMessage, 240))}</small>${item.revoked || timestampMs(item.expiresAt) <= Date.now() ? `<small>Tự động xóa: ${escapeHtml(dateTime(item.deleteAt))}</small>` : ""}</td>
       <td data-label="Thao tác"><div class="advisory-row-actions"></div></td>
     `;
     const actions = row.querySelector(".advisory-row-actions");
@@ -493,7 +540,7 @@ async function handleRowAction(button) {
   if (action === "extend") {
     const base = Math.max(Date.now(), timestampMs(item.expiresAt));
     const expires = Math.min(base + 3 * DAY_MS, Date.now() + 30 * DAY_MS);
-    await updateDoc(doc(db, "advisoryLinks", item.id), { expiresAt: Timestamp.fromMillis(expires), revoked: false, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, "advisoryLinks", item.id), { expiresAt: Timestamp.fromMillis(expires), deleteAt: Timestamp.fromMillis(expires + DELETE_GRACE_MS), revoked: false, updatedAt: serverTimestamp() });
     notify("Đã gia hạn link thêm 3 ngày");
   } else if (action === "duplicate") {
     const units = (item.units || []).map((unit) => {
@@ -504,8 +551,8 @@ async function handleRowAction(button) {
     await copyText(created.url);
     notify("Đã tạo phiên bản mới và sao chép link");
   } else if (action === "revoke") {
-    await updateDoc(doc(db, "advisoryLinks", item.id), { revoked: true, updatedAt: serverTimestamp() });
-    notify("Đã thu hồi link ngay");
+    await updateDoc(doc(db, "advisoryLinks", item.id), { revoked: true, deleteAt: Timestamp.fromMillis(Date.now() + DELETE_GRACE_MS), updatedAt: serverTimestamp() });
+    notify("Đã thu hồi link · tự xóa sau 3 ngày");
   } else if (action === "interest") {
     const codes = (item.units || []).map((unit) => unit.code);
     const currentIndex = Math.max(-1, codes.indexOf(item.interestedUnitCode));
@@ -624,4 +671,5 @@ window.addEventListener("ptgsub:pricing-updated", (event) => {
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (!user) currentLinks = [];
+  else cleanupOwnedLinks().catch(() => {});
 });
