@@ -11,8 +11,21 @@
 window.DEBUG_UNIT_COORDINATES = false;
 
 window.lowRiseUnitCoordinates = Object.freeze({
+  // Đường C16: dãy chẵn nằm phía dưới tên đường.
+  C1634: Object.freeze({
+    x: 1063.5,
+    y: 2052,
+    width: 11,
+    height: 32,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 824, y: 1940, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 100, y: -45 }),
+  }),
+
+  // Đường C17: dãy lẻ nằm phía trên tên đường.
   C1707: Object.freeze({
-    x: 922.5,
+    x: 945.5,
     y: 2095,
     width: 11,
     height: 32,
@@ -21,8 +34,30 @@ window.lowRiseUnitCoordinates = Object.freeze({
     crop: Object.freeze({ x: 685, y: 1990, width: 480, height: 240 }),
     tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
+  C1741: Object.freeze({
+    x: 1117.5,
+    y: 2095,
+    width: 11,
+    height: 32,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 878, y: 1990, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 102, y: 24 }),
+  }),
+
+  // Đường C18: dãy lẻ nằm phía trên tên đường.
+  C1807: Object.freeze({
+    x: 945.5,
+    y: 2205,
+    width: 11,
+    height: 32,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 706, y: 2100, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 28, y: 24 }),
+  }),
   C1837: Object.freeze({
-    x: 1099.5,
+    x: 1096.5,
     y: 2205,
     width: 11,
     height: 32,
@@ -30,6 +65,38 @@ window.lowRiseUnitCoordinates = Object.freeze({
     padding: 2,
     crop: Object.freeze({ x: 860, y: 2100, width: 480, height: 240 }),
     tagOffset: Object.freeze({ x: 102, y: 24 }),
+  }),
+  C1841: Object.freeze({
+    x: 1117.5,
+    y: 2205,
+    width: 11,
+    height: 32,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 878, y: 2100, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 102, y: 24 }),
+  }),
+
+  // Đường C19: dãy lẻ nằm phía trên tên đường.
+  C1955: Object.freeze({
+    x: 1192.5,
+    y: 2314,
+    width: 11,
+    height: 33,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 953, y: 2205, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 28, y: 24 }),
+  }),
+  C1981: Object.freeze({
+    x: 1332.5,
+    y: 2314,
+    width: 11,
+    height: 33,
+    rotation: 0,
+    padding: 2,
+    crop: Object.freeze({ x: 1093, y: 2205, width: 480, height: 240 }),
+    tagOffset: Object.freeze({ x: 28, y: 24 }),
   }),
   C19177: Object.freeze({
     x: 1910,

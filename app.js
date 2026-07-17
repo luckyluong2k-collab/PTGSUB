@@ -3311,10 +3311,16 @@ function drawVerifiedLowRiseMarker(ctx, coordinate) {
   const tagY = coordinate.y + Number(tagOffset.y || 0);
   const tagWidth = Math.max(64, String(coordinate.code || "Căn").length * 9 + 18);
   const tagHeight = 26;
-  const edgeX = coordinate.x - Math.sin(radians) * (height / 2);
-  const edgeY = coordinate.y + Math.cos(radians) * (height / 2);
   const tagAnchorX = tagX;
   const tagAnchorY = tagY + tagHeight / 2;
+  const connectorDx = tagAnchorX - coordinate.x;
+  const connectorDy = tagAnchorY - coordinate.y;
+  const localDx = connectorDx * Math.cos(radians) + connectorDy * Math.sin(radians);
+  const localDy = -connectorDx * Math.sin(radians) + connectorDy * Math.cos(radians);
+  const localEdgeX = Math.sign(localDx) * width / 2;
+  const localEdgeY = Math.sign(localDy) * height / 2;
+  const edgeX = coordinate.x + localEdgeX * Math.cos(radians) - localEdgeY * Math.sin(radians);
+  const edgeY = coordinate.y + localEdgeX * Math.sin(radians) + localEdgeY * Math.cos(radians);
 
   ctx.save();
   ctx.strokeStyle = "#ed1c24";
