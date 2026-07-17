@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v200-advisory-scenario-select";
+const CACHE_NAME = "park-pricing-v201-advisory-link-preview";
 const ASSETS = [
   "./",
   "./index.html",
@@ -89,7 +89,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     const requestUrl = new URL(event.request.url);
     const isForumPage = requestUrl.pathname.endsWith("/forum.html");
-    const isAdvisoryPage = requestUrl.pathname.endsWith("/tu-van.html") || requestUrl.pathname.startsWith("/tu-van/");
+    const isAdvisoryPage = requestUrl.pathname.endsWith("/tu-van.html") || requestUrl.pathname.startsWith("/tu-van/") || requestUrl.pathname.startsWith("/t/");
     const cacheKey = isForumPage ? "./forum.html" : isAdvisoryPage ? "./tu-van.html" : "./index.html";
     event.respondWith(
       fetch(event.request)
