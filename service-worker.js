@@ -1,12 +1,12 @@
-const CACHE_NAME = "park-pricing-v199-advisory-phone-lead";
+const CACHE_NAME = "park-pricing-v200-advisory-scenario-select";
 const ASSETS = [
   "./",
   "./index.html",
   "./forum.html",
   "./styles.css?v=117",
   "./feng-shui.css?v=8",
-  "./advisory-links.css?v=5",
-  "./advisory-links.js?v=17",
+  "./advisory-links.css?v=6",
+  "./advisory-links.js?v=18",
   "./tu-van.html",
   "./tu-van.css?v=14",
   "./tu-van.js?v=14",

@@ -125,6 +125,7 @@
 .advisory-candidate strong { display: block; color: #0a655c; font-size: .95rem; }
 .advisory-candidate small { display: block; margin-top: 3px; color: #607470; line-height: 1.45; }
 .advisory-primary-choice { display: flex; align-items: center; gap: 5px; color: #6b4b0e; font-size: .74rem; font-weight: 850; white-space: nowrap; }
+.advisory-candidate-controls{display:grid;gap:8px;justify-items:end}.advisory-scenario-choice{display:grid;gap:4px;min-width:190px}.advisory-scenario-choice>span{color:#5c716d;font-size:.66rem;font-weight:900;text-transform:uppercase}.advisory-scenario-choice select{width:100%;min-height:38px;padding:7px 32px 7px 10px;border:1px solid #76aaa3;border-radius:9px;background:#fff;color:#0b5f57;font-size:.78rem;font-weight:850;cursor:pointer}.advisory-scenario-choice select:focus{border-color:#d7a22f;box-shadow:0 0 0 2px rgba(215,162,47,.18);outline:none}
 .advisory-form-error { min-height: 20px; margin: -4px 0 0; color: #a33728; font-size: .8rem; font-weight: 850; }
 .advisory-form-actions { justify-content: flex-end; }
 .advisory-empty { padding: 24px; color: #657a76; text-align: center; }
@@ -143,6 +144,7 @@ body.theme-dark .advisory-manual-unit > div:first-child strong, body.theme-dark 
 body.theme-dark .advisory-manual-unit > div:first-child span { color:#bfd1cd; }
 body.theme-dark .advisory-manual-unit-controls input, body.theme-dark .advisory-manual-unit-controls select { border-color:#557b75; background:#0a3038; color:#fff; }
 body.theme-dark .advisory-candidate:has([data-advisory-unit]:checked) { border-color: #52b9ad; background: #103f43; }
+body.theme-dark .advisory-scenario-choice>span{color:#bfd1cd}body.theme-dark .advisory-scenario-choice select{border-color:#557b75;background:#0a3038;color:#fff}
 
 @media (max-width: 760px) {
   .advisory-dialog, .advisory-create-dialog { width: calc(100vw - 8px); max-height: calc(100dvh - 8px); border-radius: 15px; }
@@ -153,7 +155,7 @@ body.theme-dark .advisory-candidate:has([data-advisory-unit]:checked) { border-c
   .advisory-manual-unit > div:first-child { display:grid; gap:4px; }
   .advisory-manual-unit-controls { grid-template-columns:minmax(0,1fr); }
   .advisory-candidate { grid-template-columns: minmax(0, 1fr); }
-  .advisory-primary-choice { padding-left: 34px; }
+  .advisory-candidate-controls{grid-template-columns:minmax(0,1fr) auto;align-items:end;justify-items:stretch;padding-left:34px}.advisory-primary-choice{padding-bottom:9px}.advisory-scenario-choice{min-width:0}
   .advisory-table-wrap { overflow: visible; border: 0; background: transparent; }
   .advisory-table, .advisory-table tbody, .advisory-table tr, .advisory-table td { display: block; width: 100%; min-width: 0; box-sizing: border-box; }
   .advisory-table thead { display: none; }

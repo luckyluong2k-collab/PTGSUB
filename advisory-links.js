@@ -60,6 +60,27 @@ function unitCode(value) {
   return safeText(value, 24).toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 24);
 }
 
+function advisoryScenarioKey(value, label = "") {
+  const allowed = ["loan", "standard", "tts50", "tts70", "tts95"];
+  if (allowed.includes(value)) return value;
+  const normalized = safeText(label || value, 120).toLowerCase();
+  if (/không vay/.test(normalized)) return "standard";
+  if (/50/.test(normalized)) return "tts50";
+  if (/70/.test(normalized)) return "tts70";
+  if (/95|100/.test(normalized)) return "tts95";
+  return "loan";
+}
+
+function advisoryScenarioOptions(code) {
+  return window.ptgsubAdvisoryPricing?.scenarios?.(code) || [
+    { value: "loan", label: "Có vay" },
+    { value: "standard", label: "Không vay" },
+    { value: "tts50", label: "TTS 50%" },
+    { value: "tts70", label: "TTS 70%" },
+    { value: "tts95", label: "TTS 100%" },
+  ];
+}
+
 function saleName(value = "") {
   return safeText(value, 120) || safeText(currentUser?.displayName || currentUser?.email?.split("@")[0], 120) || DEFAULT_SALE_NAME;
 }
@@ -279,6 +300,7 @@ function currentUnitSnapshot() {
     totalPrice: safeText(latestPricingState.totalText || document.getElementById("totalPrice")?.textContent, 80),
     upfrontPrice: safeText(document.getElementById("upfrontPrice")?.textContent, 80),
     scenario: safeText(latestPricingState.scenarioText || document.querySelector(".segmented button.active")?.textContent, 120),
+    scenarioKey: advisoryScenarioKey(latestPricingState.scenario, latestPricingState.scenarioText),
     paymentSchedule: Array.isArray(latestPricingState.paymentSchedule)
       ? latestPricingState.paymentSchedule.slice(0, 20).map((item) => ({
         label: safeText(item?.label, 160),
@@ -315,6 +337,7 @@ function candidateSnapshot(entry) {
     catalogListedGross: Number(catalog.listedGross) || 0,
     catalogBaseNet: Number(catalog.baseNet) || 0,
     catalogSalesPolicy: safeText(catalog.salesPolicy, 240),
+    _scenarioKey: advisoryScenarioKey(source.scenarioKey || source._scenarioKey, source.scenario),
   };
   const map = source.map || window.ptgsubAdvisoryPricing?.map?.(code);
   if (map?.image && map?.crop && map?.unitRect) snapshot.map = map;
@@ -353,12 +376,17 @@ function renderCandidates({ selectedCodes = null, primaryCode = "" } = {}) {
     const row = document.createElement("div");
     row.className = "advisory-candidate";
     const checked = selected.has(item.code);
+    const scenarioOptions = advisoryScenarioOptions(item.code);
+    const selectedScenario = advisoryScenarioKey(item._scenarioKey, item.scenario);
     row.innerHTML = `
       <label class="advisory-candidate-select">
         <input type="checkbox" data-advisory-unit value="${escapeHtml(item.code)}" ${checked ? "checked" : ""}>
         <span><strong>${escapeHtml(item.code)}</strong><small>${escapeHtml(item.unitType || "Chưa rõ loại")} · ${escapeHtml(item.areaText)}<br>${escapeHtml(item.totalPrice)}${item.scenario ? `<br>Phương án: ${escapeHtml(item.scenario)}` : ""}</small></span>
       </label>
-      <label class="advisory-primary-choice"><input type="radio" name="advisoryPrimary" value="${escapeHtml(item.code)}" ${item.code === primary ? "checked" : ""} ${checked ? "" : "disabled"}> Căn chính</label>
+      <div class="advisory-candidate-controls">
+        <label class="advisory-scenario-choice"><span>Phương án đưa vào link</span><select data-advisory-scenario="${escapeHtml(item.code)}">${scenarioOptions.map((option) => `<option value="${escapeHtml(option.value)}" ${option.value === selectedScenario ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}</select></label>
+        <label class="advisory-primary-choice"><input type="radio" name="advisoryPrimary" value="${escapeHtml(item.code)}" ${item.code === primary ? "checked" : ""} ${checked ? "" : "disabled"}> Căn chính</label>
+      </div>
     `;
     container.appendChild(row);
   });
@@ -419,7 +447,7 @@ function selectedUnits() {
   const selectedCodes = Array.from(document.querySelectorAll("[data-advisory-unit]:checked")).map((input) => input.value);
   const primary = document.querySelector('input[name="advisoryPrimary"]:checked')?.value || selectedCodes[0] || "";
   const ordered = selectedCodes.slice().sort((a, b) => (a === primary ? -1 : b === primary ? 1 : 0));
-  return ordered.map((code) => currentCandidates.find((item) => item.code === code)).filter(Boolean);
+  return ordered.map((code) => currentCandidates.find((item) => item.code === code)).filter(Boolean).map(({ _scenarioKey, ...unit }) => unit);
 }
 
 function initialChangeState(units) {
@@ -710,6 +738,22 @@ function bindInterface() {
   managerDialog()?.addEventListener("click", (event) => { if (event.target === managerDialog()) closeDialog(managerDialog()); });
   createDialog()?.addEventListener("click", (event) => { if (event.target === createDialog()) closeDialog(createDialog()); });
   document.getElementById("advisoryCandidates")?.addEventListener("change", (event) => {
+    const scenarioSelect = event.target.closest("[data-advisory-scenario]");
+    if (scenarioSelect) {
+      const state = selectedCandidateState();
+      const code = unitCode(scenarioSelect.dataset.advisoryScenario);
+      const index = currentCandidates.findIndex((item) => item.code === code);
+      try {
+        const recalculated = candidateSnapshot(window.ptgsubAdvisoryPricing.snapshot(code, scenarioSelect.value));
+        recalculated._scenarioKey = scenarioSelect.value;
+        if (index >= 0) currentCandidates.splice(index, 1, recalculated);
+        renderCandidates(state);
+        document.getElementById("advisoryFormError").textContent = `Đã chọn ${recalculated.scenario} cho căn ${code}.`;
+      } catch (error) {
+        document.getElementById("advisoryFormError").textContent = error?.message || `Không tính được phương án cho căn ${code}.`;
+      }
+      return;
+    }
     const checkbox = event.target.closest("[data-advisory-unit]");
     if (!checkbox) return;
     const selected = document.querySelectorAll("[data-advisory-unit]:checked");
