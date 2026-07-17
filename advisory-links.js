@@ -436,7 +436,7 @@ function renderLinks() {
       actionButton("Sao chép", "copy", item.id),
       actionButton("Gia hạn 3 ngày", "extend", item.id),
       actionButton("Tạo phiên bản mới", "duplicate", item.id),
-      actionButton("Đánh dấu quan tâm", "interest", item.id),
+      actionButton("Đánh dấu khách quan tâm", "interest", item.id),
       actionButton("Thu hồi", "revoke", item.id, "danger")
     );
     body.appendChild(row);
