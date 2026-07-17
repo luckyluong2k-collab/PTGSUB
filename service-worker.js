@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v204-verified-lowrise-coordinates";
+const CACHE_NAME = "park-pricing-v205-wide-lowrise-marker";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,8 +12,8 @@ const ASSETS = [
   "./tu-van.js?v=14",
   "./unit-image-data.js?v=1",
   "./mid-autumn-theme.css?v=6",
-  "./lowrise-unit-coordinates.js?v=1",
-  "./app.js?v=112",
+  "./lowrise-unit-coordinates.js?v=2",
+  "./app.js?v=113",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",

@@ -3299,37 +3299,55 @@ function drawVerifiedLowRiseMarker(ctx, coordinate) {
   ctx.translate(coordinate.x, coordinate.y);
   ctx.rotate(radians);
   roundedRectPath(ctx, -width / 2, -height / 2, width, height, Math.min(2, width / 3));
-  ctx.fillStyle = "rgba(255,255,255,0.01)";
-  ctx.fill();
   ctx.strokeStyle = "#ed1c24";
-  ctx.lineWidth = 1;
-  ctx.shadowColor = "rgba(255,238,0,0.92)";
-  ctx.shadowBlur = 2;
+  ctx.lineWidth = 1.8;
+  ctx.shadowColor = "rgba(255,74,45,0.9)";
+  ctx.shadowBlur = 2.5;
   ctx.stroke();
   ctx.restore();
 
-  const tagOffset = coordinate.tagOffset || { x: 24, y: 42 };
+  const tagOffset = coordinate.tagOffset || { x: 28, y: 24 };
   const tagX = coordinate.x + Number(tagOffset.x || 0);
   const tagY = coordinate.y + Number(tagOffset.y || 0);
-  const tagWidth = Math.max(42, String(coordinate.code || "Căn").length * 7 + 12);
-  const tagHeight = 18;
+  const tagWidth = Math.max(64, String(coordinate.code || "Căn").length * 9 + 18);
+  const tagHeight = 26;
   const edgeX = coordinate.x - Math.sin(radians) * (height / 2);
   const edgeY = coordinate.y + Math.cos(radians) * (height / 2);
+  const tagAnchorX = tagX;
+  const tagAnchorY = tagY + tagHeight / 2;
 
   ctx.save();
-  ctx.strokeStyle = "rgba(237,28,36,0.9)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#ed1c24";
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.shadowColor = "rgba(237,28,36,0.34)";
+  ctx.shadowBlur = 2;
   ctx.beginPath();
   ctx.moveTo(edgeX, edgeY);
-  ctx.lineTo(tagX, tagY + tagHeight / 2);
+  ctx.lineTo(tagAnchorX, tagAnchorY);
   ctx.stroke();
+  [
+    [edgeX, edgeY],
+    [tagAnchorX, tagAnchorY],
+  ].forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.strokeStyle = "#ed1c24";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+  ctx.shadowBlur = 0;
   roundedRectPath(ctx, tagX, tagY, tagWidth, tagHeight, 4);
   ctx.fillStyle = "rgba(5,62,59,0.94)";
   ctx.fill();
   ctx.strokeStyle = "#ffe35b";
+  ctx.lineWidth = 1.4;
   ctx.stroke();
   ctx.fillStyle = "#fff4a8";
-  ctx.font = "800 10px 'Be Vietnam Pro', Arial, sans-serif";
+  ctx.font = "850 14px 'Be Vietnam Pro', Arial, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(coordinate.code || "Căn", tagX + tagWidth / 2, tagY + tagHeight / 2 + 0.5);
