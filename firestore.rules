@@ -476,6 +476,32 @@ service cloud.firestore {
         && (units.size() < 3 || validAdvisoryUnit(units[2]));
     }
 
+    // Creation only needs the fields consumed by the public quote. The client
+    // owns the richer snapshot format; validating every optional map/payment
+    // detail here made otherwise valid 1-3 unit links fail unpredictably.
+    function validAdvisoryCreateUnits() {
+      let units = request.resource.data.units;
+      return units is list
+        && units.size() >= 1
+        && units.size() <= 3
+        && units[0] is map
+        && units[0].code is string
+        && units[0].code.size() > 0
+        && units[0].code.size() <= 24
+        && (units.size() < 2 || (
+          units[1] is map
+          && units[1].code is string
+          && units[1].code.size() > 0
+          && units[1].code.size() <= 24
+        ))
+        && (units.size() < 3 || (
+          units[2] is map
+          && units[2].code is string
+          && units[2].code.size() > 0
+          && units[2].code.size() <= 24
+        ));
+    }
+
     function validAdvisoryLinkShape() {
       return request.resource.data.keys().hasOnly([
           "ownerUid",
@@ -617,11 +643,31 @@ service cloud.firestore {
       allow get: if isAdmin() || advisoryOwner() || activeAdvisoryLink();
       allow list: if signedIn() && (isAdmin() || resource.data.ownerUid == request.auth.uid);
 
-      allow create: if hasActiveForumAccess()
+      allow create: if signedIn()
         && linkId.size() >= 8
         && linkId.size() <= 80
-        && validAdvisoryLinkShape()
+        && request.resource.data.keys().hasOnly([
+          "ownerUid", "ownerName", "ownerPhone", "customerAlias",
+          "createdAt", "updatedAt", "expiresAt", "deleteAt", "revoked",
+          "version", "sourceLinkId", "primaryUnitCode", "interestedUnitCode",
+          "units", "viewCount", "positiveFeedbackCount",
+          "consultationInterestCount", "lastViewedAt", "changeState",
+          "changeMessage", "statusCheckedAt"
+        ])
+        && validAdvisoryCreateUnits()
         && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerName is string
+        && request.resource.data.ownerName.size() <= 120
+        && request.resource.data.ownerPhone is string
+        && request.resource.data.ownerPhone.size() >= 9
+        && request.resource.data.ownerPhone.size() <= 15
+        && request.resource.data.customerAlias is string
+        && request.resource.data.customerAlias.size() <= 80
+        && request.resource.data.primaryUnitCode is string
+        && request.resource.data.primaryUnitCode.size() > 0
+        && request.resource.data.primaryUnitCode.size() <= 24
+        && request.resource.data.version is int
+        && request.resource.data.version >= 1
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time
         && request.resource.data.statusCheckedAt == request.time

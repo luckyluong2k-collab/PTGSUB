@@ -437,7 +437,8 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
   const state = initialChangeState(units);
   const primaryUnitCode = units[0]?.code || "";
   const expiresAtMs = Date.now() + days * DAY_MS;
-  await setDoc(doc(db, "advisoryLinks", id), {
+  const linkRef = doc(db, "advisoryLinks", id);
+  const payload = {
     ownerUid: currentUser.uid,
     ownerName: saleName(ownerName || source?.ownerName),
     ownerPhone: salePhone(ownerPhone || source?.ownerPhone),
@@ -459,7 +460,14 @@ async function createLinkFromUnits({ customerAlias, days, units, ownerName = "",
     changeState: state.state,
     changeMessage: state.message,
     statusCheckedAt: serverTimestamp(),
-  });
+  };
+  try {
+    await setDoc(linkRef, payload);
+  } catch (error) {
+    if (error?.code !== "permission-denied") throw error;
+    await currentUser.getIdToken(true);
+    await setDoc(linkRef, payload);
+  }
   return { id, url: advisoryUrl(id) };
 }
 
