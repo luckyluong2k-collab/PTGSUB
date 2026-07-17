@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v193-real-advisory-feedback";
+const CACHE_NAME = "park-pricing-v194-stacked-advisory-maps";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,8 +8,8 @@ const ASSETS = [
   "./advisory-links.css?v=3",
   "./advisory-links.js?v=12",
   "./tu-van.html",
-  "./tu-van.css?v=12",
-  "./tu-van.js?v=12",
+  "./tu-van.css?v=13",
+  "./tu-van.js?v=13",
   "./unit-image-data.js?v=1",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=111",

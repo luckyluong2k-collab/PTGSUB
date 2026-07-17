@@ -11,7 +11,7 @@
   <meta property="og:description" content="Thông tin căn, phương án thanh toán và liên hệ sale.">
   <meta property="og:type" content="website">
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/tu-van.css?v=12">
+  <link rel="stylesheet" href="/tu-van.css?v=13">
 </head>
 <body>
   <main class="advice-page">
@@ -34,7 +34,7 @@
       <div class="advice-offer-layout">
         <div class="advice-units" id="adviceUnits"></div>
         <section class="advice-visuals" id="adviceVisuals" aria-label="Hình ảnh vị trí căn" hidden>
-          <article class="advice-visual-card" id="adviceOverviewCard" hidden><div><strong>Ảnh tổng thể</strong><span>Vị trí căn trong toàn khu</span></div><canvas id="adviceOverviewMap"></canvas></article>
+          <article class="advice-visual-card" id="adviceOverviewCard" hidden><div><strong>Ảnh tổng thể</strong><span id="adviceOverviewNote">Vị trí căn trong toàn khu</span></div><canvas id="adviceOverviewMap"></canvas></article>
           <article class="advice-visual-card" id="adviceUnitCard" hidden><div><strong>Ảnh chỉ căn</strong><span id="adviceUnitImageNote">Ảnh đúng mã căn từ bảng hàng</span></div><img id="adviceUnitImage" alt="" loading="lazy" hidden><canvas id="adviceUnitMap" hidden></canvas></article>
         </section>
         <p class="advice-map-empty" id="adviceMapEmpty" hidden>Chưa có tọa độ mặt bằng cho căn này.</p>
@@ -62,6 +62,6 @@
     </section>
   </main>
   <script src="/unit-image-data.js?v=1"></script>
-  <script type="module" src="/tu-van.js?v=12"></script>
+  <script type="module" src="/tu-van.js?v=13"></script>
 </body>
 </html>

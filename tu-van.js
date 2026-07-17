@@ -46,6 +46,7 @@ async function renderPrimaryUnitMaps(unit) {
   const unitImage = document.getElementById("adviceUnitImage");
   const unitMap = document.getElementById("adviceUnitMap");
   const imageNote = document.getElementById("adviceUnitImageNote");
+  const overviewNote = document.getElementById("adviceOverviewNote");
   visuals.hidden = true;
   empty.hidden = true;
   overviewCard.hidden = true;
@@ -58,9 +59,10 @@ async function renderPrimaryUnitMaps(unit) {
   const map = unit?.map;
   const allowed = new Set(["phankhupark-map.png", "lowrise-map-sharp.jpg", "lienke-preview.png"]);
   const hasMap = Boolean(map && allowed.has(map.image) && map.crop && map.unitRect);
+  const overviewImage = hasMap ? map.image : (driveId ? "phankhupark-map.png" : "");
   const [sheetImageResult, mapImageResult] = await Promise.allSettled([
     driveId ? loadMapImage(`https://lh3.googleusercontent.com/d/${driveId}=w1600`) : Promise.reject(new Error("no sheet image")),
-    hasMap ? loadMapImage(`/${map.image}`) : Promise.reject(new Error("no map")),
+    overviewImage ? loadMapImage(`/${overviewImage}`) : Promise.reject(new Error("no map")),
   ]);
 
   const hasSheetImage = sheetImageResult.status === "fulfilled";
@@ -80,12 +82,17 @@ async function renderPrimaryUnitMaps(unit) {
     overview.height = Math.max(1, Math.round(image.height * overviewScale));
     const overviewCtx = overview.getContext("2d");
     overviewCtx.drawImage(image, 0, 0, overview.width, overview.height);
-    if (map.towerRect) drawMapRect(overviewCtx, map.towerRect, overview.width / image.width, overview.height / image.height, 0, 0, { fill:"rgba(255,55,45,.14)", stroke:"#e32626", lineWidth:4 });
-    const overviewMark = drawMapRect(overviewCtx, map.unitRect, overview.width / image.width, overview.height / image.height, 0, 0, { lineWidth:4 });
-    drawUnitBadge(overviewCtx, code, overviewMark);
+    if (hasMap) {
+      if (map.towerRect) drawMapRect(overviewCtx, map.towerRect, overview.width / image.width, overview.height / image.height, 0, 0, { fill:"rgba(255,55,45,.14)", stroke:"#e32626", lineWidth:4 });
+      const overviewMark = drawMapRect(overviewCtx, map.unitRect, overview.width / image.width, overview.height / image.height, 0, 0, { lineWidth:4 });
+      drawUnitBadge(overviewCtx, code, overviewMark);
+      overviewNote.textContent = `Vị trí căn ${code} trong toàn khu`;
+    } else {
+      overviewNote.textContent = "Mặt bằng tổng thể dự án";
+    }
     overviewCard.hidden = false;
 
-    if (!hasSheetImage) {
+    if (!hasSheetImage && hasMap) {
       const crop = { x:Math.max(0,map.crop.x), y:Math.max(0,map.crop.y), width:Math.min(map.crop.width,image.width-map.crop.x), height:Math.min(map.crop.height,image.height-map.crop.y) };
       if (crop.width > 0 && crop.height > 0) {
         const detailScale = Math.min(1, 1200 / crop.width);
