@@ -38,6 +38,7 @@ const menuButton = document.getElementById("advisoryLinksOpenBtn");
 let currentUser = null;
 let currentLinks = [];
 let currentCandidates = [];
+const candidateScenarioSelections = new Map();
 let latestPricingState = {};
 let stopActivityListener = null;
 let activityListenerReady = false;
@@ -359,6 +360,10 @@ async function loadCandidates() {
     seen.add(item.code);
     return true;
   }).slice(0, 10);
+  candidateScenarioSelections.clear();
+  currentCandidates.forEach((item) => candidateScenarioSelections.set(item.code, new Set([
+    advisoryScenarioKey(item._scenarioKey, item.scenario),
+  ])));
   renderCandidates();
 }
 
@@ -377,14 +382,18 @@ function renderCandidates({ selectedCodes = null, primaryCode = "" } = {}) {
     row.className = "advisory-candidate";
     const checked = selected.has(item.code);
     const scenarioOptions = advisoryScenarioOptions(item.code);
-    const selectedScenario = advisoryScenarioKey(item._scenarioKey, item.scenario);
+    const selectedScenarios = candidateScenarioSelections.get(item.code) || new Set([
+      advisoryScenarioKey(item._scenarioKey, item.scenario),
+    ]);
+    candidateScenarioSelections.set(item.code, selectedScenarios);
+    const selectedLabels = scenarioOptions.filter((option) => selectedScenarios.has(option.value)).map((option) => option.label);
     row.innerHTML = `
       <label class="advisory-candidate-select">
         <input type="checkbox" data-advisory-unit value="${escapeHtml(item.code)}" ${checked ? "checked" : ""}>
         <span><strong>${escapeHtml(item.code)}</strong><small>${escapeHtml(item.unitType || "Chưa rõ loại")} · ${escapeHtml(item.areaText)}<br>${escapeHtml(item.totalPrice)}${item.scenario ? `<br>Phương án: ${escapeHtml(item.scenario)}` : ""}</small></span>
       </label>
       <div class="advisory-candidate-controls">
-        <label class="advisory-scenario-choice"><span>Phương án đưa vào link</span><select data-advisory-scenario="${escapeHtml(item.code)}">${scenarioOptions.map((option) => `<option value="${escapeHtml(option.value)}" ${option.value === selectedScenario ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}</select></label>
+        <div class="advisory-scenario-choice"><span>Phương án đưa vào link</span><details data-advisory-scenario-menu="${escapeHtml(item.code)}"><summary>${escapeHtml(selectedLabels.join(" + ") || "Chọn phương án")}</summary><div>${scenarioOptions.map((option) => `<label><input type="checkbox" data-advisory-scenario-option="${escapeHtml(item.code)}" value="${escapeHtml(option.value)}" ${selectedScenarios.has(option.value) ? "checked" : ""}><span>${escapeHtml(option.label)}</span></label>`).join("")}</div></details></div>
         <label class="advisory-primary-choice"><input type="radio" name="advisoryPrimary" value="${escapeHtml(item.code)}" ${item.code === primary ? "checked" : ""} ${checked ? "" : "disabled"}> Căn chính</label>
       </div>
     `;
@@ -430,6 +439,7 @@ function addManualCandidate() {
     const existingIndex = currentCandidates.findIndex((item) => item.code === code);
     if (existingIndex >= 0) currentCandidates.splice(existingIndex, 1, snapshot);
     else currentCandidates.unshift(snapshot);
+    candidateScenarioSelections.set(code, new Set([scenarioSelect?.value || "loan"]));
     if (state.selectedCodes.size < MAX_LINKS || state.selectedCodes.has(code)) state.selectedCodes.add(code);
     if (!state.primaryCode) state.primaryCode = code;
     renderCandidates(state);
@@ -447,7 +457,18 @@ function selectedUnits() {
   const selectedCodes = Array.from(document.querySelectorAll("[data-advisory-unit]:checked")).map((input) => input.value);
   const primary = document.querySelector('input[name="advisoryPrimary"]:checked')?.value || selectedCodes[0] || "";
   const ordered = selectedCodes.slice().sort((a, b) => (a === primary ? -1 : b === primary ? 1 : 0));
-  return ordered.map((code) => currentCandidates.find((item) => item.code === code)).filter(Boolean).map(({ _scenarioKey, ...unit }) => unit);
+  return ordered.flatMap((code) => {
+    const fallback = currentCandidates.find((item) => item.code === code);
+    if (!fallback) return [];
+    const selected = candidateScenarioSelections.get(code) || new Set([
+      advisoryScenarioKey(fallback._scenarioKey, fallback.scenario),
+    ]);
+    const keys = advisoryScenarioOptions(code).map((option) => option.value).filter((key) => selected.has(key));
+    return keys.map((key) => {
+      try { return candidateSnapshot(window.ptgsubAdvisoryPricing.snapshot(code, key)); }
+      catch { return fallback; }
+    });
+  }).map(({ _scenarioKey, ...unit }) => unit);
 }
 
 function initialChangeState(units) {
@@ -738,17 +759,28 @@ function bindInterface() {
   managerDialog()?.addEventListener("click", (event) => { if (event.target === managerDialog()) closeDialog(managerDialog()); });
   createDialog()?.addEventListener("click", (event) => { if (event.target === createDialog()) closeDialog(createDialog()); });
   document.getElementById("advisoryCandidates")?.addEventListener("change", (event) => {
-    const scenarioSelect = event.target.closest("[data-advisory-scenario]");
-    if (scenarioSelect) {
+    const scenarioOption = event.target.closest("[data-advisory-scenario-option]");
+    if (scenarioOption) {
       const state = selectedCandidateState();
-      const code = unitCode(scenarioSelect.dataset.advisoryScenario);
+      const code = unitCode(scenarioOption.dataset.advisoryScenarioOption);
       const index = currentCandidates.findIndex((item) => item.code === code);
+      const selected = new Set(candidateScenarioSelections.get(code) || []);
+      if (scenarioOption.checked) selected.add(scenarioOption.value);
+      else selected.delete(scenarioOption.value);
+      if (!selected.size) {
+        scenarioOption.checked = true;
+        document.getElementById("advisoryFormError").textContent = "Mỗi căn cần có ít nhất một phương án thanh toán.";
+        return;
+      }
       try {
-        const recalculated = candidateSnapshot(window.ptgsubAdvisoryPricing.snapshot(code, scenarioSelect.value));
-        recalculated._scenarioKey = scenarioSelect.value;
+        candidateScenarioSelections.set(code, selected);
+        const previewKey = scenarioOption.checked ? scenarioOption.value : Array.from(selected)[0];
+        const recalculated = candidateSnapshot(window.ptgsubAdvisoryPricing.snapshot(code, previewKey));
+        recalculated._scenarioKey = previewKey;
         if (index >= 0) currentCandidates.splice(index, 1, recalculated);
         renderCandidates(state);
-        document.getElementById("advisoryFormError").textContent = `Đã chọn ${recalculated.scenario} cho căn ${code}.`;
+        document.querySelector(`[data-advisory-scenario-menu="${code}"]`)?.setAttribute("open", "");
+        document.getElementById("advisoryFormError").textContent = `Đã chọn ${selected.size} phương án thanh toán cho căn ${code}.`;
       } catch (error) {
         document.getElementById("advisoryFormError").textContent = error?.message || `Không tính được phương án cho căn ${code}.`;
       }
@@ -788,8 +820,9 @@ function bindInterface() {
     const ownerPhone = salePhone(document.getElementById("advisorySalePhone").value);
     const alias = safeText(document.getElementById("advisoryCustomerAlias").value, 80);
     const units = selectedUnits();
+    const selectedApartmentCount = document.querySelectorAll("[data-advisory-unit]:checked").length;
     if (!alias) { errorBox.textContent = "Vui lòng nhập tên gợi nhớ của khách."; return; }
-    if (!units.length || units.length > MAX_LINKS) { errorBox.textContent = "Hãy chọn từ 1 đến 3 căn."; return; }
+    if (!units.length || selectedApartmentCount < 1 || selectedApartmentCount > MAX_LINKS) { errorBox.textContent = "Hãy chọn từ 1 đến 3 căn và ít nhất một phương án cho mỗi căn."; return; }
     submit.disabled = true;
     submit.textContent = "Đang tạo link…";
     try {

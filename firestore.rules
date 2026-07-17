@@ -470,7 +470,7 @@ service cloud.firestore {
       let units = request.resource.data.units;
       return units is list
         && units.size() >= 1
-        && units.size() <= 3
+        && units.size() <= 15
         && validAdvisoryUnit(units[0])
         && (units.size() < 2 || validAdvisoryUnit(units[1]))
         && (units.size() < 3 || validAdvisoryUnit(units[2]));
@@ -478,12 +478,12 @@ service cloud.firestore {
 
     // Creation only needs the fields consumed by the public quote. The client
     // owns the richer snapshot format; validating every optional map/payment
-    // detail here made otherwise valid 1-3 unit links fail unpredictably.
+    // detail here made otherwise valid quote-option links fail unpredictably.
     function validAdvisoryCreateUnits() {
       let units = request.resource.data.units;
       return units is list
         && units.size() >= 1
-        && units.size() <= 3
+        && units.size() <= 15
         && units[0] is map
         && units[0].code is string
         && units[0].code.size() > 0
