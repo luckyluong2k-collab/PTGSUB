@@ -22,6 +22,17 @@
     },
   ];
 
+  function requestedDemoThemeId() {
+    try {
+      var requested = new URLSearchParams(window.location.search).get("demo-theme") || "";
+      return systemThemes.some(function (theme) { return theme.id === requested; }) ? requested : "";
+    } catch (_error) {
+      return "";
+    }
+  }
+
+  var demoThemeId = requestedDemoThemeId();
+
   function findSystemTheme(themeId) {
     return systemThemes.find(function (theme) { return theme.id === themeId; }) || systemThemes[0];
   }
@@ -40,16 +51,17 @@
   }
 
   function applySystemTheme(themeId) {
-    var selectedTheme = findSystemTheme(themeId);
+    var selectedTheme = findSystemTheme(demoThemeId || themeId);
     systemThemes.forEach(function (theme) {
       body.classList.remove(theme.bodyClass);
     });
     body.classList.add(selectedTheme.bodyClass);
     body.dataset.siteTheme = selectedTheme.id;
+    body.classList.toggle("site-theme-demo", Boolean(demoThemeId));
     setMidAutumnDecorVisible(selectedTheme.id === "mid-autumn-red-gold");
-    localStorage.setItem(systemThemeStorageKey, selectedTheme.id);
+    if (!demoThemeId) localStorage.setItem(systemThemeStorageKey, selectedTheme.id);
     window.dispatchEvent(new CustomEvent("ptgsub-site-theme-change", {
-      detail: { themeId: selectedTheme.id },
+      detail: { themeId: selectedTheme.id, isDemo: Boolean(demoThemeId) },
     }));
     return selectedTheme.id;
   }
@@ -67,6 +79,21 @@
   window.setMidAutumnDecorVisible = setMidAutumnDecorVisible;
 
   loadSystemTheme();
+
+  if (demoThemeId) {
+    var demoBadge = document.createElement("div");
+    var demoLabel = document.createElement("strong");
+    var demoExit = document.createElement("a");
+    var exitUrl = new URL(window.location.href);
+    exitUrl.searchParams.delete("demo-theme");
+    demoBadge.className = "mid-autumn-demo-badge";
+    demoBadge.setAttribute("role", "status");
+    demoLabel.textContent = "DEMO TRUNG THU";
+    demoExit.textContent = "Thoát demo";
+    demoExit.href = exitUrl.href;
+    demoBadge.append(demoLabel, demoExit);
+    body.appendChild(demoBadge);
+  }
 
   if (!toggle) return;
 
