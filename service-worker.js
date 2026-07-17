@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v189-listed-price-savings";
+const CACHE_NAME = "park-pricing-v190-unit-strengths";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,8 +8,8 @@ const ASSETS = [
   "./advisory-links.css?v=3",
   "./advisory-links.js?v=9",
   "./tu-van.html",
-  "./tu-van.css?v=10",
-  "./tu-van.js?v=10",
+  "./tu-van.css?v=11",
+  "./tu-van.js?v=11",
   "./unit-image-data.js?v=1",
   "./mid-autumn-theme.css?v=6",
   "./app.js?v=111",
