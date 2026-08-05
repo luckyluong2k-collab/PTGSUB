@@ -39,35 +39,47 @@
     name: "P10/P11/P16/P18",
     hasCompletion: true,
     completionMode: "netTimes112",
-    // CSBH: gói hoàn thiện là giá trị cộng thêm, không phải một khoản CK.
-    completionDiscount: 0,
-    noLoanDiscount: 0.01,
+    // CSƯĐ13 áp dụng từ 10/07/2026: CK gói hoàn thiện 3% trên giá trị căn hộ thô.
+    completionDiscount: 0.03,
+    noLoanDiscount: 0.05,
     fixedDiscounts: {},
     completionUnits: { Studio: 4722222.22222222, "1BR+": 4259259, "2BR": 5000000 },
-    ttsJuly: { tts95: 0.115, tts70: 0.065, tts50: 0.035 },
-    earlyBird: 0.01,
+    ttsJuly: { tts95: 0.09, tts70: 0.06, tts50: 0.03 },
+    ttsWindows: [
+      {
+        through: "2026-08-25",
+        deadline: "2026-08-25",
+        rates: { tts95: 0.09, tts70: 0.06, tts50: 0.03 },
+      },
+      {
+        through: "2026-09-25",
+        deadline: "2026-09-25",
+        rates: { tts95: 0.085, tts70: 0.055, tts50: 0.025 },
+      },
+    ],
+    maxLoanRatio: 0.70,
     standardSchedule: {
-      installmentRates: [0.10, 0.20, 0.25],
-      handoverRate: 0.25,
-      completionContractRate: 0.50,
+      installmentRates: [0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.10],
+      handoverRate: 0.35,
+      completionFollowsInstallments: true,
     },
     ttsSchedule: {
-      tts50: { postRates: [0.05, 0.10], handoverRate: 0.30 },
-      tts70: { postRates: [0.10, 0.10], handoverRate: 0.05 },
-      tts95: { postRates: [], handoverRate: 0 },
+      tts50: { followStandardSchedule: true },
+      tts70: { followStandardSchedule: true },
+      tts95: { followStandardSchedule: true },
     },
-    completionContractRate: 0.50,
-    standardSecondPaymentDays: 6,
-    loanSecondPaymentDays: 6,
-    ttsSecondPaymentDays: 6,
+    completionContractRate: 0.70,
+    standardSecondPaymentDays: 9,
+    loanSecondPaymentDays: 9,
+    ttsSecondPaymentDays: 9,
     contractDays: 9,
-    loanFourthPaymentDays: 36,
-    standardInstallmentOffsetsDays: [36, 186, 366],
+    loanFourthPaymentDays: 69,
+    standardInstallmentOffsetsDays: [69, 129, 189, 249, 309, 369, 429],
     scheduleHandover: {
       loan: "2027-09-30", standard: "2027-09-30", tts50: "2027-09-30",
       tts70: "2027-09-30", tts95: "2027-09-30",
     },
-    effectiveDate: "2026-05-01",
+    effectiveDate: "2026-07-10",
     handover: "2027-09-30",
     customerHandover: "2027-09-30",
     loanSupport: "HTLS 24 tháng, không muộn hơn 15/07/2028",
@@ -126,8 +138,20 @@
     noLoanDiscount: 0.05,
     fixedDiscounts: {},
     completionUnits: {},
-    ttsJuly: { tts95: 0.105, tts70: 0.055, tts50: 0.025 },
-    earlyBird: 0.01,
+    ttsJuly: { tts95: 0.10, tts70: 0.05, tts50: 0.02 },
+    ttsWindows: [
+      {
+        through: "2026-08-25",
+        deadline: "2026-08-25",
+        rates: { tts95: 0.10, tts70: 0.05, tts50: 0.02 },
+      },
+      {
+        through: "2026-09-25",
+        deadline: "2026-09-25",
+        rates: { tts95: 0.095, tts70: 0.045, tts50: 0.015 },
+      },
+    ],
+    maxLoanRatio: 0.70,
     standardSchedule: {
       installmentRates: [
         0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -150,7 +174,7 @@
     },
     standardSecondPaymentDays: 9,
     loanSecondPaymentDays: 9,
-    ttsSecondPaymentDays: 6,
+    ttsSecondPaymentDays: 9,
     contractDays: 9,
     loanFourthPaymentDays: 69,
     standardInstallmentFirstDays: 69,
@@ -159,9 +183,10 @@
       loan: "2027-12-31", standard: "2028-12-31", tts50: "2028-12-31",
       tts70: "2028-12-31", tts95: "2027-12-31",
     },
-    effectiveDate: "2026-03-11",
+    effectiveDate: "2026-07-10",
     handover: "2028-12-31",
     customerHandover: "2027-12-31",
+    customerHandoverLabel: "Dự kiến nhận căn để sử dụng khi đã TT ≥70% (Sun Early Key)",
     loanSupport: "HTLS 30 tháng, không quá 31/10/2028",
   },
   KHOIDE_P3P9: {
@@ -249,7 +274,14 @@
     areaDiscountPerSqm: 3000000,
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
-    ttsJuly: { tts95: 0.21, tts70: 0.145, tts50: 0.12 },
+    ttsJuly: { tts95: 0.20, tts70: 0.14, tts50: 0.115 },
+    ttsWindows: [
+      {
+        through: "2026-08-24",
+        deadline: "2026-08-24",
+        rates: { tts95: 0.20, tts70: 0.14, tts50: 0.115 },
+      },
+    ],
     scenarioLabels: { tts95: "TTS 100%" },
     lowRiseTts100Schedule: true,
     standardSchedule: {
@@ -498,6 +530,7 @@ let selectedUnitCode = normalizeUnitCode(els.unitCode.value);
 let inventoryRefreshInFlight = false;
 let inventoryMonitorTimer = 0;
 let lastCatalogRefreshAt = 0;
+let quoteDateIsAutomatic = true;
 
 const unitMapImage = "phankhupark-map.png";
 const lowRiseMapImage = "lowrise-map-sharp.jpg";
@@ -891,13 +924,30 @@ function percent(value) {
   return `${(value * 100).toLocaleString("vi-VN", { maximumFractionDigits: 2 })}%`;
 }
 
+function todayIsoDate() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function syncAutomaticQuoteDate() {
+  if (!quoteDateIsAutomatic) return;
+  const today = todayIsoDate();
+  if (els.quoteDate.value !== today) els.quoteDate.value = today;
+}
+
 function dateFromText(dateText) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateText || ""));
   if (match) {
     return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
   }
-  const parsed = new Date(dateText || "2026-07-08");
-  if (Number.isNaN(parsed.getTime())) return new Date(2026, 6, 8);
+  const parsed = new Date(dateText || todayIsoDate());
+  if (Number.isNaN(parsed.getTime())) return dateFromText(todayIsoDate());
   return parsed;
 }
 
@@ -951,6 +1001,52 @@ function normalizeUnitCode(value) {
 
 function normalizeFacet(value) {
   return String(value || "").trim().toLocaleLowerCase("vi-VN");
+}
+
+const COMPASS_DIRECTIONS = [
+  "Bắc",
+  "Đông Bắc",
+  "Đông",
+  "Đông Nam",
+  "Nam",
+  "Tây Nam",
+  "Tây",
+  "Tây Bắc",
+];
+
+function normalizeCompassDirection(value) {
+  const normalized = normalizeHeaderText(value);
+  const aliases = {
+    b: "Bắc",
+    bac: "Bắc",
+    north: "Bắc",
+    bd: "Đông Bắc",
+    db: "Đông Bắc",
+    "bac dong": "Đông Bắc",
+    "dong bac": "Đông Bắc",
+    d: "Đông",
+    dong: "Đông",
+    east: "Đông",
+    dn: "Đông Nam",
+    nd: "Đông Nam",
+    "dong nam": "Đông Nam",
+    "nam dong": "Đông Nam",
+    n: "Nam",
+    nam: "Nam",
+    south: "Nam",
+    nt: "Tây Nam",
+    tn: "Tây Nam",
+    "nam tay": "Tây Nam",
+    "tay nam": "Tây Nam",
+    t: "Tây",
+    tay: "Tây",
+    west: "Tây",
+    bt: "Tây Bắc",
+    tb: "Tây Bắc",
+    "bac tay": "Tây Bắc",
+    "tay bac": "Tây Bắc",
+  };
+  return aliases[normalized] || "";
 }
 
 function normalizeHeaderText(value) {
@@ -1438,7 +1534,7 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
     { includes: ["gia tho chua"], excludes: ["tts"] },
   ], 150);
   const salesPolicyIdx = preferredColumnIndex(labels, [
-    { includes: ["csbh"], maxLength: 40 },
+    { includes: ["csbh"], maxLength: 80 },
     { includes: ["chinh sach ban hang"], maxLength: 80 },
   ], 80);
   const grossIdx = preferredColumnIndex(labels, [
@@ -1446,8 +1542,8 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
     { includes: ["tong gia gom vat"], excludes: ["chua", "tts"] },
     { includes: ["gia da gom vat"], excludes: ["chua", "tts"] },
     { includes: ["bao gom vat kpbt"], excludes: ["chua", "tts"] },
-    { includes: ["tong gia ban ra thi truong"], excludes: ["tts"] },
-    { includes: ["gia ban ra thi truong"], excludes: ["tts"] },
+    { includes: ["tong gia ban ra thi truong"], excludes: ["chua", "tts"] },
+    { includes: ["gia ban ra thi truong"], excludes: ["chua", "tts"] },
     { includes: ["tong tien thanh toan"], excludes: ["tts"] },
   ], 170);
   const noteIndexes = statusNoteColumnIndexes(labels);
@@ -1480,8 +1576,8 @@ function parseGoogleSheetUnits(response, { gid = "", gidIndex = 0 } = {}) {
       return;
     }
 
-    let listedGross = lowRiseDetails?.listedGross || 0;
-    if (!listedGross) listedGross = gvizMoney(row, grossIdx);
+    let listedGross = gvizMoney(row, grossIdx);
+    if (!listedGross) listedGross = lowRiseDetails?.listedGross || 0;
     let baseNet = gvizMoney(row, baseNetIdx);
     const area = isLowRise
       ? lowRiseDetails?.area || gvizNumber(row, areaIdx)
@@ -1842,7 +1938,7 @@ function populateFinderOptions() {
   fillFilterSelect(els.filterType, "loại căn", optionValues(catalogEntries, ({ unit }) => unit.unitType));
   fillFilterSelect(els.filterFloor, "tầng", optionValues(catalogEntries, ({ code, unit }) => unitFloor(unit, code)));
   fillFilterSelect(els.filterView, "view", optionValues(catalogEntries, ({ unit }) => unit.view));
-  fillFilterSelect(els.filterDirection, "hướng", optionValues(catalogEntries, ({ unit }) => unit.direction));
+  fillFilterSelect(els.filterDirection, "hướng", COMPASS_DIRECTIONS);
 }
 
 function unitCard({ code, unit }) {
@@ -1850,7 +1946,7 @@ function unitCard({ code, unit }) {
   const floor = unitFloor(unit, code);
   const apartmentNo = unitApartmentNumber(code, unit);
   const view = unit.view || "Chưa cập nhật";
-  const direction = unit.direction || "Chưa cập nhật";
+  const direction = normalizeCompassDirection(unit.direction) || unit.direction || "Chưa cập nhật";
   const isSelected = code === selectedUnitCode;
   return `
     <button class="unit-card${isSelected ? " selected" : ""}" type="button"
@@ -1885,7 +1981,7 @@ function renderFinder() {
   const type = normalizeFacet(els.filterType.value);
   const floor = normalizeFacet(els.filterFloor.value);
   const view = normalizeFacet(els.filterView.value);
-  const direction = normalizeFacet(els.filterDirection.value);
+  const direction = normalizeCompassDirection(els.filterDirection.value);
   const priceSort = els.filterPriceSort.value === "desc" ? -1 : 1;
 
   const matches = catalogEntries
@@ -1894,7 +1990,7 @@ function renderFinder() {
       if (type && normalizeFacet(unit.unitType) !== type) return false;
       if (floor && normalizeFacet(unitFloor(unit, code)) !== floor) return false;
       if (view && normalizeFacet(unit.view) !== view) return false;
-      if (direction && normalizeFacet(unit.direction) !== direction) return false;
+      if (direction && normalizeCompassDirection(unit.direction) !== direction) return false;
       return true;
     })
     .sort((a, b) =>
@@ -1968,6 +2064,13 @@ function discountStepFromJuly2026(dateText) {
 
 function rollingTtsRate(policy, scenario, dateText) {
   if (!["tts50", "tts70", "tts95"].includes(scenario)) return 0;
+  if (Array.isArray(policy.ttsWindows)) {
+    const quoteDate = dateFromText(dateText);
+    const effectiveDate = dateFromText(policy.effectiveDate);
+    if (quoteDate < effectiveDate) return 0;
+    const window = policy.ttsWindows.find(({ through }) => quoteDate <= dateFromText(through));
+    return window?.rates?.[scenario] || 0;
+  }
   const base = policy.ttsJuly[scenario] || 0;
   const steps = discountStepFromJuly2026(dateText);
   return Math.max(0, base - steps * 0.005);
@@ -2147,8 +2250,12 @@ function ttsRatioFromScenario(scenario, policy) {
   return 0;
 }
 
-function ttsDeadlineFromQuote(dateText) {
+function ttsDeadlineFromQuote(dateText, policy) {
   const quoteDate = dateFromText(dateText);
+  if (Array.isArray(policy?.ttsWindows)) {
+    const window = policy.ttsWindows.find(({ through }) => quoteDate <= dateFromText(through));
+    if (window?.deadline) return dateFromText(window.deadline);
+  }
   const deadline = new Date(quoteDate.getFullYear(), quoteDate.getMonth(), 25);
   if (quoteDate.getDate() > 25) {
     deadline.setMonth(deadline.getMonth() + 1);
@@ -2218,14 +2325,30 @@ function buildTtsSchedule(result) {
   const deposit = depositByType[result.unitType] || 0;
   const quoteDateText = result.quoteDate || els.quoteDate.value;
   const quoteDate = dateFromText(quoteDateText);
-  const deadline = ttsDeadlineFromQuote(quoteDateText);
+  const deadline = ttsDeadlineFromQuote(quoteDateText, result.policy);
   const secondDate = addDays(quoteDate, result.policy.ttsSecondPaymentDays ?? 6);
   const handoverDate = scheduleHandoverDate(result.policy, result.scenario, quoteDateText);
   const completion = completionBreakdown(result.policy, result.unitType, result.area);
   const paymentBasisRawWithVat = result.rawWithVat;
   const config = result.policy.ttsSchedule?.[result.scenario] || { postRates: [], handoverRate: 0 };
-  const postRates = config.postRates || [];
-  const postDates = ttsPostInstallmentDates(config, quoteDate, deadline, handoverDate, postRates.length);
+  let postRates = config.postRates || [];
+  let postDates = ttsPostInstallmentDates(config, quoteDate, deadline, handoverDate, postRates.length);
+  let handoverRate = config.handoverRate || 0;
+  if (config.followStandardSchedule) {
+    const standardRates = result.policy.standardSchedule?.installmentRates || [];
+    const standardDates = standardInstallmentDates(result.policy, quoteDate, standardRates.length);
+    let outstandingBeforeGcn = Math.max(0, 0.95 - ttsRatio);
+    const scheduledPayments = [];
+    standardRates.forEach((rate, index) => {
+      if (standardDates[index] <= deadline || outstandingBeforeGcn <= 0) return;
+      const appliedRate = Math.min(rate, outstandingBeforeGcn);
+      scheduledPayments.push({ rate: appliedRate, date: standardDates[index] });
+      outstandingBeforeGcn = Math.max(0, outstandingBeforeGcn - appliedRate);
+    });
+    postRates = scheduledPayments.map(({ rate }) => rate);
+    postDates = scheduledPayments.map(({ date }) => date);
+    handoverRate = outstandingBeforeGcn;
+  }
   const completionContractRate = result.policy.completionContractRate || 0;
   let completionGrossPaid = 0;
   const secondAmount = Math.max(0, round(paymentBasisRawWithVat * 0.15 - deposit));
@@ -2274,7 +2397,6 @@ function buildTtsSchedule(result) {
   });
 
   const completionAtHandover = Math.max(0, completion.grossWithVat - completionGrossPaid);
-  const handoverRate = config.handoverRate || 0;
   rows.push([
     `Bàn giao${handoverRate ? ` - ${percent(handoverRate)}` : ""} + KPBT/thuế (${formatDateText(handoverDate)})`,
     round(
@@ -2314,7 +2436,8 @@ function calculate(options = {}) {
   const constructionArea = parseNumber(els.constructionArea.value);
   const listedGross = parseMoney(els.listedGross.value);
   const baseNet = parseMoney(els.baseNet.value);
-  const loanRatio = Math.max(0, Math.min(100, parseNumber(els.loanRatio.value))) / 100;
+  const requestedLoanRatio = Math.max(0, Math.min(100, parseNumber(els.loanRatio.value))) / 100;
+  const loanRatio = Math.min(requestedLoanRatio, policy.maxLoanRatio ?? 1);
   const scenario = options.scenario || activeScenario;
   const quoteDateText = options.quoteDate || els.quoteDate.value;
   const includeGuarantee = options.includeGuarantee ?? els.bankGuarantee.checked;
@@ -2695,7 +2818,10 @@ function renderQuoteCard(result, isLoan, isTts) {
     quoteCardDetail("Mã căn - loại căn", unitLabel),
     quoteCardDetail("Nhóm tòa", result.policy.name),
     ...(result.policy.customerHandover
-      ? [quoteCardDetail("Ngày dự kiến nhận bàn giao nhà", formatDateText(result.policy.customerHandover))]
+      ? [quoteCardDetail(
+        result.policy.customerHandoverLabel || "Ngày dự kiến nhận bàn giao nhà",
+        formatDateText(result.policy.customerHandover)
+      )]
       : []),
     quoteCardDetail("Giá niêm yết đã gồm VAT/KPBT", money(result.listedGross)),
     quoteCardDetail("Giá thô sau CK", rawGrossAfterDiscountText),
@@ -2717,7 +2843,7 @@ function renderQuoteCard(result, isLoan, isTts) {
           <h3>${safeText(unitLabel)} - ${safeText(result.policy.name)}</h3>
           <p class="quote-subtitle">Phương án: <strong>${safeText(scenario)}</strong></p>
         </div>
-        <span class="quote-badge">${safeText(scenario)}</span>
+        <span class="quote-badge" style="color:#fff7e6!important;-webkit-text-fill-color:#fff7e6!important">${safeText(scenario)}</span>
       </div>
       <div class="quote-stats">${stats.join("")}</div>
       <div class="quote-detail-grid">${details.join("")}</div>
@@ -3056,10 +3182,14 @@ function runMultiQuoteExport(scenarios, mode = multiQuoteExportMode) {
     document.body.classList.add("print-mode", "multi-quote-print-mode");
     showToast("Đang mở hộp thoại lưu PDF");
 
+    let exportCompleted = false;
     const cleanup = () => {
+      if (exportCompleted) return;
+      exportCompleted = true;
       document.body.classList.remove("print-mode", "multi-quote-print-mode");
       document.title = originalTitle;
       window.removeEventListener("afterprint", cleanup);
+      showToast("Đã hoàn tất xuất PDF");
     };
 
     window.addEventListener("afterprint", cleanup);
@@ -3192,10 +3322,14 @@ function exportPdf(scenarios = [activeScenario]) {
   document.body.classList.add("print-mode");
   showToast("Đang mở hộp thoại lưu PDF");
 
+  let exportCompleted = false;
   const cleanup = () => {
+    if (exportCompleted) return;
+    exportCompleted = true;
     document.body.classList.remove("print-mode");
     document.title = originalTitle;
     window.removeEventListener("afterprint", cleanup);
+    showToast("Đã hoàn tất xuất PDF");
   };
 
   window.addEventListener("afterprint", cleanup);
@@ -3837,7 +3971,7 @@ function loanScheduleUrl(result) {
   params.set("loan", String(round(result.bankDisbursement)));
   params.set("loanPct", "100");
   params.set("support", String(loanSupportMonths(result.policy)));
-  params.set("purchaseDate", els.quoteDate.value || "2026-07-08");
+  params.set("purchaseDate", els.quoteDate.value || todayIsoDate());
   params.set("source", "pricing-app");
   return `tra-goc-lai-35-nam-tu-ngay-mua.html?${params.toString()}`;
 }
@@ -3849,6 +3983,7 @@ function openLoanScheduleCalculator() {
 }
 
 function render() {
+  syncAutomaticQuoteDate();
   const policy = policies[els.policyGroup.value] || policies.P3P9;
   syncPolicyControls(policy);
   const result = calculate();
@@ -3911,7 +4046,9 @@ function makeQuoteText(result) {
     `${unitLabel} - ${result.policy.name}`,
     `Phương án: ${scenarioLabel(result.scenario, result.policy)}`,
     `Mã căn - loại căn: ${unitLabel}`,
-    ...(result.policy.customerHandover ? [`Ngày dự kiến nhận bàn giao nhà: ${formatDateText(result.policy.customerHandover)}`] : []),
+    ...(result.policy.customerHandover
+      ? [`${result.policy.customerHandoverLabel || "Ngày dự kiến nhận bàn giao nhà"}: ${formatDateText(result.policy.customerHandover)}`]
+      : []),
     `Giá niêm yết đã gồm VAT/KPBT: ${money(result.listedGross)}`,
     `Giá Cuối Phải TT: ${money(result.total)}`,
   ];
@@ -3935,6 +4072,15 @@ function showToast(message) {
     els.toast.classList.remove("show");
     window.setTimeout(() => els.toast.classList.remove("unit-autofill-toast"), 240);
   }, isUnitAutofill ? 500 : 1800);
+
+  // Lân Nhi là kênh thông báo trực quan; xếp hàng nếu SVG chưa tải xong.
+  if (window.LanNhiPet?.notify) {
+    window.LanNhiPet.notify(message);
+  } else {
+    window.__lanNhiNotificationQueue = window.__lanNhiNotificationQueue || [];
+    window.__lanNhiNotificationQueue.push({ message, options: {} });
+    window.__lanNhiNotificationQueue = window.__lanNhiNotificationQueue.slice(-5);
+  }
 }
 
 async function copyTextToClipboard(text) {
@@ -3962,7 +4108,8 @@ function resetDefaults() {
   els.unitType.value = "Studio";
   els.area.value = "29.70";
   els.constructionArea.value = "";
-  els.quoteDate.value = "2026-07-08";
+  quoteDateIsAutomatic = true;
+  els.quoteDate.value = todayIsoDate();
   els.listedGross.value = "1,671,152,684";
   syncBaseFromGross();
   els.bankGuarantee.checked = true;
@@ -3999,6 +4146,7 @@ function applyAppUrlParams() {
 
 els.pricingForm.querySelectorAll("input:not([data-unit-filter]), select:not([data-unit-filter])").forEach((input) => {
   input.addEventListener("input", () => {
+    if (input === els.quoteDate) quoteDateIsAutomatic = !input.value;
     if (input === els.unitCode) {
       const matchedUnit = applyUnitCatalog();
       if (!matchedUnit) return;
@@ -4016,6 +4164,7 @@ els.pricingForm.querySelectorAll("input:not([data-unit-filter]), select:not([dat
     render();
   });
   input.addEventListener("change", () => {
+    if (input === els.quoteDate) quoteDateIsAutomatic = !input.value;
     if (input === els.unitCode) {
       const matchedUnit = applyUnitCatalog();
       if (!matchedUnit) return;
@@ -4238,7 +4387,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=87", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=89", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
@@ -4269,6 +4418,7 @@ if (!document.body.classList.contains("auth-locked") && !document.querySelector(
 }
 startInventoryMonitoring();
 applyAppUrlParams();
+syncAutomaticQuoteDate();
 syncBaseFromGross();
 document.querySelectorAll("[data-money-input]").forEach(formatMoneyInput);
 renderFinder();
