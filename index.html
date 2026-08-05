@@ -33,8 +33,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=117">
   <link rel="stylesheet" href="feng-shui.css?v=8">
-  <link rel="stylesheet" href="advisory-links.css?v=8">
-  <link rel="stylesheet" href="mid-autumn-theme.css?v=8">
+  <link rel="stylesheet" href="advisory-links.css?v=12">
+  <link rel="stylesheet" href="mid-autumn-theme.css?v=17">
+  <link rel="stylesheet" href="pet/pet.css?v=13">
 </head>
 <body class="auth-locked">
   <div id="midAutumnDecor" class="mid-autumn-decor" aria-hidden="true" data-html2canvas-ignore="true" hidden>
@@ -63,6 +64,21 @@
     <svg class="mid-autumn-rabbit" viewBox="0 0 100 130" focusable="false">
       <ellipse cx="37" cy="29" rx="12" ry="31" fill="#fff7e8" stroke="#f5c451" stroke-width="2"/><ellipse cx="63" cy="27" rx="12" ry="31" fill="#fff7e8" stroke="#f5c451" stroke-width="2"/><path d="M37 9v34M63 7v34" stroke="#f3b9ad" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="65" r="30" fill="#fff7e8" stroke="#f5c451" stroke-width="2"/><ellipse cx="49" cy="108" rx="35" ry="23" fill="#fff7e8" stroke="#f5c451" stroke-width="2"/><circle cx="39" cy="61" r="3.5" fill="#5f0614"/><circle cx="61" cy="61" r="3.5" fill="#5f0614"/><path d="m47 70 3 3 3-3M50 73v5" fill="none" stroke="#b51b31" stroke-width="2" stroke-linecap="round"/><circle cx="28" cy="72" r="5" fill="#f3b9ad" opacity=".65"/><circle cx="72" cy="72" r="5" fill="#f3b9ad" opacity=".65"/><circle cx="78" cy="104" r="14" fill="#f5c451" stroke="#8b0f23" stroke-width="2"/><path d="M70 104h16M78 96v16" stroke="#8b0f23" stroke-width="2"/>
     </svg>
+    <svg class="mid-autumn-chang-e" viewBox="0 0 220 360" focusable="false">
+      <title>Chị Hằng</title>
+      <circle cx="110" cy="60" r="21" fill="currentColor"/>
+      <path d="M84 73c10 17 19 25 26 25s16-8 26-25c25 10 36 31 35 54 18-3 34-14 47-31-6 31-25 52-59 61l-8 68c6 45 22 84 48 118-38-10-68-34-89-72-21 38-51 62-89 72 26-34 42-73 48-118l-8-68c-34-9-53-30-59-61 13 17 29 28 47 31-1-23 10-44 35-54Z" fill="currentColor"/>
+      <path d="M77 46c6-24 24-38 47-34 17 3 28 16 31 35-13-11-25-15-38-13-13 2-26 6-40 12Z" fill="currentColor" opacity=".72"/>
+      <path d="M43 160c42 18 92 18 134 0M61 230c33 13 65 13 98 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+    </svg>
+    <svg class="mid-autumn-cuoi" viewBox="0 0 320 330" focusable="false">
+      <title>Chú Cuội dưới gốc đa</title>
+      <path d="M113 315c18-66 22-126 13-180-7-38 2-73 27-107 4 46 14 77 31 94 20 20 26 51 18 94-7 39-4 72 8 99Z" fill="currentColor" opacity=".82"/>
+      <path d="M144 91C101 50 55 48 8 85c46-4 79 4 98 24-45-8-78 2-99 30 43-11 79-8 108 11M172 96c35-51 81-67 138-48-43 12-73 31-88 58 39-19 72-19 99 0-40 1-74 14-102 38" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+      <circle cx="90" cy="222" r="17" fill="currentColor"/>
+      <path d="M83 239c-19 17-26 42-20 74h48c3-23-1-43-12-59l30 19 10-14-36-31Z" fill="currentColor"/>
+      <path d="M64 313 43 329M110 313l22 16" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+    </svg>
   </div>
   <aside class="auth-drawer" id="authGate" aria-label="Quản lý đăng nhập">
     <div class="auth-card">
@@ -78,6 +94,7 @@
           <li>Lọc, so sánh căn theo tòa, loại căn, tầng, view và giá.</li>
           <li>Lưu lịch sử 10 căn đã tra gần nhất để mở lại nhanh.</li>
           <li>Xuất file ảnh/PDF báo giá nhanh.</li>
+          <li>Tạo link báo giá riêng từng khách, cá nhân hóa nội dung và không để lộ bảng hàng.</li>
           <li>Tạo biểu đồ biến động giá theo từng tháng khi chiết khấu thay đổi.</li>
           <li>Tạo ảnh chỉ căn và ghi giá tiền Chung Cư (LK đang update).</li>
           <li>Sao chép nhanh link vị trí dự án, tiến độ Park Residence, CSBH, Bảng Hàng...</li>
@@ -116,7 +133,7 @@
 
         <button class="menu-3d-button advisory-links-menu-button" id="advisoryLinksOpenBtn" data-auth-menu type="button" hidden>
           <span class="menu-3d-icon" aria-hidden="true">&#128279;</span>
-          <span>Link &#273;&#227; g&#7917;i kh&#225;ch</span>
+          <span>Link b&#225;o gi&#225; ri&#234;ng t&#7915;ng kh&#225;ch</span>
         </button>
 
         <a class="model-home-link menu-3d-button" id="modelHomeSection" data-auth-menu hidden href="https://drive.google.com/drive/folders/11zfFpF3DPZksh8a5A3my-rQjCDn1I9AO" target="_blank" rel="noopener noreferrer" aria-label="Mở ảnh nhà mẫu trong cửa sổ mới">
@@ -428,7 +445,7 @@
         </label>
         <label>
           Ng&#224;y b&#225;o gi&#225;
-          <input id="quoteDate" type="date" value="2026-07-08">
+          <input id="quoteDate" type="date">
         </label>
       </div>
 
@@ -724,15 +741,16 @@
   <div class="toast" id="toast" role="status"></div>
   <div class="print-area" id="pdfPrintArea" aria-hidden="true"></div>
   <script src="/unit-image-data.js?v=1"></script>
-  <script src="lowrise-unit-coordinates.js?v=4"></script>
-  <script src="app.js?v=115"></script>
+  <script src="lowrise-unit-coordinates.js?v=5"></script>
+  <script src="app.js?v=123"></script>
   <script src="ui-unit-lookup.js?v=1"></script>
   <script type="module" src="firebase-auth.js?v=86"></script>
-  <script type="module" src="advisory-links.js?v=19"></script>
+  <script type="module" src="advisory-links.js?v=28"></script>
   <script src="ui-admin-search.js?v=1"></script>
   <script src="ui-menu.js?v=4"></script>
   <script src="ui-payment.js?v=1"></script>
   <script src="ui-theme.js?v=6"></script>
   <script src="feng-shui.js?v=3"></script>
+  <script src="pet/pet.js?v=6"></script>
 </body>
 </html>
