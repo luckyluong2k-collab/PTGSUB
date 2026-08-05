@@ -250,6 +250,7 @@
     landUseRightUnitPrice: 12689776.73,
     maintenanceRate: 0.005,
     ttsJuly: { tts95: 0.20, tts70: 0.14, tts50: 0.115 },
+    ttsStepStartDate: "2026-08-25",
     scenarioLabels: { tts95: "TTS 100%" },
     lowRiseTts100Schedule: true,
     standardSchedule: {
@@ -1965,18 +1966,20 @@ function applyUnitCatalog() {
   return true;
 }
 
-function discountStepFromJuly2026(dateText) {
+function discountStepFromJuly2026(dateText, stepStartDateText = "2026-07-25") {
   const d = dateFromText(dateText || "2026-07-01");
   if (Number.isNaN(d.getTime())) return 0;
-  const monthOffset = (d.getFullYear() - 2026) * 12 + (d.getMonth() - 6);
-  const step = monthOffset + (d.getDate() >= 25 ? 1 : 0);
-  return step;
+  const firstStepDate = dateFromText(stepStartDateText);
+  if (Number.isNaN(firstStepDate.getTime())) return 0;
+  const monthOffset = (d.getFullYear() - firstStepDate.getFullYear()) * 12 + (d.getMonth() - firstStepDate.getMonth());
+  const step = monthOffset + (d.getDate() >= firstStepDate.getDate() ? 1 : 0);
+  return Math.max(0, step);
 }
 
 function rollingTtsRate(policy, scenario, dateText) {
   if (!["tts50", "tts70", "tts95"].includes(scenario)) return 0;
   const base = policy.ttsJuly[scenario] || 0;
-  const steps = discountStepFromJuly2026(dateText);
+  const steps = discountStepFromJuly2026(dateText, policy.ttsStepStartDate);
   return Math.max(0, base - steps * 0.005);
 }
 
