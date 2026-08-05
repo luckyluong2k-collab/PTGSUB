@@ -1,4 +1,4 @@
-name: Deploy PTGSUB to Firebase Hosting
+name: Apply August low-rise discount update
 
 on:
   workflow_dispatch:
@@ -6,33 +6,63 @@ on:
     branches:
       - main
     paths:
-      - "app.js"
-      - "ui-unit-lookup.js"
-      - "service-worker.js"
-      - "styles.css"
-      - "feng-shui.css"
-      - "feng-shui.js"
-      - "firebase-index.html"
-      - "firebase-auth.js"
-      - "unit-data.js"
-      - "lowrise-map-sharp.jpg"
       - ".github/workflows/firebase-hosting-deploy.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  deploy:
+  patch-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+
+      - name: Patch only the low-rise August TTS discounts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("app.js")
+          data = path.read_bytes()
+          old = b'    ttsJuly: { tts95: 0.21, tts70: 0.145, tts50: 0.12 },'
+          new = b'    ttsJuly: { tts95: 0.20, tts70: 0.14, tts50: 0.115 },'
+
+          if data.count(old) != 1:
+              raise SystemExit(f"Expected exactly one target line, found {data.count(old)}")
+
+          updated = data.replace(old, new, 1)
+          path.write_bytes(updated)
+          PY
+
+      - name: Restore the original deploy workflow
+        shell: bash
+        run: |
+          git show HEAD^:.github/workflows/firebase-hosting-deploy.yml > .github/workflows/firebase-hosting-deploy.yml
+
+      - name: Verify no unrelated source changes
+        shell: bash
+        run: |
+          git diff --check
+          changed="$(git diff --name-only | sort)"
+          expected="$(printf '%s\n%s' '.github/workflows/firebase-hosting-deploy.yml' 'app.js')"
+          test "$changed" = "$expected"
+          git diff --numstat app.js | awk '$1 == 1 && $2 == 1 { ok=1 } END { exit !ok }'
+
+      - name: Commit the single source-line update
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js .github/workflows/firebase-hosting-deploy.yml
+          git commit -m "Update August 2026 low-rise TTS discounts"
+          git push origin main
 
       - name: Prepare Firebase version of index
-        run: |
-          cp firebase-index.html index.html
+        run: cp firebase-index.html index.html
 
       - name: Deploy live hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
