@@ -1,20 +1,19 @@
-# Tour 360° Bất động sản — MVP
+# Tour 360° Sun Urban City
 
-Website tour ảnh cầu 360° dành cho tư vấn căn hộ, chạy bằng HTML/CSS/JavaScript thuần và Pannellum 2.5.7.
+Website tour ảnh cầu 360° chạy độc lập trong thư mục `tour360/`, không thay đổi ứng dụng PTGSUB hiện tại.
 
-## Chức năng đã có
+## Nội dung hiện có
 
-- Xoay, zoom và xem toàn màn hình trên điện thoại / máy tính.
-- Nhiều phòng trong một tour.
-- Hotspot mũi tên để chuyển giữa các phòng.
-- Danh sách phòng, hiệu ứng chuyển cảnh và giao diện thương hiệu.
-- Nút gọi điện và nhắn Zalo cho Đức Lương — 0387 335 227.
-- `editor.html` hỗ trợ lấy tọa độ `pitch` và `yaw` để đặt hotspot.
-- Không cần build, có thể triển khai lên Firebase Hosting, GitHub Pages, Netlify hoặc Cloudflare Pages.
+- 14 ảnh panorama DJI toàn cảnh dự án.
+- Ảnh nguồn: 12.000 × 6.000 px, chuẩn equirectangular 2:1.
+- Ảnh dùng trên web: 8.192 × 4.096 px, JPEG progressive, tối ưu để cân bằng độ nét và tốc độ tải.
+- Danh sách 14 điểm nhìn: khu thấp tầng, trục đường, hồ cảnh quan, khu thể thao, khu cao tầng, công viên nước và các khu vực đang phát triển.
+- CTA gọi điện và Zalo: 0387 335 227.
+- Giao diện responsive cho điện thoại và máy tính.
 
 ## Chạy thử trên máy
 
-Không nên mở trực tiếp bằng `file://`. Trong thư mục này, chạy một web server tĩnh:
+Không mở trực tiếp bằng `file://` vì trình duyệt có thể chặn tài nguyên. Tại thư mục gốc repo, chạy:
 
 ```bash
 python -m http.server 8080
@@ -22,51 +21,49 @@ python -m http.server 8080
 
 Sau đó mở:
 
-- Tour: `http://localhost:8080`
-- Hotspot editor: `http://localhost:8080/editor.html`
-
-## Thay ảnh chụp từ Insta360
-
-1. Trong Insta360 Studio hoặc ứng dụng Insta360, xuất ảnh đã stitch dạng JPG equirectangular tỷ lệ 2:1.
-2. Tạo thư mục `assets/panos` và chép ảnh vào đó.
-3. Mở `tour-config.js` và thay URL demo:
-
-```js
-panorama: "./assets/panos/phong-khach.jpg"
+```text
+http://localhost:8080/tour360/
 ```
 
-4. Mở `editor.html`, tải ảnh lên và xoay đến cửa / lối đi.
-5. Bấm **Lấy tọa độ hiện tại**, nhập scene đích rồi tạo cấu hình.
-6. Dán object nhận được vào mảng `hotSpots` của phòng tương ứng.
+## Cấu trúc chính
 
-## Thêm một phòng
-
-Trong `tour-config.js`, thêm scene mới vào `scenes`:
-
-```js
-kitchen: {
-  title: "Khu bếp",
-  subtitle: "Bếp liên thông phòng khách",
-  icon: "🍳",
-  panorama: "./assets/panos/khu-bep.jpg",
-  pitch: 0,
-  yaw: 0,
-  hfov: 105,
-  hotSpots: []
-}
+```text
+tour360/
+├── index.html
+├── styles.css
+├── app.js
+├── tour-config.js
+├── editor.html
+├── drive-manifest.json
+├── scripts/
+│   └── import_drive_panos.py
+└── assets/
+    └── panos/
+        ├── scene-01.jpg
+        ├── ...
+        └── scene-14.jpg
 ```
 
-## Triển khai độc lập lên Firebase
+## Thay đổi tên và mô tả điểm nhìn
 
-Tạo một project Firebase hoặc Hosting site riêng, sau đó chạy:
+Sửa các trường `title` và `subtitle` trong `tour-config.js`. Không cần đổi tên file ảnh.
 
-```bash
-firebase init hosting
-firebase deploy --only hosting
-```
+## Nhập lại ảnh từ Google Drive
 
-Chọn thư mục public là thư mục `tour360` này và không ghi đè `index.html`.
+Workflow `.github/workflows/import-tour360-panoramas.yml` tự động:
 
-## Lưu ý hình ảnh
+1. Đọc danh sách file trong `drive-manifest.json`.
+2. Tải ảnh từ Google Drive.
+3. Kiểm tra tỷ lệ 2:1.
+4. Tối ưu về 8192 × 4096 px.
+5. Commit ảnh vào `assets/panos/`.
 
-Các URL ảnh trong `tour-config.js` chỉ là ảnh demo công khai từ website chính thức của Pannellum. Trước khi gửi khách, phải thay toàn bộ bằng ảnh 360° do anh sở hữu hoặc được chủ đầu tư cho phép sử dụng.
+Khi thay ảnh trên Drive hoặc đổi file ID, cập nhật `drive-manifest.json` rồi chạy workflow.
+
+## Hotspot
+
+`editor.html` hỗ trợ mở ảnh 360 và lấy tọa độ `pitch` / `yaw`. Sau khi xác định đúng quan hệ không gian giữa các điểm bay, có thể thêm hotspot chuyển cảnh trong `tour-config.js`.
+
+## Triển khai
+
+Có thể triển khai thư mục `tour360/` bằng Firebase Hosting, GitHub Pages, Cloudflare Pages hoặc bất kỳ static hosting nào. Với Firebase hiện tại, cần cấu hình route/public directory trước khi merge và deploy để không ảnh hưởng PTGSUB đang chạy.
