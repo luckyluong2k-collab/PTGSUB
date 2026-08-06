@@ -1,0 +1,117 @@
+name: Deploy Tour 360 to vhome Firebase Hosting
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "tour360/**"
+      - ".github/workflows/firebase-vhome-deploy.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-vhome-live
+  cancel-in-progress: true
+
+jobs:
+  deploy-vhome:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Authenticate Firebase
+        shell: bash
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PTG_SUB }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_PTG_SUB secret."
+            exit 1
+          fi
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Create vhome Hosting site when needed
+        shell: bash
+        run: |
+          firebase hosting:sites:list --project ptg-sub --json > "$RUNNER_TEMP/firebase-sites.json"
+          if jq -e '.result.sites[]? | select((.name // "") | endswith("/sites/vhome"))' "$RUNNER_TEMP/firebase-sites.json" >/dev/null; then
+            echo "Firebase Hosting site vhome already exists in project ptg-sub."
+          else
+            firebase hosting:sites:create vhome --project ptg-sub --non-interactive
+          fi
+
+      - name: Prepare standalone Tour 360 release
+        shell: bash
+        run: |
+          rm -rf .firebase-vhome
+          mkdir -p .firebase-vhome
+          cp -R tour360/. .firebase-vhome/
+          rm -rf .firebase-vhome/scripts
+          rm -f .firebase-vhome/drive-manifest.json
+          cat > firebase.vhome.json <<'JSON'
+          {
+            "hosting": {
+              "site": "vhome",
+              "public": ".firebase-vhome",
+              "ignore": [
+                "firebase.vhome.json",
+                "**/.*",
+                "**/node_modules/**"
+              ],
+              "headers": [
+                {
+                  "source": "**/*.@(jpg|jpeg|png|webp)",
+                  "headers": [
+                    {
+                      "key": "Cache-Control",
+                      "value": "public,max-age=31536000,immutable"
+                    }
+                  ]
+                },
+                {
+                  "source": "**/*.@(html|js|css)",
+                  "headers": [
+                    {
+                      "key": "Cache-Control",
+                      "value": "public,max-age=300"
+                    }
+                  ]
+                }
+              ],
+              "cleanUrls": true,
+              "trailingSlash": false
+            }
+          }
+          JSON
+
+      - name: Deploy vhome.web.app
+        run: firebase deploy --only hosting --config firebase.vhome.json --project ptg-sub --non-interactive
+
+      - name: Verify deployment
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            status="$(curl -L --silent --output /dev/null --write-out '%{http_code}' https://vhome.web.app/)"
+            echo "Verification attempt $attempt: HTTP $status"
+            if [ "$status" = "200" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "vhome.web.app did not return HTTP 200 after deployment."
+          exit 1
