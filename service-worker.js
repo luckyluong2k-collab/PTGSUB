@@ -1,4 +1,4 @@
-const CACHE_NAME = "park-pricing-v249-lowrise-lk-tts20";
+const CACHE_NAME = "park-pricing-v250-upfront-no-blnh";
 const ASSETS = [
   "./",
   "./index.html",
@@ -16,7 +16,7 @@ const ASSETS = [
   "./pet/pet.js?v=6",
   "./pet/lan-nhi.svg",
   "./lowrise-unit-coordinates.js?v=5",
-  "./app.js?v=123",
+  "./app.js?v=124",
   "./tra-goc-lai-35-nam-tu-ngay-mua.html",
   "./firebase-auth.js?v=86",
   "./loan-auth-guard.js?v=2",

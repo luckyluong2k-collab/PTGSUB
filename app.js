@@ -3995,8 +3995,9 @@ function render() {
   els.summaryBand.style.gridTemplateColumns = isLoan || isTts ? "1fr 1fr" : "1fr";
   els.upfrontPrice.classList.toggle("summary-mini", isTts);
   if (isLoan) {
+    const upfrontResult = els.bankGuarantee.checked ? calculate({ includeGuarantee: false }) : result;
     els.upfrontLabel.textContent = `Trả trước ${percent(result.upfrontRate || 0.25)}`;
-    els.upfrontPrice.textContent = money(result.upfront);
+    els.upfrontPrice.textContent = money(upfrontResult.upfront);
   } else if (isTts) {
     const depositRow = result.schedule[0] || ["Cọc", 0];
     const paymentRow = result.schedule[1] || ["Phải vào", 0];
@@ -4387,7 +4388,7 @@ els.ttsPriceChart.addEventListener("pointerleave", () => {
 function installServiceWorkerUpdates() {
   if (!("serviceWorker" in navigator)) return;
 
-  navigator.serviceWorker.register("service-worker.js?v=90", { updateViaCache: "none" })
+  navigator.serviceWorker.register("service-worker.js?v=91", { updateViaCache: "none" })
     .then((registration) => {
       const activateWaitingWorker = () => {
         registration.waiting?.postMessage({ type: "SKIP_WAITING" });
