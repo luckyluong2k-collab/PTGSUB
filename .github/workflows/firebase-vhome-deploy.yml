@@ -1,4 +1,4 @@
-name: Deploy Tour 360 to vhome Firebase Hosting
+name: Deploy Tour 360 to vhomes-35a1c Firebase Hosting
 
 on:
   workflow_dispatch:
@@ -13,11 +13,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: firebase-vhome-live
+  group: firebase-vhomes-35a1c-live
   cancel-in-progress: true
 
 jobs:
-  deploy-vhome:
+  deploy-vhomes:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -36,40 +36,31 @@ jobs:
       - name: Authenticate Firebase
         shell: bash
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PTG_SUB }}
+          FIREBASE_SERVICE_ACCOUNT_PRIMARY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_VHOMES_35A1C }}
+          FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PTG_SUB }}
         run: |
+          FIREBASE_SERVICE_ACCOUNT="${FIREBASE_SERVICE_ACCOUNT_PRIMARY:-$FIREBASE_SERVICE_ACCOUNT_FALLBACK}"
           if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
-            echo "Missing FIREBASE_SERVICE_ACCOUNT_PTG_SUB secret."
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_VHOMES_35A1C secret."
             exit 1
           fi
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> "$GITHUB_ENV"
 
-      - name: Create vhome Hosting site when needed
-        shell: bash
-        run: |
-          firebase hosting:sites:list --project ptg-sub --json > "$RUNNER_TEMP/firebase-sites.json"
-          if jq -e '.result.sites[]? | select((.name // "") | endswith("/sites/vhome"))' "$RUNNER_TEMP/firebase-sites.json" >/dev/null; then
-            echo "Firebase Hosting site vhome already exists in project ptg-sub."
-          else
-            firebase hosting:sites:create vhome --project ptg-sub --non-interactive
-          fi
-
       - name: Prepare standalone Tour 360 release
         shell: bash
         run: |
-          rm -rf .firebase-vhome
-          mkdir -p .firebase-vhome
-          cp -R tour360/. .firebase-vhome/
-          rm -rf .firebase-vhome/scripts
-          rm -f .firebase-vhome/drive-manifest.json
-          cat > firebase.vhome.json <<'JSON'
+          rm -rf .firebase-vhomes
+          mkdir -p .firebase-vhomes
+          cp -R tour360/. .firebase-vhomes/
+          rm -rf .firebase-vhomes/scripts
+          rm -f .firebase-vhomes/drive-manifest.json
+          cat > firebase.vhomes.json <<'JSON'
           {
             "hosting": {
-              "site": "vhome",
-              "public": ".firebase-vhome",
+              "public": ".firebase-vhomes",
               "ignore": [
-                "firebase.vhome.json",
+                "firebase.vhomes.json",
                 "**/.*",
                 "**/node_modules/**"
               ],
@@ -99,19 +90,19 @@ jobs:
           }
           JSON
 
-      - name: Deploy vhome.web.app
-        run: firebase deploy --only hosting --config firebase.vhome.json --project ptg-sub --non-interactive
+      - name: Deploy vhomes-35a1c.web.app
+        run: firebase deploy --only hosting --config firebase.vhomes.json --project vhomes-35a1c --non-interactive
 
       - name: Verify deployment
         shell: bash
         run: |
           for attempt in 1 2 3 4 5 6; do
-            status="$(curl -L --silent --output /dev/null --write-out '%{http_code}' https://vhome.web.app/)"
+            status="$(curl -L --silent --output /dev/null --write-out '%{http_code}' https://vhomes-35a1c.web.app/)"
             echo "Verification attempt $attempt: HTTP $status"
             if [ "$status" = "200" ]; then
               exit 0
             fi
             sleep 10
           done
-          echo "vhome.web.app did not return HTTP 200 after deployment."
+          echo "vhomes-35a1c.web.app did not return HTTP 200 after deployment."
           exit 1
