@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Công cụ lấy tọa độ hotspot 360°</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css" />
+  <style>
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui;background:#07111e;color:#fff}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:100vh}.viewer{position:relative}#panorama{width:100%;height:100%}
+    .side{padding:20px;overflow:auto;border-left:1px solid #26384d;background:#0c1928}.side h1{font-size:22px;margin-top:0}.side p{color:#b8c5d4;line-height:1.5}
+    label{display:block;font-size:12px;font-weight:700;margin:16px 0 7px}input,textarea,button{width:100%;border-radius:10px;border:1px solid #33485f;padding:11px;background:#101f31;color:#fff}
+    button{cursor:pointer;font-weight:800;background:#e7ba63;color:#142033;border:none;margin-top:10px}.secondary{background:#20344a;color:#fff}.coords{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hint{font-size:12px;padding:10px;border-radius:10px;background:#14263a}.output{min-height:180px;font-family:ui-monospace,monospace;font-size:12px}
+    @media(max-width:800px){.layout{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto}.side{border-left:0;border-top:1px solid #26384d}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <section class="viewer"><div id="panorama"></div></section>
+    <aside class="side">
+      <h1>Hotspot Editor</h1>
+      <p>Tải ảnh JPG 360° tỷ lệ 2:1, xoay tới vị trí cần đặt mũi tên rồi bấm <strong>Lấy tọa độ hiện tại</strong>.</p>
+      <label for="pano-file">Ảnh panorama</label>
+      <input id="pano-file" type="file" accept="image/jpeg,image/png" />
+      <button id="load-demo" class="secondary">Mở ảnh demo</button>
+      <div class="coords">
+        <div><label for="pitch">Pitch</label><input id="pitch" readonly /></div>
+        <div><label for="yaw">Yaw</label><input id="yaw" readonly /></div>
+      </div>
+      <button id="capture">Lấy tọa độ hiện tại</button>
+      <label for="target-scene">Scene đích</label>
+      <input id="target-scene" value="bedroom" />
+      <label for="hotspot-text">Nhãn hotspot</label>
+      <input id="hotspot-text" value="Đi tới phòng ngủ" />
+      <button id="generate">Tạo đoạn cấu hình</button>
+      <label for="output">Cấu hình để dán vào tour-config.js</label>
+      <textarea id="output" class="output" readonly></textarea>
+      <button id="copy" class="secondary">Sao chép</button>
+      <p class="hint">Ảnh được mở cục bộ trong trình duyệt và không tự tải lên máy chủ.</p>
+    </aside>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
+  <script>
+    let viewer;
+    const demo = "https://pannellum.org/images/alma.jpg";
+    const panoramaEl = document.getElementById("panorama");
+    const pitchEl = document.getElementById("pitch");
+    const yawEl = document.getElementById("yaw");
+    function loadPanorama(url){
+      panoramaEl.innerHTML="";
+      viewer=pannellum.viewer("panorama",{type:"equirectangular",panorama:url,autoLoad:true,showControls:true});
+    }
+    loadPanorama(demo);
+    document.getElementById("load-demo").onclick=()=>loadPanorama(demo);
+    document.getElementById("pano-file").onchange=(event)=>{
+      const file=event.target.files[0]; if(!file)return;
+      loadPanorama(URL.createObjectURL(file));
+    };
+    document.getElementById("capture").onclick=()=>{
+      pitchEl.value=viewer.getPitch().toFixed(1);
+      yawEl.value=viewer.getYaw().toFixed(1);
+    };
+    document.getElementById("generate").onclick=()=>{
+      if(!pitchEl.value||!yawEl.value) document.getElementById("capture").click();
+      const item={pitch:Number(pitchEl.value),yaw:Number(yawEl.value),type:"scene",text:document.getElementById("hotspot-text").value,sceneId:document.getElementById("target-scene").value};
+      document.getElementById("output").value=JSON.stringify(item,null,2);
+    };
+    document.getElementById("copy").onclick=async()=>{
+      const output=document.getElementById("output");
+      await navigator.clipboard.writeText(output.value);
+      document.getElementById("copy").textContent="Đã sao chép ✓";
+      setTimeout(()=>document.getElementById("copy").textContent="Sao chép",1200);
+    };
+  </script>
+</body>
+</html>
