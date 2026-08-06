@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Tour căn hộ 360° tương tác - Đức Lương Sun Group" />
+  <title>Tour 360° căn hộ 1BR | Đức Lương</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="tour-shell">
+    <section class="viewer-wrap" aria-label="Không gian căn hộ 360 độ">
+      <div id="panorama"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">DL</div>
+          <div>
+            <strong id="project-name">SUN URBAN CITY</strong>
+            <span id="unit-name">Nhà mẫu căn hộ 1BR</span>
+          </div>
+        </div>
+        <button class="icon-button" id="fullscreen-button" type="button" aria-label="Xem toàn màn hình">⛶</button>
+      </header>
+
+      <aside class="room-panel" aria-label="Danh sách không gian">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">ĐANG XEM</span>
+            <h1 id="scene-title">Phòng khách</h1>
+          </div>
+          <button class="panel-toggle" id="panel-toggle" type="button" aria-label="Thu gọn danh sách phòng">−</button>
+        </div>
+        <div id="scene-list" class="scene-list"></div>
+        <p class="viewer-tip">Kéo để xoay • Cuộn để phóng to • Bấm mũi tên để sang phòng</p>
+      </aside>
+
+      <div class="bottom-actions">
+        <a class="action secondary" id="call-link" href="tel:0387335227">📞 Gọi tư vấn</a>
+        <a class="action primary" id="zalo-link" href="https://zalo.me/0387335227" target="_blank" rel="noopener">💬 Nhắn Zalo</a>
+      </div>
+
+      <div class="loading-screen" id="loading-screen" role="status" aria-live="polite">
+        <div class="spinner"></div>
+        <strong>Đang tải không gian 360°</strong>
+        <span>Vui lòng giữ kết nối mạng ổn định</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
+  <script src="./tour-config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
